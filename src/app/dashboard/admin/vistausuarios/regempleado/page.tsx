@@ -99,7 +99,7 @@ const RegEmpleadoPage = () => {
 
 	// Función para actualizar el estado del formulario cuando se cambia un campo
 	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
 	) => {
 		const { name, value } = e.target;
 
@@ -158,7 +158,7 @@ const RegEmpleadoPage = () => {
 						fechaNacimiento: '',
 						telefono: '',
 						is_active: true,
-						create_for: `${session.nombre}`,
+						create_for: `${session?.user?.nombre}`,
 						update_for: '',
 						password: '',
 						rolId: '',
@@ -509,7 +509,7 @@ const RegEmpleadoPage = () => {
 					</Col>
 					<Col>
 						{/* Botón para volver */}
-						<Link href={`/dashboard/${session.rol}/vistausuarios`}>
+						<Link href={`/dashboard/${session.user.rol}/vistausuarios`}>
 							<Button
 								variant='secondary'
 								style={{
