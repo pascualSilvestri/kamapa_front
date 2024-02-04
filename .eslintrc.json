@@ -1,0 +1,21 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
+	"parserOptions": {
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	},
+	"plugins": ["react"],
+	"rules": {}, // .eslintrc.js
+
+	// ... otras configuraciones ...
+	"extends": ["next", "next/core-web-vitals"],
+	"rules": {
+		// ... otras reglas ...
+		"react/prop-types": "off" // Desactiva la regla react/prop-types
+		// ... otras reglas ...
+	}
+	// ... otras configuraciones ...
+}
