@@ -4,35 +4,6 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { getSession } from 'next-auth/react';
 import { JWT } from 'next-auth/jwt';
 
-interface Rol {
-	id: number;
-	name: string;
-	createdAt: string;
-	updatedAt: string;
-}
-
-interface User {
-	id: number;
-	legajo: string;
-	fecha_ingreso: string;
-	fecha_egreso: string | null;
-	nombre: string;
-	apellido: string;
-	dni: string;
-	cuil: string;
-	fechaNacimiento: string;
-	telefono: string;
-	is_active: boolean;
-	create_for: string;
-	update_for: string;
-	password: string;
-	createdAt: string;
-	updatedAt: string;
-	domicilioId: number;
-	contactoId: number;
-	rolId: number;
-	rol: Rol;
-}
 
 interface Session {
 	user: User;
@@ -83,13 +54,13 @@ const handler = NextAuth({
 	],
 	callbacks: {
 		async session({ session, token }) {
-			// Accede anidando a las propiedades de user
-			session.user = (token.user as any)?.user;
-			session.user.rol = (token.user as any)?.user.rol;
-			console.log(session);
-			console.log(session.user);
-			return Promise.resolve(session);
-		},
+			// Asigna directamente el objeto de usuario desde el token al objeto de sesión
+			if (token.user) {
+			  session.user = token.user as User; // Asigna todo el objeto de usuario a la sesión
+			}
+			
+			return session; // Devuelve el objeto de sesión actualizado
+		  },
 		async jwt(params: { token: JWT; user: User | any } & JWT['jwt']) {
 			const { token, user } = params;
 			if (user) {

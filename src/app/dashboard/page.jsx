@@ -28,7 +28,7 @@ const Dashboard = () => {
 	return (
 		<div className='d-flex justify-content-center align-items-center mt-5'>
 			<Card className='text-center'>
-				<Card.Header>Panel {session.rol.name}</Card.Header>
+				{/* <Card.Header>Panel {session.rol.name}</Card.Header> */}
 				<Card.Body>
 					<Card.Title>
 						Bienvenido, {session.user.nombre} {session.user.apellido}
@@ -39,7 +39,7 @@ const Dashboard = () => {
 					</Card.Text>
 
 					{/* Enlace a la ruta específica según el rol */}
-					<Link href={`/dashboard/${session.rol.name}`}>
+					<Link href={`/dashboard/`}>
 						<Button
 							variant='flat'
 							type='submit'
