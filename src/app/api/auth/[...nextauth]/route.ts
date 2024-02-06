@@ -4,7 +4,6 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { getSession } from 'next-auth/react';
 import { JWT } from 'next-auth/jwt';
 
-
 interface Session {
 	user: User;
 	expires: string;
@@ -56,11 +55,11 @@ const handler = NextAuth({
 		async session({ session, token }) {
 			// Asigna directamente el objeto de usuario desde el token al objeto de sesión
 			if (token.user) {
-			  session.user = token.user as User; // Asigna todo el objeto de usuario a la sesión
+				session.user = token.user as User; // Asigna todo el objeto de usuario a la sesión
 			}
-			
+
 			return session; // Devuelve el objeto de sesión actualizado
-		  },
+		},
 		async jwt(params: { token: JWT; user: User | any } & JWT['jwt']) {
 			const { token, user } = params;
 			if (user) {
