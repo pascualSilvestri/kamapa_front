@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-
 import {
 	Container,
 	Card,
@@ -13,7 +12,7 @@ import {
 } from 'react-bootstrap';
 import Link from 'next/link';
 
-export default function AdminPage() {
+export default function Page() {
 	return (
 		<Container>
 			<Row className='mb-3  justify-content-center'>

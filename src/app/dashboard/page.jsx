@@ -31,11 +31,11 @@ const Dashboard = () => {
 				{/* <Card.Header>Panel {session.rol.name}</Card.Header> */}
 				<Card.Body>
 					<Card.Title>
-						Bienvenido, {session.user.nombre} {session.user.apellido}
+						Bienvenido, {session.user.user.nombre} {session.user.user.apellido}
 					</Card.Title>
 					<Card.Text>
-						<strong>Legajo:</strong> {session.user.legajo} <br />
-						<strong>Teléfono:</strong> {session.user.telefono}
+						<strong>Legajo:</strong> {session.user.user.legajo} <br />
+						<strong>Teléfono:</strong> {session.user.user.telefono}
 					</Card.Text>
 
 					{/* Enlace a la ruta específica según el rol */}

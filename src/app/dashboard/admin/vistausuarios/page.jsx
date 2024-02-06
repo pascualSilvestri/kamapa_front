@@ -5,7 +5,7 @@ import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
-const VistaEmpleadosPage = () => {
+const Page = () => {
 	const [empleados, setEmpleados] = useState([]);
 	const [selectedEmpleado, setSelectedEmpleado] = useState(null);
 	const [showModal, setShowModal] = useState(false);
@@ -161,7 +161,7 @@ const VistaEmpleadosPage = () => {
 				</Col>
 				<Col>
 					{/* Botón para volver */}
-					<Link href={`/dashboard/${session.rol}`}>
+					<Link href={`/dashboard/${session.user.rolId}`}>
 						<Button
 							variant='secondary'
 							style={{
@@ -411,4 +411,4 @@ const VistaEmpleadosPage = () => {
 	);
 };
 
-export default VistaEmpleadosPage;
+export default Page;
