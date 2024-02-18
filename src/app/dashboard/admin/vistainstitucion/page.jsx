@@ -1,4 +1,6 @@
 'use client';
+import { useSession, signOut } from 'next-auth/react';
+
 import { useState, useEffect } from 'react';
 import { Button, Table, Image } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
@@ -78,110 +80,87 @@ const VistaInstitucionPage = () => {
 		setType(ModalType.Delete);
 	};
 
+	const { data: session, status } = useSession();
+
+	// Si el estado de la página está cargando, muestra el componente Loading
+	if (status === 'loading') {
+		
+	}
+
+	// Si no hay sesión, redirige a la página de inicio de sesión
+	if (!session) {
+		window.location.replace('/login');
+		return null;
+	}
+
+	console.log(session)
+
 	return (
 		<div className='p-3'>
-			<Link href='/dashboard/admin/vistainstitucion/reginstitucion'>
-				<Button
-					variant='flat'
-					style={{
-						backgroundColor: 'purple',
-						color: 'white',
-						padding: '0.4rem 1rem',
-						fontSize: '1rem',
-						marginBottom: '1rem',
-						transition: 'all 0.3s ease',
-					}}
-					onMouseEnter={(e) => {
-						e.currentTarget.style.backgroundColor = 'white';
-						e.currentTarget.style.color = 'black';
-					}}
-					onMouseLeave={(e) => {
-						e.currentTarget.style.backgroundColor = 'purple';
-						e.currentTarget.style.color = 'white';
-					}}>
-					Registrar Institucion
-				</Button>
-			</Link>
+            <div className='mb-3 d-flex justify-content-center'>
+                <div className='me-1'>
+                    <Link href={`/dashboard/${session.user.rol.name}`}>
+                        <Button variant='secondary'>Volver</Button>
+                    </Link>
+                </div>
+                <div>
+                    <Link href='/dashboard/admin/vistainstitucion/reginstitucion'>
+                        <Button variant='flat' style={{ backgroundColor: 'purple', color: 'white' }}>
+                            Registrar Institución
+                        </Button>
+                    </Link>
+                </div>
+            </div>
 
-			<Table
-				striped
-				bordered
-				hover>
-				<thead>
-					<tr>
-						<th>Logo</th>
-						<th>CUE</th>
-						<th>Nombre</th>
-					</tr>
-				</thead>
-				<tbody>
-					{Array.isArray(instituciones) && instituciones.length > 0 ? (
-						instituciones.map((institucion) => (
-							<tr key={institucion.id}>
-								{/* Accede a las propiedades del objeto institucion de acuerdo a la estructura */}
-								<td>
-									<Image
-										src={institucion.logo}
-										alt=''
-										width={50}
-										height={50}
-										quality={100}
-										priority={true}
-									/>
-								</td>
-								<td>{institucion && `${institucion.cue}`}</td>
-								<td>{institucion && institucion.nombre}</td>
-								<td>
-									<Button
-										variant='link'
-										onClick={() => handleConsultar(institucion.id)}
-										title='Consultar Institucion'>
-										<BsEye />
-									</Button>
-									<Button
-										variant='link'
-										onClick={() => handleModificar(institucion.id)}
-										title='Modificar Institucion'>
-										<BsPencil />
-									</Button>
-									<Button
-										variant='link'
-										onClick={() => handleEliminar(institucion.id)}
-										title='Eliminar Institucion'>
-										<BsTrash />
-									</Button>
-								</td>
-							</tr>
-						))
-					) : (
-						<tr>
-							<td colSpan='4'>No hay instituciones disponibles</td>
-						</tr>
-					)}
-				</tbody>
-			</Table>
-			<ModalViewInstitucion
-				showModal={showModal}
-				institucion={institucion}
-				setShowModal={setShowModal}
-			/>
-			<ModalUpdateInstitucion
-				showEditModal={showEditModal}
-				setShowEditModal={setShowEditModal}
-				institucion={institucion}
-				id={institucion?.id}
-				setInstitucion={setInstitucion}
-			/>
-			{type && (
-				<Modal2
-					type={type}
-					isActive={activo}
-					setActivo={setActivo}
-					setConfirmar={setConfirmar}
-				/>
-			)}
-		</div>
-	);
+            <Table striped bordered hover responsive>
+                <thead>
+                    <tr>
+                        <th>Logo</th>
+                        <th>CUE</th>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {Array.isArray(instituciones) && instituciones.length > 0 ? (
+                        instituciones.map((institucion) => (
+                            <tr key={institucion.id}>
+                                <td>
+                                    <Image
+                                        src={institucion.logo}
+                                        alt=''
+                                        width={50}
+                                        height={50}
+                                        quality={100}
+                                        priority={true}
+                                    />
+                                </td>
+                                <td>{institucion && `${institucion.cue}`}</td>
+                                <td>{institucion && institucion.nombre}</td>
+                                <td>
+                                    <Button variant='link' onClick={() => handleConsultar(institucion.id)} title='Consultar Institucion'>
+                                        <BsEye />
+                                    </Button>
+                                    <Button variant='link' onClick={() => handleModificar(institucion.id)} title='Modificar Institucion'>
+                                        <BsPencil />
+                                    </Button>
+                                    <Button variant='link' onClick={() => handleEliminar(institucion.id)} title='Eliminar Institucion'>
+                                        <BsTrash />
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan='4'>No hay instituciones disponibles</td>
+                        </tr>
+                    )}
+                </tbody>
+            </Table>
+
+            {/* Tus modales aquí */}
+        </div>
+    );
 };
 
 export default VistaInstitucionPage;

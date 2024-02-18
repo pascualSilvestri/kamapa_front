@@ -1,4 +1,6 @@
 'use client';
+import { useSession, signOut } from 'next-auth/react';
+
 import React from 'react';
 import {
 	Container,
@@ -13,6 +15,23 @@ import {
 import Link from 'next/link';
 
 export default function Page() {
+
+	const { data: session, status } = useSession();
+
+	// Si el estado de la página está cargando, muestra el componente Loading
+	if (status === 'loading') {
+		
+	}
+
+	// Si no hay sesión, redirige a la página de inicio de sesión
+	if (!session) {
+		window.location.replace('/login');
+		return null;
+	}
+
+	console.log(session)
+
+	
 	return (
 		<Container>
 			<Row className='mb-3  justify-content-center'>
@@ -54,7 +73,7 @@ export default function Page() {
 								Gestiona a los usuarios de tu aplicación
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href='/dashboard/admin/vistausuarios'>
+								<Link href={`/dashboard/${session.user.rol.name}/vistausuarios`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -72,7 +91,7 @@ export default function Page() {
 								Administra las Instituciones Registradas
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href='/dashboard/admin/vistainstitucion'>
+							<Link href={`/dashboard/${session.user.rol.name}/vistainstitucion`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -88,7 +107,7 @@ export default function Page() {
 							<CardTitle style={{ textAlign: 'center' }}>Roles</CardTitle>
 							<CardSubtitle>Asignacion de vistas Segun el Rol</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href='/admin/roles'>
+							<Link href={`/dashboard/${session.user.rol.name}`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -106,7 +125,7 @@ export default function Page() {
 								Estadísticas de Usuarios & Instituciones Registrados
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href='/admin/reports'>
+							<Link href={`/dashboard/${session.user.rol.name}`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>

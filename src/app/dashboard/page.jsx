@@ -39,7 +39,7 @@ const Dashboard = () => {
 					</Card.Text>
 
 					{/* Enlace a la ruta específica según el rol */}
-					<Link href={`/dashboard/`}>
+					<Link href={`/dashboard/${session.user.rol.name}`}>
 						<Button
 							variant='flat'
 							type='submit'
