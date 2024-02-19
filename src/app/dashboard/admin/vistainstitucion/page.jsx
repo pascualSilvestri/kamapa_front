@@ -74,10 +74,34 @@ const VistaInstitucionPage = () => {
 	};
 
 	const handleEliminar = async (id) => {
-		// Lógica para manejar la acción de eliminar
-		setId(id);
-		setActivo(true);
-		setType(ModalType.Delete);
+		try {
+			// Envía la solicitud al backend para eliminar el elemento con el ID especificado
+			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`, {
+				method: 'DELETE', // Utiliza el método DELETE para la eliminación
+				headers: {
+					'Content-Type': 'application/json', // Especifica el tipo de contenido
+					// Otras cabeceras si es necesario
+				},
+				// Otros parámetros de configuración de la solicitud si es necesario
+			});
+	
+			// Verifica si la solicitud fue exitosa
+			if (response.ok) {
+				// Actualiza el estado local o realiza otras acciones si es necesario
+				setId(id);
+				setActivo(true);
+				setType(ModalType.Delete);
+				// Puedes realizar otras acciones después de la eliminación si es necesario
+			} else {
+				// Maneja errores si la solicitud no fue exitosa
+				console.error('Error al eliminar el elemento');
+				// Puedes mostrar mensajes de error o realizar otras acciones si es necesario
+			}
+		} catch (error) {
+			// Maneja errores si ocurren durante la solicitud
+			console.error('Error al realizar la solicitud de eliminación:', error);
+			// Puedes mostrar mensajes de error o realizar otras acciones si es necesario
+		}
 	};
 
 	const { data: session, status } = useSession();
@@ -118,7 +142,7 @@ const VistaInstitucionPage = () => {
                 </div>
 				
                 <div>
-                    <Link href={`/dashboard/${session.user.rol.name}/vistainstitucion/reginstitucion`}>
+                    <Link href={`/dashboard/${session.user.rol.name}/reginstitucion`}>
                         <Button variant='flat' style={{
 								backgroundColor: 'purple',
 								color: 'white',
