@@ -52,7 +52,7 @@ function Modal2({type,isActive,setActivo,setConfirmar}) {
     </div>
   ):(
   <div>
-    <h1>Soy modificar </h1>
+    <h1> </h1>
   </div>
   );
 }

@@ -1,5 +1,5 @@
 'use client';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 
 import React from 'react';
 import {
