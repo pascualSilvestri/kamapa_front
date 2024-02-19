@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
 import useFormStatus from './../../../components/useFormStatus';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 
 
 // Define la interfaz para el objeto de provincia
@@ -35,6 +35,8 @@ interface FormData {
 
 // Define el componente del formulario de registro de institución
 const RegInstitucionPage = () => {
+
+
 	// Estados para los datos del formulario, provincias, estado del modal y estado del formulario
 	const [formState, setFormState] = useState<FormData>({
 		institucion: {
@@ -60,6 +62,7 @@ const RegInstitucionPage = () => {
 	const { status, setStatus, resetStatus } = useFormStatus(); // Utiliza el hook para el estado del formulario
 	const [showModal, setShowModal] = useState(false);
 	const [modalMessage, setModalMessage] = useState('');
+	
 
 	// Función para manejar los cambios en los campos del formulario
 	const handleChange = (
@@ -91,9 +94,7 @@ const RegInstitucionPage = () => {
 		});
 	};
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////Codigo modificaco por pascual para subir imagen//////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	const handleFileInputChange = (e) => {
 		const file = e.target.files[0];
 
@@ -216,22 +217,18 @@ const RegInstitucionPage = () => {
 		
 	};
 	
+	const { data: session, status: sessionStatus } = useSession();
 
-	const { data: session } = useSession();
+	console.log(session);
 
-	// Si el estado de la página está cargando, muestra el componente Loading
-	if (status === 'loading') {
-		
+	if (sessionStatus === 'loading') {
+		// Mostrar componente de carga
+	} else if (!session || !session.user || session.user.rol.name !== 'admin') {
+		signIn('login'); // Redireccionar a la página de inicio de sesión si no hay sesión o si el rol no es admin
 	}
 
-	// Si no hay sesión, redirige a la página de inicio de sesión
-	if (!session) {
-		window.location.replace('/login');
-		return null;
-	}
 
-	console.log(session)
-
+	
 
 	// Renderiza el formulario y el modal
 	return (
