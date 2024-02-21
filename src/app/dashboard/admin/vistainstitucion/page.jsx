@@ -60,7 +60,7 @@ const VistaInstitucionPage = () => {
 		setType(ModalType.Edit);
 	};
 
-	//Esto hermano te vas a tener que fijar, el confirmar y el eliminar, porque no anda cono corresponde
+	//Esto hermano te vas a tener que fijar, el confirmar y el eliminar, porque no anda cono corresponde y no me sale
 	useEffect(() => {
 		if (confirmar) {
 			const response = fetch(
@@ -91,9 +91,9 @@ const VistaInstitucionPage = () => {
 			// Verifica si la solicitud fue exitosa
 			if (response.ok) {
 				// Actualiza el estado local o realiza otras acciones si es necesario
+				setType(ModalType.Delete);
 				setId(id);
 				setActivo(true);
-				setType(ModalType.Delete);
 				// Puedes realizar otras acciones después de la eliminación si es necesario
 			} else {
 				// Maneja errores si la solicitud no fue exitosa
@@ -111,7 +111,7 @@ const VistaInstitucionPage = () => {
 
 	// Si el estado de la página está cargando, muestra el componente Loading
 	if (status === 'loading') {
-		
+		// aqui podria ir el loading que por ahora voy a evitar para no tener problemas
 	}
 
 	// Si no hay sesión, redirige a la página de inicio de sesión
