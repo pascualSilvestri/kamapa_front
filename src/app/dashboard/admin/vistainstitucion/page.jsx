@@ -24,20 +24,7 @@ const VistaInstitucionPage = () => {
 		fetchData();
 	}, [institucion, id]);
 
-	useEffect(() => {
-		if (confirmar) {
-			const response = fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`,
-				{
-					method: 'DELETE',
-				},
-			);
-			setConfirmar(false);
-			setActivo(false);
-			fetchData();
-		}
-	}, [confirmar, id]);
-
+	
 	const fetchData = async () => {
 		try {
 			const response = await fetch(
@@ -72,6 +59,22 @@ const VistaInstitucionPage = () => {
 		setShowEditModal(true);
 		setType(ModalType.Edit);
 	};
+
+	//Esto hermano te vas a tener que fijar, el confirmar y el eliminar, porque no anda cono corresponde
+	useEffect(() => {
+		if (confirmar) {
+			const response = fetch(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`,
+				{
+					method: 'DELETE',
+				},
+			);
+			setConfirmar(false);
+			setActivo(false);
+			fetchData();
+		}
+	}, [confirmar, id]);
+
 
 	const handleEliminar = async (id) => {
 		try {
