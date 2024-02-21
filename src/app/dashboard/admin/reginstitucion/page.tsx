@@ -224,10 +224,10 @@ const RegInstitucionPage = () => {
 	const user = session && session.user;
 
 	console.log(session);
-	
+
 	if (sessionStatus === 'loading') {
 		// Mostrar componente de carga
-	} else if (!session || !user || user.rol.name !== 'admin') {
+	} else if (!session || !user || user?.rol?.name !== 'admin') {
 		signIn('login'); // Redireccionar a la página de inicio de sesión si no hay sesión o si el rol no es admin
 	} else {
 		// Renderizar el contenido del componente
