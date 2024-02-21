@@ -59,7 +59,7 @@ const RegInstitucionPage = () => {
 	});
 
 	const [provincias, setProvincias] = useState<Provincia[]>([]);
-	const { status, setStatus, resetStatus } = useFormStatus(); // Utiliza el hook para el estado del formulario
+	// const { status, setStatus, resetStatus } = useFormStatus(); // Utiliza el hook para el estado del formulario
 	const [showModal, setShowModal] = useState(false);
 	const [modalMessage, setModalMessage] = useState('');
 	
@@ -194,21 +194,21 @@ const RegInstitucionPage = () => {
 
 			if (response.ok) {
 				// Si el registro fue exitoso, muestra un mensaje de éxito
-				setStatus('success');
+				// setStatus('success');
 				setModalMessage('Institución registrada con éxito');
 				setShowModal(true);
 				// Limpia el estado del formulario llamando a la función resetForm
-				setFormState(resetForm());
+				// setFormState(resetForm());
 			} else {
 				// Si el registro no fue exitoso, muestra un mensaje de error
-				setStatus('error');
+				// setStatus('error');
 				setModalMessage('Error al registrar la institución');
 				setShowModal(true);
 				console.log('Error al registrar la institución', data);
 			}
 		} catch (error) {
 			// Si hay un error en la solicitud, muestra un mensaje de error
-			setStatus('error');
+			// setStatus('error');
 			setModalMessage('Error al registrar la institución');
 			setShowModal(true);
 			console.error('Error al registrar la institución', error);
