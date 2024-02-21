@@ -19,6 +19,7 @@ export default function Page() {
 
 	const { data: session, status } = useSession();
 	const navigation = redirect();
+	const rolName = session?.user?.rol.name;
 
 	// Si el estado de la página está cargando, muestra el componente Loading
 	if (status === 'loading') {
@@ -75,7 +76,7 @@ export default function Page() {
 								Gestiona a los usuarios de tu aplicación
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-								<Link href={`/dashboard/${session.user.rol.name}/vistausuarios`}>
+								<Link href={`/dashboard/${rolName}/vistausuarios`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -93,7 +94,7 @@ export default function Page() {
 								Administra las Instituciones Registradas
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${session.user.rol.name}/vistainstitucion`}>
+							<Link href={`/dashboard/${rolName}/vistainstitucion`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -109,7 +110,7 @@ export default function Page() {
 							<CardTitle style={{ textAlign: 'center' }}>Roles</CardTitle>
 							<CardSubtitle>Asignacion de vistas Segun el Rol</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${session.user.rol.name}`}>
+							<Link href={`/dashboard/${rolName}`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -127,7 +128,7 @@ export default function Page() {
 								Estadísticas de Usuarios & Instituciones Registrados
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${session.user.rol.name}`}>
+							<Link href={`/dashboard/${rolName}`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>

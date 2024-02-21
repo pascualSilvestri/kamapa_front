@@ -133,7 +133,7 @@ const VistaInstitucionPage = () => {
 		<div className='p-3'>
 			<div className='mb-3 d-flex justify-content-center'>
 				<div className='me-1'>
-					<Link href={`/dashboard/${session.user.rol.name}`}>
+					<Link href={`/dashboard/${session?.user?.rol?.name}`}>
 						<Button variant='secondary' style={{
 							marginRight: '10px',
 							padding: '0.4rem 1rem',
@@ -152,7 +152,7 @@ const VistaInstitucionPage = () => {
 				</div>
 
 				<div>
-					<Link href={`/dashboard/${session.user.rol.name}/reginstitucion`}>
+					<Link href={`/dashboard/${session?.user?.rol?.name}/reginstitucion`}>
 						<Button variant='flat' style={{
 							backgroundColor: 'purple',
 							color: 'white',
