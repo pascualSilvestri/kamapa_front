@@ -9,6 +9,7 @@ import Modal2 from '../../../components/Modal';
 import { ModalType } from '../../../../utils/const';
 import ModalViewInstitucion from '../../../components/ModalViewInstitucion';
 import ModalUpdateInstitucion from '../../../components/ModalUpdateInstitucion';
+import { useRouter } from 'next/router';
 
 const VistaInstitucionPage = () => {
 	const [instituciones, setInstituciones] = useState([]);
@@ -19,10 +20,27 @@ const VistaInstitucionPage = () => {
 	const [type, setType] = useState('');
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
+	const router = useRouter();
 
 	useEffect(() => {
 		fetchData();
 	}, [institucion, id]);
+
+	const { data: session, status } = useSession();
+
+	// Si el estado de la página está cargando, muestra el componente Loading
+	if (status === 'loading') {
+		// aqui podria ir el loading que por ahora voy a evitar para no tener problemas
+	}
+
+	// Si no hay sesión, redirige a la página de inicio de sesión
+	if (!session) {
+		router.push('/login');
+		return null;
+	}
+
+	console.log(session)
+
 
 	
 	const fetchData = async () => {
@@ -109,20 +127,6 @@ const VistaInstitucionPage = () => {
 		}
 	};
 
-	const { data: session, status } = useSession();
-
-	// Si el estado de la página está cargando, muestra el componente Loading
-	if (status === 'loading') {
-		// aqui podria ir el loading que por ahora voy a evitar para no tener problemas
-	}
-
-	// Si no hay sesión, redirige a la página de inicio de sesión
-	if (!session) {
-		window.location.replace('/login');
-		return null;
-	}
-
-	console.log(session)
 
 	return (
 		<div className='p-3'>
