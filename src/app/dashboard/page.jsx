@@ -28,7 +28,7 @@ const Dashboard = () => {
 	return (
 		<div className='d-flex justify-content-center align-items-center mt-5'>
 			<Card className='text-center'>
-				{/* <Card.Header>Panel {session.rol.name}</Card.Header> */}
+				<Card.Header>Panel {session.user.rol.name}</Card.Header>
 				<Card.Body>
 					<Card.Title>
 						Bienvenido, {session.user.user.nombre} {session.user.user.apellido}
