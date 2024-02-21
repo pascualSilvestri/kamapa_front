@@ -1,6 +1,6 @@
 'use client';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { useNavigation } from 'next/navigation';
 
 import React from 'react';
 import {
@@ -18,7 +18,7 @@ import Link from 'next/link';
 export default function Page() {
 
 	const { data: session, status } = useSession();
-	const router = useRouter();
+	const navigation = useNavigation();
 
 	// Si el estado de la página está cargando, muestra el componente Loading
 	if (status === 'loading') {
@@ -27,7 +27,7 @@ export default function Page() {
 
 	// Si no hay sesión, redirige a la página de inicio de sesión
 	if (!session) {
-		router.push('/login');
+		navigation.push('/login')
 		return null;
 	}
 
