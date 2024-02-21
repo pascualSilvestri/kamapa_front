@@ -26,6 +26,21 @@ const VistaInstitucionPage = () => {
 		fetchData();
 	}, [institucion, id]);
 
+	//Esto hermano te vas a tener que fijar, el confirmar y el eliminar, porque no anda cono corresponde y no me sale
+	useEffect(() => {
+		if (confirmar) {
+			const response = fetch(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`,
+				{
+					method: 'DELETE',
+				},
+			);
+			setConfirmar(false);
+			setActivo(false);
+			fetchData();
+		}
+	}, [confirmar, id]);
+
 	const { data: session, status } = useSession();
 
 	// Si el estado de la página está cargando, muestra el componente Loading
@@ -42,7 +57,7 @@ const VistaInstitucionPage = () => {
 	console.log(session)
 
 
-	
+
 	const fetchData = async () => {
 		try {
 			const response = await fetch(
@@ -78,36 +93,21 @@ const VistaInstitucionPage = () => {
 		setType(ModalType.Edit);
 	};
 
-	//Esto hermano te vas a tener que fijar, el confirmar y el eliminar, porque no anda cono corresponde y no me sale
-	useEffect(() => {
-		if (confirmar) {
-			const response = fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`,
-				{
-					method: 'DELETE',
-				},
-			);
-			setConfirmar(false);
-			setActivo(false);
-			fetchData();
-		}
-	}, [confirmar, id]);
-
 
 	const handleEliminar = async (id) => {
 		try {
 			// Envía la solicitud al backend para eliminar el elemento con el ID especificado
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`, 
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`,
 				{
-				method: 'DELETE', // Utiliza el método DELETE para la eliminación
-				headers: {
-					'Content-Type': 'application/json', // Especifica el tipo de contenido
-					// Otras cabeceras si es necesario
-				},
-				// Otros parámetros de configuración de la solicitud si es necesario
-			});
-	
+					method: 'DELETE', // Utiliza el método DELETE para la eliminación
+					headers: {
+						'Content-Type': 'application/json', // Especifica el tipo de contenido
+						// Otras cabeceras si es necesario
+					},
+					// Otros parámetros de configuración de la solicitud si es necesario
+				});
+
 			// Verifica si la solicitud fue exitosa
 			if (response.ok) {
 				// Actualiza el estado local o realiza otras acciones si es necesario
@@ -130,15 +130,15 @@ const VistaInstitucionPage = () => {
 
 	return (
 		<div className='p-3'>
-            <div className='mb-3 d-flex justify-content-center'>
-                <div className='me-1'>
-                    <Link href={`/dashboard/${session.user.rol.name}`}>
-                        <Button variant='secondary' style={{
-								marginRight: '10px',
-								padding: '0.4rem 1rem',
-								fontSize: '1rem',
-								transition: 'all 0.3s ease',
-							}}
+			<div className='mb-3 d-flex justify-content-center'>
+				<div className='me-1'>
+					<Link href={`/dashboard/${session.user.rol.name}`}>
+						<Button variant='secondary' style={{
+							marginRight: '10px',
+							padding: '0.4rem 1rem',
+							fontSize: '1rem',
+							transition: 'all 0.3s ease',
+						}}
 							onMouseEnter={(e) => {
 								e.currentTarget.style.backgroundColor = 'white';
 								e.currentTarget.style.color = 'black';
@@ -147,18 +147,18 @@ const VistaInstitucionPage = () => {
 								e.currentTarget.style.backgroundColor = 'grey';
 								e.currentTarget.style.color = 'white';
 							}}>Volver</Button>
-                    </Link>
-                </div>
-				
-                <div>
-                    <Link href={`/dashboard/${session.user.rol.name}/reginstitucion`}>
-                        <Button variant='flat' style={{
-								backgroundColor: 'purple',
-								color: 'white',
-								padding: '0.4rem 1rem',
-								fontSize: '1rem',
-								transition: 'all 0.3s ease',
-							}}
+					</Link>
+				</div>
+
+				<div>
+					<Link href={`/dashboard/${session.user.rol.name}/reginstitucion`}>
+						<Button variant='flat' style={{
+							backgroundColor: 'purple',
+							color: 'white',
+							padding: '0.4rem 1rem',
+							fontSize: '1rem',
+							transition: 'all 0.3s ease',
+						}}
 							onMouseEnter={(e) => {
 								e.currentTarget.style.backgroundColor = 'white';
 								e.currentTarget.style.color = 'black';
@@ -167,59 +167,59 @@ const VistaInstitucionPage = () => {
 								e.currentTarget.style.backgroundColor = 'purple';
 								e.currentTarget.style.color = 'white';
 							}}>
-                            Registrar Institución
-                        </Button>
-                    </Link>
-                </div>
-            </div>
+							Registrar Institución
+						</Button>
+					</Link>
+				</div>
+			</div>
 
-            <Table striped bordered hover responsive>
-                <thead>
-                    <tr>
-                        <th>Logo</th>
-                        <th>CUE</th>
-                        <th>Nombre</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Array.isArray(instituciones) && instituciones.length > 0 ? (
-                        instituciones.map((institucion) => (
-                            <tr key={institucion.id}>
-                                <td>
-                                    <Image
-                                        src={institucion.logo}
-                                        alt=''
-                                        width={50}
-                                        height={50}
-                                        quality={100}
-                                        priority={true}
-                                    />
-                                </td>
-                                <td>{institucion && `${institucion.cue}`}</td>
-                                <td>{institucion && institucion.nombre}</td>
-                                <td>
-                                    <Button variant='link' onClick={() => handleConsultar(institucion.id)} title='Consultar Institucion'>
-                                        <BsEye />
-                                    </Button>
-                                    <Button variant='link' onClick={() => handleModificar(institucion.id)} title='Modificar Institucion'>
-                                        <BsPencil />
-                                    </Button>
-                                    <Button variant='link' onClick={() => handleEliminar(institucion.id)} title='Eliminar Institucion'>
-                                        <BsTrash />
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan='4'>No hay instituciones disponibles</td>
-                        </tr>
-                    )}
-                </tbody>
-            </Table>
+			<Table striped bordered hover responsive>
+				<thead>
+					<tr>
+						<th>Logo</th>
+						<th>CUE</th>
+						<th>Nombre</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					{Array.isArray(instituciones) && instituciones.length > 0 ? (
+						instituciones.map((institucion) => (
+							<tr key={institucion.id}>
+								<td>
+									<Image
+										src={institucion.logo}
+										alt=''
+										width={50}
+										height={50}
+										quality={100}
+										priority={true}
+									/>
+								</td>
+								<td>{institucion && `${institucion.cue}`}</td>
+								<td>{institucion && institucion.nombre}</td>
+								<td>
+									<Button variant='link' onClick={() => handleConsultar(institucion.id)} title='Consultar Institucion'>
+										<BsEye />
+									</Button>
+									<Button variant='link' onClick={() => handleModificar(institucion.id)} title='Modificar Institucion'>
+										<BsPencil />
+									</Button>
+									<Button variant='link' onClick={() => handleEliminar(institucion.id)} title='Eliminar Institucion'>
+										<BsTrash />
+									</Button>
+								</td>
+							</tr>
+						))
+					) : (
+						<tr>
+							<td colSpan='4'>No hay instituciones disponibles</td>
+						</tr>
+					)}
+				</tbody>
+			</Table>
 
-            <ModalViewInstitucion
+			<ModalViewInstitucion
 				showModal={showModal}
 				institucion={institucion}
 				setShowModal={setShowModal}
@@ -239,9 +239,9 @@ const VistaInstitucionPage = () => {
 					setConfirmar={setConfirmar}
 				/>
 			)}
-        </div>
-		
-    );
+		</div>
+
+	);
 };
 
 export default VistaInstitucionPage;
