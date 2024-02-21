@@ -21,20 +21,21 @@ export default function Page() {
 	const navigation = redirect();
 	const rolName = session?.user?.rol.name;
 
-	// Si el estado de la página está cargando, muestra el componente Loading
-	if (status === 'loading') {
-		
-	}
-
 	// Si no hay sesión, redirige a la página de inicio de sesión
 	if (!session) {
 		navigation('/login')
-		return null;
 	}
+
+
+	// Si el estado de la página está cargando, muestra el componente Loading
+	if (status === 'loading') {
+
+	}
+
 
 	console.log(session)
 
-	
+
 	return (
 		<Container>
 			<Row className='mb-3  justify-content-center'>
@@ -76,7 +77,7 @@ export default function Page() {
 								Gestiona a los usuarios de tu aplicación
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-								<Link href={`/dashboard/${rolName}/vistausuarios`}>
+							<Link href={`/dashboard/${rolName}/vistausuarios`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>

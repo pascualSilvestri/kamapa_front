@@ -9,16 +9,18 @@ const Dashboard = () => {
 	const { data: session, status } = useSession();
 	const navigation = redirect();
 
+
+
+
+	// Si no hay sesión, redirige a la página de inicio de sesión
+	if (!session) {
+		navigation('/login')
+	}
 	// Si el estado de la página está cargando, muestra el componente Loading
 	if (status === 'loading') {
 		return <Loading />;
 	}
 
-	// Si no hay sesión, redirige a la página de inicio de sesión
-	if (!session) {
-		navigation('/login')
-		return null;
-	}
 	console.log(session);
 
 	// // Función para cerrar sesión
