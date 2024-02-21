@@ -79,7 +79,9 @@ const VistaInstitucionPage = () => {
 	const handleEliminar = async (id) => {
 		try {
 			// Envía la solicitud al backend para eliminar el elemento con el ID especificado
-			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`, {
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`, 
+				{
 				method: 'DELETE', // Utiliza el método DELETE para la eliminación
 				headers: {
 					'Content-Type': 'application/json', // Especifica el tipo de contenido
