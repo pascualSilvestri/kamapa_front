@@ -36,6 +36,14 @@ interface FormData {
 // Define el componente del formulario de registro de institución
 const RegInstitucionPage = () => {
 
+	const [provincias, setProvincias] = useState<Provincia[]>([]);
+	// const { status, setStatus, resetStatus } = useFormStatus(); // Utiliza el hook para el estado del formulario
+	const [showModal, setShowModal] = useState(false);
+	const [modalMessage, setModalMessage] = useState('');
+	const { data: session, status: sessionStatus } = useSession();
+
+	
+
 
 	// Estados para los datos del formulario, provincias, estado del modal y estado del formulario
 	const [formState, setFormState] = useState<FormData>({
@@ -58,11 +66,7 @@ const RegInstitucionPage = () => {
 		},
 	});
 
-	const [provincias, setProvincias] = useState<Provincia[]>([]);
-	// const { status, setStatus, resetStatus } = useFormStatus(); // Utiliza el hook para el estado del formulario
-	const [showModal, setShowModal] = useState(false);
-	const [modalMessage, setModalMessage] = useState('');
-	
+
 
 	// Función para manejar los cambios en los campos del formulario
 	const handleChange = (
@@ -217,18 +221,17 @@ const RegInstitucionPage = () => {
 		
 	};
 	
-	const { data: session, status: sessionStatus } = useSession();
+	const user = session && session.user;
 
 	console.log(session);
-
+	
 	if (sessionStatus === 'loading') {
 		// Mostrar componente de carga
-	} else if (!session || !session.user || session.user.rol.name !== 'admin') {
+	} else if (!session || !user || user.rol.name !== 'admin') {
 		signIn('login'); // Redireccionar a la página de inicio de sesión si no hay sesión o si el rol no es admin
+	} else {
+		// Renderizar el contenido del componente
 	}
-
-
-	
 
 	// Renderiza el formulario y el modal
 	return (
