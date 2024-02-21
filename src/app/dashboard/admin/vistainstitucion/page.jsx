@@ -9,7 +9,7 @@ import Modal2 from '../../../components/Modal';
 import { ModalType } from '../../../../utils/const';
 import ModalViewInstitucion from '../../../components/ModalViewInstitucion';
 import ModalUpdateInstitucion from '../../../components/ModalUpdateInstitucion';
-import { useNavigation } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 const VistaInstitucionPage = () => {
 	const [instituciones, setInstituciones] = useState([]);
@@ -20,7 +20,7 @@ const VistaInstitucionPage = () => {
 	const [type, setType] = useState('');
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
-	const navigation = useNavigation();
+	const navigation = redirect();
 
 	useEffect(() => {
 		fetchData();
@@ -51,7 +51,7 @@ const VistaInstitucionPage = () => {
 	// Si no hay sesión, redirige a la página de inicio de sesión
 	if (!session) {
 		
-		navigation.push('/login')
+		navigation('/login')
 		return null;
 	}
 
