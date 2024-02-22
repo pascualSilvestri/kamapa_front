@@ -75,14 +75,6 @@ const VistaInstitucionPage = () => {
 	}, [confirmar, id]);
 
 
-
-
-	// Si no hay sesión, redirige a la página de inicio de sesión
-
-	console.log(session)
-
-
-
 	const fetchData = async () => {
 		try {
 			const response = await fetch(
