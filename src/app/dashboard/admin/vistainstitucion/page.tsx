@@ -39,11 +39,8 @@ const VistaInstitucionPage = () => {
 
 
 	useEffect(() => {
-		if (!session) {
-			router.push('/login')
-		}
 
-		if (session && session.user) {
+		if (session) {
 			setUser({
 				nombre: session.user.nombre,
 				apellido: session.user.apellido,
@@ -52,8 +49,9 @@ const VistaInstitucionPage = () => {
 			});
 			setRol(session.user.rol);
 		}
+	}
+	, [session]);
 
-	}, [session]);
 
 	useEffect(() => {
 		fetchData();
