@@ -13,7 +13,14 @@ const VistaEmpleadosPage = () => {
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
+	const [rol, setRol] = useState({ name: '', id: 0 });
 	const { user } = useUserContext();
+
+	useEffect(() =>{
+		if(user){
+			setRol(user.rol);
+		}
+	},[])
 
 	useEffect(() => {
 		const fetchData = async () => {
