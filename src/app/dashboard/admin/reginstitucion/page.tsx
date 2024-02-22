@@ -41,10 +41,6 @@ const RegInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [modalMessage, setModalMessage] = useState('');
 	const { data: session, status: sessionStatus } = useSession();
-
-	
-
-
 	// Estados para los datos del formulario, provincias, estado del modal y estado del formulario
 	const [formState, setFormState] = useState<FormData>({
 		institucion: {
@@ -67,6 +63,31 @@ const RegInstitucionPage = () => {
 	});
 
 
+
+	
+	// Carga las provincias desde la API al cargar el componente
+	useEffect(() => {
+		const fetchProvincias = async () => {
+			try {
+				const response = await fetch(
+					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/provincia`,
+				);
+				if (response.ok) {
+					const data = await response.json();
+					setProvincias(data);
+				} else {
+					console.error('Error al cargar las provincias');
+				}
+			} catch (error) {
+				console.error('Error al cargar las provincias:', error);
+			}
+		};
+
+		fetchProvincias();
+	}, []);
+
+
+	
 
 	// Función para manejar los cambios en los campos del formulario
 	const handleChange = (
@@ -116,26 +137,6 @@ const RegInstitucionPage = () => {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// Carga las provincias desde la API al cargar el componente
-	useEffect(() => {
-		const fetchProvincias = async () => {
-			try {
-				const response = await fetch(
-					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/provincia`,
-				);
-				if (response.ok) {
-					const data = await response.json();
-					setProvincias(data);
-				} else {
-					console.error('Error al cargar las provincias');
-				}
-			} catch (error) {
-				console.error('Error al cargar las provincias:', error);
-			}
-		};
-
-		fetchProvincias();
-	}, []);
 
 	// Define una función para reiniciar el estado del formulario
 	const resetForm = () => {

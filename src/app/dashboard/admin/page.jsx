@@ -1,7 +1,7 @@
 'use client';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import { useEffect } from 'react';
 import {
 	Container,
 	Card,
@@ -21,16 +21,20 @@ export default function Page() {
 
 	const rolName = session?.user?.rol.name;
 
-	// Si no hay sesión, redirige a la página de inicio de sesión
-	if (!session) {
-		router.push('/login')
-	}
+	useEffect(() => {
+		// Si no hay sesión, redirige a la página de inicio de sesión
+		if (!session) {
+			router.push('/login');
+		}
 
-
-	// Si el estado de la página está cargando, muestra el componente Loading
+			// Si el estado de la página está cargando, muestra el componente Loading
 	if (status === 'loading') {
-
+		// ...
 	}
+
+
+	}, []);
+
 
 
 	console.log(session)

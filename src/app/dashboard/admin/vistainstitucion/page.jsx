@@ -1,7 +1,7 @@
 'use client';
 import { useSession, signOut } from 'next-auth/react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { Button, Table, Image } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import Link from 'next/link';
@@ -20,6 +20,7 @@ const VistaInstitucionPage = () => {
 	const [type, setType] = useState('');
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
+	const { data: session, status } = useSession();
 	const router = useRouter();
 
 	useEffect(() => {
@@ -41,18 +42,20 @@ const VistaInstitucionPage = () => {
 		}
 	}, [confirmar, id]);
 
-	const { data: session, status } = useSession();
 
-	if (!session) {
-		
-		router.push('/login')
-		
-	}
 
-	// Si el estado de la página está cargando, muestra el componente Loading
-	if (status === 'loading') {
-		// aqui podria ir el loading que por ahora voy a evitar para no tener problemas
-	}
+	useEffect(() => {
+		if (!session) {
+		
+			router.push('/login')
+			
+		}
+	
+		// Si el estado de la página está cargando, muestra el componente Loading
+		if (status === 'loading') {
+			// aqui podria ir el loading que por ahora voy a evitar para no tener problemas
+		}
+	}, [session]);
 
 	// Si no hay sesión, redirige a la página de inicio de sesión
 

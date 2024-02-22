@@ -4,6 +4,7 @@ import { Card, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const Dashboard = () => {
 	const { data: session, status } = useSession();
@@ -11,29 +12,24 @@ const Dashboard = () => {
 
 
 
+	useEffect(() => {
+		if (!session) {
+			router.push('/login');
+		}
+		// Si el estado de la página está cargando, muestra el componente Loading
+		if (status === 'loading') {
+			return <Loading />;
+		}
 
-
-	// Si no hay sesión, redirige a la página de inicio de sesión
-	if (!session) {
-		router.push('/login')
-	}
-	// Si el estado de la página está cargando, muestra el componente Loading
-	if (status === 'loading') {
-		return <Loading />;
-	}
+	},[session]);
 
 	console.log(session);
 
-	// // Función para cerrar sesión
-	// const handleLogout = async () => {
-	//   await signOut(); // Utiliza signOut directamente desde next-auth/react
-	//   window.location.replace('/login'); // Redirige a la página de inicio de sesión
-	// };
 
 	return (
 		<div className='d-flex justify-content-center align-items-center mt-5'>
 			<Card className='text-center'>
-				<Card.Header>Panel {session.user.rol.name}</Card.Header>
+				<Card.Header>Panel {session?.user.rol.name}</Card.Header>
 				<Card.Body>
 					<Card.Title>
 						Bienvenido, {session.user.user.nombre} {session.user.user.apellido}
