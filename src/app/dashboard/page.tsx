@@ -6,21 +6,31 @@ import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Rol, User } from '../../model/types';
-import { useUserContext } from "../../context/userContext";
 
 
 const Dashboard = () => {
 	const { data: session, status } = useSession();
 	const router = useRouter();
 	const [rol, setRol] = useState<Rol>({name: '', id: 0});
-	const { user, updateUser } = useUserContext();
+	const [user , setUser] = useState<User>({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+	});
 
 	useEffect(() => {
 		if (!session) {
 			router.push('/login');
 		} else {
 			setRol(session.user.rol);
-			updateUser(session.user);
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+			});
+			
 		}
 	}, [session]);
 
@@ -38,11 +48,11 @@ const Dashboard = () => {
 				<Card.Header>Panel {rol.name}</Card.Header>
 				<Card.Body>
 					<Card.Title>
-						Bienvenido, {user.user.nombre} {user.user.apellido}
+						Bienvenido, {user.nombre} {user.apellido}
 					</Card.Title>
 					<Card.Text>
-						<strong>Legajo:</strong> {user.user.legajo} <br />
-						<strong>Teléfono:</strong> {user.user.telefono}
+						<strong>Legajo:</strong> {user.legajo} <br />
+						<strong>Teléfono:</strong> {user.telefono}
 					</Card.Text>
 
 					{/* Enlace a la ruta específica según el rol */}
