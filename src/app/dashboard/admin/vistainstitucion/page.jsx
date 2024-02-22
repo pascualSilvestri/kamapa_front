@@ -9,7 +9,7 @@ import Modal2 from '../../../components/Modal';
 import { ModalType } from '../../../../utils/const';
 import ModalViewInstitucion from '../../../components/ModalViewInstitucion';
 import ModalUpdateInstitucion from '../../../components/ModalUpdateInstitucion';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const VistaInstitucionPage = () => {
 	const [instituciones, setInstituciones] = useState([]);
@@ -20,7 +20,7 @@ const VistaInstitucionPage = () => {
 	const [type, setType] = useState('');
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
-	const navigation = redirect();
+	const router = useRouter();
 
 	useEffect(() => {
 		fetchData();
@@ -45,7 +45,7 @@ const VistaInstitucionPage = () => {
 
 	if (!session) {
 		
-		navigation('/login')
+		router.push('/login')
 		
 	}
 

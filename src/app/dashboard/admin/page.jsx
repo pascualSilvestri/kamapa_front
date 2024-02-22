@@ -1,7 +1,6 @@
 'use client';
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
-
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import {
 	Container,
@@ -18,12 +17,13 @@ import Link from 'next/link';
 export default function Page() {
 
 	const { data: session, status } = useSession();
-	const navigation = redirect();
+	const router = useRouter();
+
 	const rolName = session?.user?.rol.name;
 
 	// Si no hay sesión, redirige a la página de inicio de sesión
 	if (!session) {
-		navigation('/login')
+		router.push('/login')
 	}
 
 

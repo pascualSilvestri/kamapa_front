@@ -3,18 +3,19 @@ import { useSession, signOut } from 'next-auth/react';
 import { Card, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import Loading from '../components/Loading';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const Dashboard = () => {
 	const { data: session, status } = useSession();
-	const navigation = redirect();
+	const router = useRouter();
+
 
 
 
 
 	// Si no hay sesión, redirige a la página de inicio de sesión
 	if (!session) {
-		navigation('/login')
+		router.push('/login')
 	}
 	// Si el estado de la página está cargando, muestra el componente Loading
 	if (status === 'loading') {
