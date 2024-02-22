@@ -24,7 +24,7 @@
 		"**/*.ts",
 		"**/*.tsx",
 		"src/app/dashboard/admin/page.tsx",
-		"src/app/dashboard/admin/vistausuarios/page.jsx"
-	],
+		"src/app/dashboard/admin/vistausuarios/page.tsx"
+, "src/app/layout.js"	],
 	"exclude": ["node_modules"]
 }

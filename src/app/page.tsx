@@ -70,7 +70,6 @@ function DarkVariantExample() {
 				{/* Botón */}
 				<Link href='/login'>
 					<Button
-						top='10px'
 						variant='flat'
 						style={{
 							backgroundColor: 'purple',

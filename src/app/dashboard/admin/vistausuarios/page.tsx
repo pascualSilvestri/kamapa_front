@@ -4,6 +4,7 @@ import { Button, Table, Modal, Form, Row, Col } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { useUserContext } from '../../../../context/userContext';
 
 const VistaEmpleadosPage = () => {
 	const [empleados, setEmpleados] = useState([]);
@@ -12,8 +13,7 @@ const VistaEmpleadosPage = () => {
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
-
-	const { data: session } = useSession();
+	const { user } = useUserContext();
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -82,10 +82,10 @@ const VistaEmpleadosPage = () => {
 
 	const handleConfirmSave = async () => {
 		try {
-			const legajo = document.getElementById('formLegajo')?.value;
-			const nombre = document.getElementById('formNombre')?.value;
-			const apellido = document.getElementById('formApellido')?.value;
-			// const dni = document.getElementById('formDNI')?.value;
+			const legajo = (document.getElementById('formLegajo') as HTMLInputElement)?.value;
+			const nombre = (document.getElementById('formNombre') as HTMLInputElement)?.value;
+			const apellido = (document.getElementById('formApellido') as HTMLInputElement)?.value;
+			// const dni = (document.getElementById('formDNI') as HTMLInputElement)?.value;
 
 			const updatedEmpleado = {
 				...selectedEmpleado,
@@ -136,7 +136,7 @@ const VistaEmpleadosPage = () => {
 		<div className='p-3'>
 			<Row className='mb-3  justify-content-center'>
 				<Col>
-					<Link href={`/dashboard/${session.user.rol.name}/regempleado`}>
+					<Link href={`/dashboard/${user.rol.name}/regempleado`}>
 						<Button
 							variant='flat'
 							style={{
@@ -161,7 +161,7 @@ const VistaEmpleadosPage = () => {
 				</Col>
 				<Col>
 					{/* Botón para volver */}
-					<Link href={`/dashboard/${session.user.rol.name}`}>
+					<Link href={`/dashboard/${user.rol.name}`}>
 						<Button
 							variant='secondary'
 							style={{
@@ -236,7 +236,7 @@ const VistaEmpleadosPage = () => {
 						))
 					) : (
 						<tr>
-							<td colSpan='4'>No hay empleados disponibles</td>
+							<td colSpan={4}>No hay empleados disponibles</td>
 						</tr>
 					)}
 				</tbody>

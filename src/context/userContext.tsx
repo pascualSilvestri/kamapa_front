@@ -1,13 +1,8 @@
 import React, { createContext, useContext, useState } from 'react';
-
-// Definir el tipo de dato para el usuario
-type User = {
-    name: string;
-    email: string;
-};
+import { User } from '../model/types';
 
 // Crear el contexto para el usuario
-const UserContext = createContext<User | null>(null);
+const UserContext = createContext<any>(null);
 
 // Crear el hook personalizado para acceder al contexto del usuario
 export const useUserContext = () => useContext(UserContext);
@@ -22,8 +17,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <UserContext.Provider value={user}>
-                {children}
+        <UserContext.Provider value={[user, setUser]}>
+            {children}
         </UserContext.Provider>
     );
 };

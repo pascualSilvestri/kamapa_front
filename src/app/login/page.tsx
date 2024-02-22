@@ -6,6 +6,7 @@ import { Card, Button } from 'react-bootstrap';
 import Image from 'next/image';
 
 
+
 const LoginPage = () => {
   const [errors, setErrors] = useState<string[]>([]);
   const [dni, setDni] = useState<string>("");

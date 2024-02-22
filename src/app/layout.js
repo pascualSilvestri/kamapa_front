@@ -3,7 +3,7 @@ import React, { Suspense } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from './components/Loading'; // Importa el componente de carga
 import SessionAuthProvider from '../../contexts/SessionAuthProvider';
-
+import { UserProvider } from '../context/userContext';
 
 export default function RootLayout({ children }) {
 	return (
@@ -59,8 +59,10 @@ export default function RootLayout({ children }) {
 			<body>
 				<main className='container-fluid p-0'>
 					<SessionAuthProvider>
+						<UserProvider>
 						<Suspense fallback={<Loading />} />
 						{children}
+						</UserProvider>
 					</SessionAuthProvider>
 				</main>
 			</body>
