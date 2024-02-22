@@ -1,7 +1,7 @@
 'use client';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	Container,
 	Card,
@@ -13,13 +13,21 @@ import {
 	Col,
 } from 'react-bootstrap';
 import Link from 'next/link';
+import { Rol, User } from '../../../model/types';
+
 
 export default function Page() {
 
 	const { data: session, status } = useSession();
+	const [user, setUser] = useState < User > ({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+	});
+	const [rol, setRol] = useState < Rol > ({ name: '', id: 0 });
 	const router = useRouter();
 
-	const rolName = session?.user?.rol.name;
 
 	useEffect(() => {
 		// Si no hay sesión, redirige a la página de inicio de sesión
@@ -27,9 +35,16 @@ export default function Page() {
 			router.push('/login');
 		}
 
-		// Si el estado de la página está cargando, muestra el componente Loading
-		if (status === 'loading') {
-			return <Loading />;
+		if (session) {
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+			});
+			setRol(
+				session.user.rol
+			);
 		}
 
 
@@ -81,7 +96,7 @@ export default function Page() {
 								Gestiona a los usuarios de tu aplicación
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${rolName}/vistausuarios`}>
+							<Link href={`/dashboard/${rol.name}/vistausuarios`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -99,7 +114,7 @@ export default function Page() {
 								Administra las Instituciones Registradas
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${rolName}/vistainstitucion`}>
+							<Link href={`/dashboard/${rol.name}/vistainstitucion`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -115,7 +130,7 @@ export default function Page() {
 							<CardTitle style={{ textAlign: 'center' }}>Roles</CardTitle>
 							<CardSubtitle>Asignacion de vistas Segun el Rol</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${rolName}`}>
+							<Link href={`/dashboard/${rol.name}`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -133,7 +148,7 @@ export default function Page() {
 								Estadísticas de Usuarios & Instituciones Registrados
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${rolName}`}>
+							<Link href={`/dashboard/${rol.name}`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
