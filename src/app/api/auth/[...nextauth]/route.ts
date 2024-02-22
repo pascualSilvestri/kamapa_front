@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-
+import { User, Rol } from '../../../../types/interfaces';
 import { getSession } from 'next-auth/react';
 import { JWT } from 'next-auth/jwt';
 
