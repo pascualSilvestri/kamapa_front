@@ -28,12 +28,7 @@ const VistaInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { data: session, status } = useSession();
-	const [user, setUser] = useState<User>({
-		nombre: '',
-		apellido: '',
-		legajo: '',
-		telefono: '',
-	});
+
 	const [rol, setRol] = useState<Rol>({name: '', id: 0});
 	const router = useRouter();
 
@@ -64,12 +59,6 @@ const VistaInstitucionPage = () => {
 		}
 
 		if (session) {
-			setUser({
-				nombre: session.user.nombre,
-				apellido: session.user.apellido,
-				legajo: session.user.legajo,
-				telefono: session.user.telefono,
-			});
 			setRol(session.user.rol);
 		}
 	
@@ -77,7 +66,7 @@ const VistaInstitucionPage = () => {
 		if (status === 'loading') {
 			// aqui podria ir el loading que por ahora voy a evitar para no tener problemas
 		}
-	}, [session]);
+	}, []);
 
 	// Si no hay sesión, redirige a la página de inicio de sesión
 
@@ -159,7 +148,7 @@ const VistaInstitucionPage = () => {
 		<div className='p-3'>
 			<div className='mb-3 d-flex justify-content-center'>
 				<div className='me-1'>
-					<Link href={`/dashboard/${session?.user?.rol?.name}`}>
+					<Link href={`/dashboard/${rol.name}`}>
 						<Button variant='secondary' style={{
 							marginRight: '10px',
 							padding: '0.4rem 1rem',
@@ -178,7 +167,7 @@ const VistaInstitucionPage = () => {
 				</div>
 
 				<div>
-					<Link href={`/dashboard/${session?.user?.rol?.name}/reginstitucion`}>
+					<Link href={`/dashboard/${rol.name}/reginstitucion`}>
 						<Button variant='flat' style={{
 							backgroundColor: 'purple',
 							color: 'white',
