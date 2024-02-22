@@ -23,7 +23,7 @@
 		".next/types/**/*.ts",
 		"**/*.ts",
 		"**/*.tsx",
-		"src/app/dashboard/admin/page.jsx",
+		"src/app/dashboard/admin/page.tsx",
 		"src/app/dashboard/admin/vistausuarios/page.jsx"
 	],
 	"exclude": ["node_modules"]
