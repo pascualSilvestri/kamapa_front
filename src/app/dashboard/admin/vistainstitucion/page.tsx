@@ -58,7 +58,7 @@ const VistaInstitucionPage = () => {
 			router.push('/login')
 		}
 
-		if (session) {
+		if (session && session.user) {
 			setRol(session.user.rol);
 		}
 
