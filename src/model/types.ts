@@ -3,6 +3,7 @@ export interface User {
 	apellido: string;
 	legajo: string;
 	telefono: string;
+	rol?: string;
 }
 
 export interface Rol {

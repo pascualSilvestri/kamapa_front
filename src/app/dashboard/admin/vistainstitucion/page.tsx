@@ -1,6 +1,5 @@
 'use client';
 import { useSession, signOut } from 'next-auth/react';
-
 import { useState, useEffect, use } from 'react';
 import { Button, Table, Image } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
@@ -49,8 +48,13 @@ const VistaInstitucionPage = () => {
 			});
 			setRol(session.user.rol);
 		}
+
+		if (!session) {
+			router.push('/login');
+		}
 	}
 	, [session]);
+
 
 
 	useEffect(() => {

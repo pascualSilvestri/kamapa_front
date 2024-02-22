@@ -47,7 +47,7 @@ const RegInstitucionPage = () => {
 	const [formState, setFormState] = useState<FormData>({
 		institucion: {
 			cue: '',
-			logo: null,
+			logo: new File([], ''),
 			nombre: '',
 			descripcion: '',
 		},
