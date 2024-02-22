@@ -28,9 +28,20 @@ const VistaInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { data: session, status } = useSession();
-
 	const [rol, setRol] = useState<Rol>({name: '', id: 0});
 	const router = useRouter();
+
+
+	useEffect(() => {
+		if (!session) {
+			router.push('/login')
+		}
+
+		if (session && session.user) {
+			setRol(session.user.rol);
+		}
+
+	}, [session]);
 
 	useEffect(() => {
 		fetchData();
@@ -53,16 +64,6 @@ const VistaInstitucionPage = () => {
 
 
 
-	useEffect(() => {
-		if (!session) {
-			router.push('/login')
-		}
-
-		if (session && session.user) {
-			setRol(session.user.rol);
-		}
-
-	}, []);
 
 	// Si no hay sesión, redirige a la página de inicio de sesión
 
