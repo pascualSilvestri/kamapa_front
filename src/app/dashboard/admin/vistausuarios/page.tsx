@@ -4,7 +4,7 @@ import { Button, Table, Modal, Form, Row, Col } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useUserContext } from '../../../../context/userContext';
+
 
 const VistaEmpleadosPage = () => {
 	const [empleados, setEmpleados] = useState([]);
@@ -14,11 +14,23 @@ const VistaEmpleadosPage = () => {
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
 	const [rol, setRol] = useState({ name: '', id: 0 });
-	const { user } = useUserContext();
+	const [user, setUser] = useState({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+	});
+	const { data: session, status } = useSession();
 
 	useEffect(() =>{
-		if(user){
-			setRol(user.rol);
+		if (session) {
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+			});
+			setRol(session.user.rol);
 		}
 	},[])
 
@@ -143,7 +155,7 @@ const VistaEmpleadosPage = () => {
 		<div className='p-3'>
 			<Row className='mb-3  justify-content-center'>
 				<Col>
-					<Link href={`/dashboard/${user.rol.name}/regempleado`}>
+					<Link href={`/dashboard/${rol.name}/regempleado`}>
 						<Button
 							variant='flat'
 							style={{
@@ -168,7 +180,7 @@ const VistaEmpleadosPage = () => {
 				</Col>
 				<Col>
 					{/* Botón para volver */}
-					<Link href={`/dashboard/${user.rol.name}`}>
+					<Link href={`/dashboard/${rol.name}`}>
 						<Button
 							variant='secondary'
 							style={{
