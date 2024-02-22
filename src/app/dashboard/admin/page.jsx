@@ -27,10 +27,10 @@ export default function Page() {
 			router.push('/login');
 		}
 
-			// Si el estado de la página está cargando, muestra el componente Loading
-	if (status === 'loading') {
-		// ...
-	}
+		// Si el estado de la página está cargando, muestra el componente Loading
+		if (status === 'loading') {
+			return <Loading />;
+		}
 
 
 	}, []);

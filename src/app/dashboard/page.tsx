@@ -4,43 +4,61 @@ import { Card, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Rol, User } from '../../model/types';
+
+
+
+
 
 const Dashboard = () => {
 	const { data: session, status } = useSession();
 	const router = useRouter();
-
-
+	const [user, setUser] = useState<User>({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+	});
+	const [rol, setRol] = useState<Rol>({name: '', id: 0});
 
 	useEffect(() => {
 		if (!session) {
 			router.push('/login');
+		} else {
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+			});
+			setRol(session.user.rol);
 		}
-		// Si el estado de la página está cargando, muestra el componente Loading
-		if (status === 'loading') {
-			return <Loading />;
-		}
+	}, [session]);
 
-	},[session]);
-
-	console.log(session);
+	console.log(user)
+	console.log(rol)
+	// Si el estado de la página está cargando, muestra el componente Loading
+	if (status === 'loading') {
+		return <Loading />;
+	}
 
 
 	return (
 		<div className='d-flex justify-content-center align-items-center mt-5'>
 			<Card className='text-center'>
-				<Card.Header>Panel {session?.user.rol.name}</Card.Header>
+				<Card.Header>Panel {rol.name}</Card.Header>
 				<Card.Body>
 					<Card.Title>
-						Bienvenido, {session.user.user.nombre} {session.user.user.apellido}
+						Bienvenido, {user.nombre} {user.apellido}
 					</Card.Title>
 					<Card.Text>
-						<strong>Legajo:</strong> {session.user.user.legajo} <br />
-						<strong>Teléfono:</strong> {session.user.user.telefono}
+						<strong>Legajo:</strong> {user.legajo} <br />
+						<strong>Teléfono:</strong> {user.telefono}
 					</Card.Text>
 
 					{/* Enlace a la ruta específica según el rol */}
-					<Link href={`/dashboard/${session.user.rol.name}`}>
+					<Link href={`/dashboard/${rol?.name}`}>
 						<Button
 							variant='flat'
 							type='submit'

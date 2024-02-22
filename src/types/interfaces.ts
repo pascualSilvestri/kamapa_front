@@ -1,4 +1,5 @@
 interface User {
+	user(user: any): unknown;
 	id: number;
 	legajo: string;
 	fecha_ingreso: string;
@@ -24,6 +25,29 @@ interface User {
 interface Rol {
 	id: number;
 	name: string;
-	createdAt: string;
-	updatedAt: string;
 }
+
+
+interface Institucion {
+	id: number;
+	cue: string;
+	nombre: string;
+	logo: string;
+}
+
+interface Domicilio {
+	id: number;
+	calle: string;
+	numero: string;
+	localidad: string;
+	provincia: string;
+	pais: string;
+}
+
+interface Contacto {
+	id: number;
+	email: string;
+	telefono: string;
+}
+
+export type { User, Rol, Institucion, Domicilio, Contacto };

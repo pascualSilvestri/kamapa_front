@@ -4,13 +4,8 @@ import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
 import useFormStatus from './../../../components/useFormStatus';
 import Link from 'next/link';
 import { useSession, signIn } from 'next-auth/react';
+import { Provincia, User, Rol } from '../../../../model/types';
 
-
-// Define la interfaz para el objeto de provincia
-interface Provincia {
-	id: string;
-	provincia: string;
-}
 
 // Define la interfaz para los datos del formulario
 interface FormData {
@@ -41,6 +36,13 @@ const RegInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [modalMessage, setModalMessage] = useState('');
 	const { data: session, status: sessionStatus } = useSession();
+	const [user, setUser] = useState<User>({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+	});
+	const [rol, setRol] = useState<Rol>({name: '', id: 0});
 	// Estados para los datos del formulario, provincias, estado del modal y estado del formulario
 	const [formState, setFormState] = useState<FormData>({
 		institucion: {
@@ -62,6 +64,19 @@ const RegInstitucionPage = () => {
 		},
 	});
 
+	useEffect(() => {
+
+		if (session) {
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+			});
+			setRol(session.user.rol);
+		}
+	}
+	, [session]);
 
 
 	
@@ -222,18 +237,7 @@ const RegInstitucionPage = () => {
 		
 	};
 	
-	const user = session && session.user;
-
-	console.log(session);
-
-	if (sessionStatus === 'loading') {
-		// Mostrar componente de carga
-	} else if (!session || !user || user?.rol?.name !== 'admin') {
-		signIn('login'); // Redireccionar a la página de inicio de sesión si no hay sesión o si el rol no es admin
-	} else {
-		// Renderizar el contenido del componente
-	}
-
+	
 	// Renderiza el formulario y el modal
 	return (
 		<Container className='p-3'>
@@ -402,7 +406,7 @@ const RegInstitucionPage = () => {
 				<Row className='mb-3'>
             
             <Col sm={6}>
-                <Link href={`/dashboard/${session.user.rol.name}/vistainstitucion`}>
+                <Link href={`/dashboard/vistainstitucion`}>
                     <Button
                         variant='secondary'
                         style={{

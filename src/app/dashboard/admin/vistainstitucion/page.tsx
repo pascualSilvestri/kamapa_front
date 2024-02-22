@@ -10,10 +10,17 @@ import { ModalType } from '../../../../utils/const';
 import ModalViewInstitucion from '../../../components/ModalViewInstitucion';
 import ModalUpdateInstitucion from '../../../components/ModalUpdateInstitucion';
 import { useRouter } from 'next/navigation';
+import { Rol, User, Institucion } from '../../../../model/types';
+
 
 const VistaInstitucionPage = () => {
 	const [instituciones, setInstituciones] = useState([]);
-	const [institucion, setInstitucion] = useState({});
+	const [institucion, setInstitucion] = useState<Institucion>({
+		id: 0,
+		cue: '',
+		nombre: '',
+		logo: '',
+	});
 	const [activo, setActivo] = useState(false);
 	const [confirmar, setConfirmar] = useState(false);
 	const [id, setId] = useState();
@@ -21,6 +28,13 @@ const VistaInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { data: session, status } = useSession();
+	const [user, setUser] = useState<User>({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+	});
+	const [rol, setRol] = useState<Rol>({name: '', id: 0});
 	const router = useRouter();
 
 	useEffect(() => {
@@ -46,9 +60,17 @@ const VistaInstitucionPage = () => {
 
 	useEffect(() => {
 		if (!session) {
-		
 			router.push('/login')
-			
+		}
+
+		if (session) {
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+			});
+			setRol(session.user.rol);
 		}
 	
 		// Si el estado de la página está cargando, muestra el componente Loading
@@ -197,8 +219,6 @@ const VistaInstitucionPage = () => {
 										alt=''
 										width={50}
 										height={50}
-										quality={100}
-										priority={true}
 									/>
 								</td>
 								<td>{institucion && `${institucion.cue}`}</td>
@@ -218,7 +238,7 @@ const VistaInstitucionPage = () => {
 						))
 					) : (
 						<tr>
-							<td colSpan='4'>No hay instituciones disponibles</td>
+							<td colSpan={4}>No hay instituciones disponibles</td>
 						</tr>
 					)}
 				</tbody>
@@ -234,8 +254,7 @@ const VistaInstitucionPage = () => {
 				setShowEditModal={setShowEditModal}
 				institucion={institucion}
 				id={institucion?.id}
-				setInstitucion={setInstitucion}
-			/>
+				setInstitucion={setInstitucion} handleSave={undefined}			/>
 			{type && (
 				<Modal2
 					type={type}
