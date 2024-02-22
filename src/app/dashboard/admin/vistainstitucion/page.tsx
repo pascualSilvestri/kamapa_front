@@ -10,7 +10,7 @@ import { ModalType } from '../../../../utils/const';
 import ModalViewInstitucion from '../../../components/ModalViewInstitucion';
 import ModalUpdateInstitucion from '../../../components/ModalUpdateInstitucion';
 import { useRouter } from 'next/navigation';
-import { Rol, Institucion } from '../../../../model/types';
+import { Rol, User, Institucion } from '../../../../model/types';
 
 
 const VistaInstitucionPage = () => {
@@ -28,6 +28,12 @@ const VistaInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { data: session, status } = useSession();
+	const [user, setUser] = useState<User>({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+	});
 	const [rol, setRol] = useState<Rol>({name: '', id: 0});
 	const router = useRouter();
 
@@ -38,6 +44,12 @@ const VistaInstitucionPage = () => {
 		}
 
 		if (session && session.user) {
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+			});
 			setRol(session.user.rol);
 		}
 
