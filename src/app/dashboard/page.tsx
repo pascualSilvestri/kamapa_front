@@ -25,10 +25,10 @@ const Dashboard = () => {
 		} else {
 			setRol(session.user.rol);
 			setUser({
-				nombre: session.user.nombre,
-				apellido: session.user.apellido,
-				legajo: session.user.legajo,
-				telefono: session.user.telefono,
+				nombre: session.user.user.nombre,
+				apellido: session.user.user.apellido,
+				legajo: session.user.user.legajo,
+				telefono: session.user.user.telefono,
 			});
 			
 		}
