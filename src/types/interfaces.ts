@@ -1,5 +1,5 @@
 interface User {
-	user(user: any): unknown;
+	user: UserSession; 
 	id: number;
 	legajo: string;
 	fecha_ingreso: string;
@@ -20,6 +20,13 @@ interface User {
 	contactoId: number;
 	rolId: number;
 	rol: Rol;
+}
+
+interface UserSession{
+    nombre: string;
+	apellido: string;
+	legajo: string;
+	telefono: string;
 }
 
 interface Rol {

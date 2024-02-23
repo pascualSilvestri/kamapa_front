@@ -20,6 +20,9 @@ const Dashboard = () => {
 	});
 
 	useEffect(() => {
+
+
+		console.log(session.user)
 		if (!session) {
 			router.push('/login');
 		} else {
