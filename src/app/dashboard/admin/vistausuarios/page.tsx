@@ -32,7 +32,7 @@ const VistaEmpleadosPage = () => {
 			});
 			setRol(session.user.rol);
 		}
-	},[])
+	},[session])
 
 	useEffect(() => {
 		const fetchData = async () => {

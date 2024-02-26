@@ -54,9 +54,6 @@ const RegEmpleado = () => {
         });
     };
 
-
-
-
     const { data: session, status: sessionStatus } = useSession();
     const [rol, setRol] = useState<Rol>({name: '', id: 0});
 
@@ -81,7 +78,30 @@ const RegEmpleado = () => {
     }
     , [session]);
 
-    // Función para manejar el envío del formulario
+ 
+
+     // Lógica para obtener provincias
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/provincia`)
+            .then(response => response.json())
+            .then((data: Provincia[]) => {
+                setProvincias(data);
+            })
+            .catch(error => console.error('Error fetching provinces:', error));
+    }, []);
+
+    // Lógica para obtener roles
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rols`)
+            .then(response => response.json())
+            .then(data => {
+                // Maneja los datos de los roles
+            })
+            .catch(error => console.error('Error fetching roles:', error));
+    }, []);
+
+
+       // Función para manejar el envío del formulario
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setShowModal(true);
@@ -94,27 +114,6 @@ const RegEmpleado = () => {
         limpiarCampos(); // Limpia los campos del formulario
     };
 
-    // Lógica para obtener provincias
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/provincia`)
-            .then(response => response.json())
-            .then((data: Provincia[]) => {
-                setProvincias(data);
-                console.log(provincias);
-            })
-            .catch(error => console.error('Error fetching provinces:', error));
-    }, [provincias]);
-    console.log(provincias);
-
-    // Lógica para obtener roles
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rols`)
-            .then(response => response.json())
-            .then(data => {
-                // Maneja los datos de los roles
-            })
-            .catch(error => console.error('Error fetching roles:', error));
-    }, []);
 
     return (
         <Container>
@@ -280,24 +279,24 @@ const RegEmpleado = () => {
                     </Form>
                 </Form>
 
-              {/* Modal para confirmar el registro */}
-                <Modal show={showModal} onHide={handleCloseModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Confirmar Registro</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        ¿Está seguro que desea registrar a: {nombre} {apellido} con permisos de: {Object.keys(roles).filter(rol => roles[rol]).join(', ')}?
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                            Cancelar
-                        </Button>
-                        <Button variant="primary" onClick={handleCloseModal}>
-                            Confirmar Registro
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
-            </Col>
+               {/* Modal para confirmar el registro */}
+                    <Modal show={showModal} onHide={handleCloseModal}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Confirmar Registro</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            ¿Está seguro que desea registrar a: {nombre} {apellido} con permisos de: {Object.keys(roles).filter(rol => roles[rol]).join(', ')}?
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleCloseModal}>
+                                Cancelar
+                            </Button>
+                            <Button variant="primary" onClick={handleCloseModal}>
+                                Confirmar Registro
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                </Col>
         </Row>
     </Container>
     );
