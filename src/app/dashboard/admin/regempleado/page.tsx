@@ -238,47 +238,45 @@ const RegEmpleado = () => {
                             />
                         ))}
                     </Form.Group>
-
-                    {/* Botones dentro de la estructura del formulario */}
-                        <div className="d-flex justify-content-center">
+                    <Form onSubmit={handleSubmit} className="d-flex justify-content-center">
                         <div className='mb-3 me-1'>
-                            <Link href={`/dashboard/${rol.name}/vistausuarios`}>
-                            <Button variant='secondary' style={{
-                                marginRight: '10px',
+                            <Link href={`/dashboard/${rol.name}`}>
+                                <Button variant='secondary' style={{
+                                    marginRight: '10px',
+                                    padding: '0.4rem 1rem',
+                                    fontSize: '1rem',
+                                    transition: 'all 0.3s ease',
+                                }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'white';
+                                        e.currentTarget.style.color = 'black';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'grey';
+                                        e.currentTarget.style.color = 'white';
+                                    }}>Volver</Button>
+                            </Link>
+                        </div>
+                        <div>
+                            <Button type="submit" variant='flat' style={{
+                                backgroundColor: 'purple',
+                                color: 'white',
                                 padding: '0.4rem 1rem',
                                 fontSize: '1rem',
                                 transition: 'all 0.3s ease',
                             }}
                                 onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = 'white';
-                                e.currentTarget.style.color = 'black';
+                                    e.currentTarget.style.backgroundColor = 'white';
+                                    e.currentTarget.style.color = 'black';
                                 }}
                                 onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'grey';
-                                e.currentTarget.style.color = 'white';
-                                }}>Volver</Button>
-                            </Link>
-                        </div>
-                        <div>
-                            <Button type="submit" variant='flat' style={{
-                            backgroundColor: 'purple',
-                            color: 'white',
-                            padding: '0.4rem 1rem',
-                            fontSize: '1rem',
-                            transition: 'all 0.3s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = 'white';
-                                e.currentTarget.style.color = 'black';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'purple';
-                                e.currentTarget.style.color = 'white';
-                            }}>
-                            Registrar Empleado
+                                    e.currentTarget.style.backgroundColor = 'purple';
+                                    e.currentTarget.style.color = 'white';
+                                }}>
+                                Registrar Empleado
                             </Button>
                         </div>
-                        </div>
+                    </Form>
                 </Form>
 
                {/* Modal para confirmar el registro */}
