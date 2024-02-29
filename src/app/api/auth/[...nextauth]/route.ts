@@ -57,17 +57,20 @@ const handler = NextAuth({
 			if (token.user) {
 				session.user = token.user as User; // Asigna todo el objeto de usuario a la sesión
 			}
-
+			console.log(session)
+			console.log(token.accessToken); // Imprime el token codificado
 			return session; // Devuelve el objeto de sesión actualizado
 		},
 		async jwt(params: { token: JWT; user: User | any } & JWT['jwt']) {
 			const { token, user } = params;
 			if (user) {
-				token.user = user;
+				// token.user = user;
+      			// console.log(token)
 			}
-
+			console.log(token)
 			return token;
 		},
+		
 	},
 	pages: {
 		signIn: '/login',
