@@ -4,18 +4,18 @@ import { User, Rol } from '../../../../types/interfaces';
 import { getSession } from 'next-auth/react';
 import { JWT } from 'next-auth/jwt';
 
-interface Session {
-	user: User;
-	expires: string;
-	id: number;
-	password: string;
-	rol: Rol;
-	nombre: string;
-	apellido: string;
-	dni: string;
-	telefono: string;
-	legajo: string;
-}
+// interface Session {
+// 	user: User;
+// 	expires: string;
+// 	id: number;
+// 	password: string;
+// 	rol: Rol;
+// 	nombre: string;
+// 	apellido: string;
+// 	dni: string;
+// 	telefono: string;
+// 	legajo: string;
+// }
 
 const handler = NextAuth({
 	providers: [
@@ -54,18 +54,17 @@ const handler = NextAuth({
 	callbacks: {
 		async session({ session, token }) {
 			// Asigna directamente el objeto de usuario desde el token al objeto de sesión
-			if (token.user) {
+			if (session.user) {
 				session.user = token.user as User; // Asigna todo el objeto de usuario a la sesión
 			}
 			console.log(session)
-			console.log(token.accessToken); // Imprime el token codificado
+			// console.log(token.accessToken); // Imprime el token codificado
 			return session; // Devuelve el objeto de sesión actualizado
 		},
 		async jwt(params: { token: JWT; user: User | any } & JWT['jwt']) {
 			const { token, user } = params;
 			if (user) {
-				// token.user = user;
-      			// console.log(token)
+			    token.user = user;
 			}
 			console.log(token)
 			return token;
