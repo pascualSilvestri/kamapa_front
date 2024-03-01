@@ -30,21 +30,20 @@ const handler = NextAuth({
         if (session.error) {
           throw new Error(session.error);
         }
-
+        console.log(session);
         return session;
       },
     }),
   ],
   callbacks: {
-    async jwt(params: { token: JWT; user: User | any; rol?: Rol } & JWT['jwt']) { // Removed unnecessary "any" from user and made rol optional
-      const { token, user,rol } = params;
+    async jwt(params: { token: JWT; user: User | any ; rol: Rol | any } & JWT['jwt']) { // Removed unnecessary "any" from user and made rol optional
+      const { token, user, rol } = params;
       return { ...token, ...user, ...rol }; // Only add rol if it exists
     },
     async session({ session, token }) {
       // Asigna directamente el objeto de usuario desde el token al objeto de sesión
       if (session) {
         session.user = token.user as User;
-        session.user.rol = token.rol as Rol // Explicitly cast user to User
       }
       console.log(session);
       return session; // Cast the session to the correct type

@@ -42,7 +42,6 @@ const VistaEmpleadosPage = () => {
 						method: 'GET',
 						headers: {
                             'Content-Type': 'application/json',
-							authorization: `Bearer ${session.token}`,
                         },
 					}
 				);

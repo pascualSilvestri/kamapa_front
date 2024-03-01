@@ -15,11 +15,7 @@ export default function RootLayout({ children }) {
 			const allowedRoutes = {
 				admin: [
 					'/dashboard',
-					'/dashboard/admin',
-					'/dashboard/admin/vistainstitucion',
-					'/dashboard/admin/vistainstitucion/reginstitucion',
-					'/dashboard/admin/vistausuario',
-					'/dashboard/admin/vistausuario/regempleado',
+					`/dashboard/${session.rol}`,
 				],
 				director: ['/dashboard', '/dashboard/director'],
 				secretario: ['/dashboard', '/dashboard/secretario'],
