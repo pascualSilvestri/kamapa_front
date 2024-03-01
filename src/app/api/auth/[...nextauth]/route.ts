@@ -1,79 +1,58 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { User, Rol } from '../../../../types/interfaces';
-import { getSession } from 'next-auth/react';
+import { User, Rol } from '../../../../types/interfaces'; // Assuming User, Rol and Session are defined in your interfaces
 import { JWT } from 'next-auth/jwt';
 
-// interface Session {
-// 	user: User;
-// 	expires: string;
-// 	id: number;
-// 	password: string;
-// 	rol: Rol;
-// 	nombre: string;
-// 	apellido: string;
-// 	dni: string;
-// 	telefono: string;
-// 	legajo: string;
-// }
-
 const handler = NextAuth({
-	providers: [
-		CredentialsProvider({
-			name: 'Credentials',
-			credentials: {
-				dni: { label: 'dni', type: 'text', placeholder: 'Ingresa tu DNI' },
-				password: {
-					label: 'Password',
-					type: 'password',
-					autocomplete: 'current-password',
-				},
-			},
-			async authorize(credentials) {
-				const res = await fetch(
-					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
-					{
-						method: 'POST',
-						body: JSON.stringify({
-							dni: credentials?.dni,
-							password: credentials?.password,
-						}),
-						headers: { 'Content-Type': 'application/json' },
-					},
-				);
-				const session = await res.json();
+  providers: [
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        dni: { label: 'dni', type: 'text', placeholder: 'Ingresa tu DNI' },
+        password: {
+          label: 'Password',
+          type: 'password',
+          autocomplete: 'current-password',
+        },
+      },
+      async authorize(credentials) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
+          method: 'POST',
+          body: JSON.stringify({
+            dni: credentials?.dni,
+            password: credentials?.password,
+          }),
+          headers: { 'Content-Type': 'application/json' },
+        });
 
-				if (session.error) {
-					throw new Error(session.error);
-				}
+        const session = await res.json();
 
-				return session;
-			},
-		}),
-	],
-	callbacks: {
-		async session({ session, token }) {
-			// Asigna directamente el objeto de usuario desde el token al objeto de sesión
-			if (session.user) {
-				session.user = token.user as User; // Asigna todo el objeto de usuario a la sesión
-			}
-			console.log(session)
-			// console.log(token.accessToken); // Imprime el token codificado
-			return session; // Devuelve el objeto de sesión actualizado
-		},
-		async jwt(params: { token: JWT; user: User | any } & JWT['jwt']) {
-			const { token, user } = params;
-			if (user) {
-			    token.user = user;
-			}
-			console.log(token)
-			return token;
-		},
-		
-	},
-	pages: {
-		signIn: '/login',
-	},
+        if (session.error) {
+          throw new Error(session.error);
+        }
+
+        return session;
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt(params: { token: JWT; user: User | any; rol?: Rol } & JWT['jwt']) { // Removed unnecessary "any" from user and made rol optional
+      const { token, user,rol } = params;
+      return { ...token, ...user, ...rol }; // Only add rol if it exists
+    },
+    async session({ session, token }) {
+      // Asigna directamente el objeto de usuario desde el token al objeto de sesión
+      if (session) {
+        session.user = token.user as User;
+        session.user.rol = token.rol as Rol // Explicitly cast user to User
+      }
+      console.log(session);
+      return session; // Cast the session to the correct type
+    },
+  },
+  pages: {
+    signIn: '/login',
+  },
 });
 
 export { handler as GET, handler as POST };

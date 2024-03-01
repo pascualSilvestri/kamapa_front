@@ -38,7 +38,13 @@ const VistaEmpleadosPage = () => {
 		const fetchData = async () => {
 			try {
 				const response = await fetch(
-					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,
+					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,{
+						method: 'GET',
+						headers: {
+                            'Content-Type': 'application/json',
+							authorization: `Bearer ${session.token}`,
+                        },
+					}
 				);
 
 				if (!response.ok) {

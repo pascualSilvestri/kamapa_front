@@ -17,28 +17,29 @@ const Dashboard = () => {
 		apellido: '',
 		legajo: '',
 		telefono: '',
+		rol:rol.name
 	});
 
 	useEffect(() => {
 
 
-		console.log(session.user)
+		console.log(session)
 		if (!session) {
 			router.push('/login');
 		} else {
-			setRol(session.user.rol);
+			setRol(rol);
 			setUser({
-				nombre: session.user.user.nombre,
-				apellido: session.user.user.apellido,
-				legajo: session.user.user.legajo,
-				telefono: session.user.user.telefono,
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+				rol: session.user.rol.name,
 			});
 			
 		}
-	}, [session]);
+	}, [rol, router, session]);
 
 	console.log(user)
-	console.log(rol)
 	// Si el estado de la página está cargando, muestra el componente Loading
 	if (status === 'loading') {
 		return <Loading />;
@@ -48,7 +49,7 @@ const Dashboard = () => {
 	return (
 		<div className='d-flex justify-content-center align-items-center mt-5'>
 			<Card className='text-center'>
-				<Card.Header>Panel {rol.name}</Card.Header>
+				<Card.Header>Panel {user.rol}</Card.Header>
 				<Card.Body>
 					<Card.Title>
 						Bienvenido, {user.nombre} {user.apellido}
@@ -59,7 +60,7 @@ const Dashboard = () => {
 					</Card.Text>
 
 					{/* Enlace a la ruta específica según el rol */}
-					<Link href={`/dashboard/${rol?.name}`}>
+					<Link href={`/dashboard/${user.rol}`}>
 						<Button
 							variant='flat'
 							type='submit'

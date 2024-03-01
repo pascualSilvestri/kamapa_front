@@ -1,4 +1,4 @@
-interface User {
+export interface User {
 	user: UserSession; 
 	id: number;
 	legajo: string;
@@ -22,27 +22,27 @@ interface User {
 	rol: Rol;
 }
 
-interface UserSession{
+export interface UserSession{
     nombre: string;
 	apellido: string;
 	legajo: string;
 	telefono: string;
 }
 
-interface Rol {
+export interface Rol {
 	id: number;
 	name: string;
 }
 
 
-interface Institucion {
+export interface Institucion {
 	id: number;
 	cue: string;
 	nombre: string;
 	logo: string;
 }
 
-interface Domicilio {
+export interface Domicilio {
 	id: number;
 	calle: string;
 	numero: string;
@@ -51,10 +51,9 @@ interface Domicilio {
 	pais: string;
 }
 
-interface Contacto {
+export interface Contacto {
 	id: number;
 	email: string;
 	telefono: string;
 }
 
-export type { User, Rol, Institucion, Domicilio, Contacto };

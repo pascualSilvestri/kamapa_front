@@ -11,6 +11,19 @@ export interface Rol {
 	id: number;
 }
 
+export interface Session {
+	user: User;
+	expires: string;
+	id: number;
+	password: string;
+	rol: Rol;
+	nombre: string;
+	apellido: string;
+	dni: string;
+	telefono: string;
+	legajo: string;
+}
+
 export interface Provincia {
 	id: string;
 	provincia: string;

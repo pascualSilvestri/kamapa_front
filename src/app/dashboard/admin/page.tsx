@@ -19,13 +19,14 @@ import { Rol, User } from '../../../model/types';
 export default function Page() {
 
 	const { data: session, status } = useSession();
+	const [rol, setRol] = useState<Rol>({name: '', id: 0});
 	const [user, setUser] = useState < User > ({
 		nombre: '',
 		apellido: '',
 		legajo: '',
 		telefono: '',
+		rol:rol.name
 	});
-	const [rol, setRol] = useState < Rol > ({ name: '', id: 0 });
 	const router = useRouter();
 
 
@@ -41,14 +42,11 @@ export default function Page() {
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
 				telefono: session.user.telefono,
+				rol:session.user.rol.name
 			});
-			setRol(
-				session.user.rol
-			);
+			
 		}
-
-
-	}, []);
+	}, [rol, router, session]);
 
 
 
@@ -96,7 +94,7 @@ export default function Page() {
 								Gestiona a los usuarios de tu aplicación
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${rol.name}/vistausuarios`}>
+							<Link href={`/dashboard/${user.rol}/vistausuarios`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
