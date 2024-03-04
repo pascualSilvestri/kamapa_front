@@ -1,6 +1,6 @@
 export interface User {
 	user: UserSession; 
-	id: number;
+	id: number | string;
 	legajo: string;
 	fecha_ingreso: string;
 	fecha_egreso: string | null;
@@ -20,6 +20,7 @@ export interface User {
 	contactoId: number;
 	rolId: number;
 	rol: Rol;
+	accessToken: string; // Agrega esta línea
 }
 
 export interface UserSession{

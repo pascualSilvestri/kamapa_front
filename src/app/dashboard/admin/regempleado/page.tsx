@@ -54,7 +54,7 @@ const RegEmpleado = () => {
                 legajo: session.user.legajo,
                 telefono: session.user.telefono,
             });
-            setRol(session.user.rol);
+            setRol(session.rol);
         }
     }, [session]);
 

@@ -1,9 +1,11 @@
 // import "next-auth";
-import { User } from "./interfaces";
+import { User, Rol } from "./interfaces";
 
 declare module "next-auth" {
   interface Session {
       user: User;
+      rol: Rol;
+      accessToken: string;
     };
   }
 

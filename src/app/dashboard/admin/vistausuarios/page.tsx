@@ -19,6 +19,7 @@ const VistaEmpleadosPage = () => {
 		apellido: '',
 		legajo: '',
 		telefono: '',
+		accessToken:'',
 	});
 	const { data: session, status } = useSession();
 
@@ -29,8 +30,9 @@ const VistaEmpleadosPage = () => {
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
 				telefono: session.user.telefono,
+				accessToken: session.accessToken,
 			});
-			setRol(session.user.rol);
+			setRol(session.rol);
 		}
 	},[session])
 
@@ -42,9 +44,11 @@ const VistaEmpleadosPage = () => {
 						method: 'GET',
 						headers: {
                             'Content-Type': 'application/json',
+							'Authorization': `Bearer ${session.accessToken}`,
                         },
 					}
-				);
+					);
+					console.log(session.accessToken);
 
 				if (!response.ok) {
 					throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -59,7 +63,7 @@ const VistaEmpleadosPage = () => {
 		};
 
 		fetchData();
-	}, []);
+	}, [session]);
 
 	const handleConsultar = (empleado) => {
 		setSelectedEmpleado(empleado);

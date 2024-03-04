@@ -33,7 +33,7 @@ const Dashboard = () => {
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
 				telefono: session.user.telefono,
-				rol: session.user.rol.name,
+				rol: session.rol.name,
 			});
 			
 		}
