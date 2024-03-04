@@ -63,7 +63,7 @@ const VistaEmpleadosPage = () => {
 		};
 
 		fetchData();
-	}, [session]);
+	}, [session]); 
 
 	const handleConsultar = (empleado) => {
 		setSelectedEmpleado(empleado);

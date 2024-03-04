@@ -34,6 +34,10 @@ const RegEmpleado = () => {
         profesor: false
     });
     const [showModal, setShowModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const [formValid, setFormValid] = useState(false);
 
     const { data: session, status: sessionStatus } = useSession();
@@ -69,10 +73,30 @@ const RegEmpleado = () => {
     }, []);
 
     // Función para manejar el envío del formulario
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit =  async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (formValid) {
             setShowModal(true);
+            await fetch(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(formValid),
+				},
+			);
+            try {
+                // Aquí deberías realizar la lógica de registro, por ejemplo, hacer una solicitud HTTP al backend
+                // Cuando el registro sea exitoso, muestra el modal de éxito
+                setShowSuccessModal(true);
+                setSuccessMessage('El empleado se registró con éxito.');
+            } catch (error) {
+                // En caso de error, muestra el modal de error
+                setShowErrorModal(true);
+                setErrorMessage('Hubo un problema al registrar al empleado. Por favor, inténtalo nuevamente.');
+            }
         }
     };
 
@@ -327,6 +351,29 @@ const RegEmpleado = () => {
                                     }}
                                     onClick={handleCloseModal}>
                                 Confirmar Registro
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                    <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Éxito</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>{successMessage}</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="purple" onClick={() => setShowSuccessModal(false)}>
+                                Cerrar
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                    <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Error</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>{errorMessage}</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="danger" onClick={() => setShowErrorModal(false)}>
+                                Cerrar
                             </Button>
                         </Modal.Footer>
                     </Modal>
