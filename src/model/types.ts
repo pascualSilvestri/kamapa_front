@@ -36,3 +36,37 @@ export interface Institucion {
 	nombre: string;
 	logo: string;
 }
+
+export interface EmployeeFormData {
+    empleado: {
+        matricula: string;
+        isActive: null;
+    };
+    usuario: {
+        legajo: string;
+        fecha_ingreso: string;
+        fecha_egreso: null;
+        nombre: string;
+        apellido: string;
+        dni: string;
+        cuil: string;
+        fechaNacimiento: string;
+        telefono: string;
+        is_active: boolean;
+        create_for: string;
+        update_for: string;
+        password: string;
+        rolId: string;
+    };
+    domicilio: {
+        calle: string;
+        numero: string;
+        barrio: string;
+        localidad: string;
+        provinciaId: string;
+    };
+    contacto: {
+        contacto: string;
+        email: string;
+    };
+}

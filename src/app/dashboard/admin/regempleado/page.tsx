@@ -1,9 +1,8 @@
 'use client'
-'use client'
 import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
-import { Rol, User } from '../../../../model/types';
+import { Rol, User, EmployeeFormData } from '../../../../model/types';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
@@ -73,27 +72,65 @@ const RegEmpleado = () => {
     }, []);
 
     // Función para manejar el envío del formulario
-    const handleSubmit =  async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (formValid) {
             setShowModal(true);
-            await fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(formValid),
-				},
-			);
+    
+            const formData: EmployeeFormData = {
+                empleado: {
+                    matricula: matriculaProfesional,
+                    isActive: null,
+                },
+                usuario: {
+                    legajo: legajo,
+                    fecha_ingreso: new Date().toISOString(), // Puedes ajustar esto según tus necesidades
+                    fecha_egreso: null,
+                    nombre: nombre,
+                    apellido: apellido,
+                    dni: dni,
+                    cuil: cuil,
+                    fechaNacimiento: fechaNacimiento,
+                    telefono: telefono,
+                    is_active: true, // O ajusta esto según tus necesidades
+                    create_for: '', // Puedes ajustar esto según tus necesidades
+                    update_for: '', // Puedes ajustar esto según tus necesidades
+                    password: '', // Puedes ajustar esto según tus necesidades
+                    rolId: '', // Puedes ajustar esto según tus necesidades
+                },
+                domicilio: {
+                    calle: domicilio,
+                    numero: '', // Puedes ajustar esto según tus necesidades
+                    barrio: '', // Puedes ajustar esto según tus necesidades
+                    localidad: '', // Puedes ajustar esto según tus necesidades
+                    provinciaId: provinciaSeleccionada,
+                },
+                contacto: {
+                    contacto: '', // Puedes ajustar esto según tus necesidades
+                    email: email,
+                },
+            };
+    
             try {
-                // Aquí deberías realizar la lógica de registro, por ejemplo, hacer una solicitud HTTP al backend
-                // Cuando el registro sea exitoso, muestra el modal de éxito
-                setShowSuccessModal(true);
-                setSuccessMessage('El empleado se registró con éxito.');
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData),
+                    }
+                );
+    
+                if (response.ok) {
+                    setShowSuccessModal(true);
+                    setSuccessMessage('El empleado se registró con éxito.');
+                } else {
+                    setShowErrorModal(true);
+                    setErrorMessage('Hubo un problema al registrar al empleado. Por favor, inténtalo nuevamente.');
+                }
             } catch (error) {
-                // En caso de error, muestra el modal de error
                 setShowErrorModal(true);
                 setErrorMessage('Hubo un problema al registrar al empleado. Por favor, inténtalo nuevamente.');
             }
@@ -287,7 +324,7 @@ const RegEmpleado = () => {
                                 </Link>
                             </div>
                             <div>
-                                <Button type="submit" variant='flat' style={{
+                                <Button type="submit"  variant='flat' style={{
                                     backgroundColor: 'purple',
                                     color: 'white',
                                     padding: '0.4rem 1rem',
@@ -318,7 +355,7 @@ const RegEmpleado = () => {
                             ¿Está seguro que desea registrar a: {nombre} {apellido} con permisos de: {Object.keys(roles).filter(rol => roles[rol]).join(', ')}?
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant='secondary' style={{
+                            <Button  variant='secondary' style={{
                                         padding: '0.4rem 1rem',
                                         fontSize: '1rem',
                                         transition: 'all 0.3s ease',
