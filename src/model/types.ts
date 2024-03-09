@@ -3,11 +3,11 @@ export interface User {
 	apellido: string;
 	legajo: string;
 	telefono: string;
-	rol?: string;
+	Roles?: Roles[];
 }
 
-export interface Rol {
-	name: string;
+export interface Roles {
+    name: string;
 	id: number;
 }
 
@@ -16,7 +16,7 @@ export interface Session {
 	expires: string;
 	id: number;
 	password: string;
-	rol: Rol;
+	roles: Roles;
 	nombre: string;
 	apellido: string;
 	dni: string;

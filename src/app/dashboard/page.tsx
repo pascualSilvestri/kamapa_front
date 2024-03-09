@@ -5,41 +5,40 @@ import Link from 'next/link';
 import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Rol, User } from '../../model/types';
+import { Roles, User } from '../../model/types';
 
 
 const Dashboard = () => {
 	const { data: session, status } = useSession();
 	const router = useRouter();
-	const [rol, setRol] = useState<Rol>({name: '', id: 0});
-	const [user , setUser] = useState<User>({
+	const [rol, setRol] = useState<Roles[]>([]);
+	const [user, setUser] = useState<User>({
 		nombre: '',
 		apellido: '',
 		legajo: '',
 		telefono: '',
-		rol:rol.name
+		Roles: rol
 	});
 
 	useEffect(() => {
 
-
-		console.log(session)
 		if (!session) {
 			router.push('/login');
 		} else {
-			setRol(rol);
 			setUser({
 				nombre: session.user.nombre,
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
 				telefono: session.user.telefono,
-				rol: session.rol.name,
+				Roles: session.user.Roles,
 			});
-			
-		}
-	}, [rol, router, session]);
+			setRol(session.user.Roles);
+			console.log(rol)
 
-	console.log(user)
+
+		}
+	}, [router, session]);
+
 	// Si el estado de la página está cargando, muestra el componente Loading
 	if (status === 'loading') {
 		return <Loading />;
@@ -49,7 +48,18 @@ const Dashboard = () => {
 	return (
 		<div className='d-flex justify-content-center align-items-center mt-5'>
 			<Card className='text-center'>
-				<Card.Header>Panel {user.rol}</Card.Header>
+				<Card.Header>	Roles<br/>
+					{
+						rol.map(role => {
+							return (
+								<>
+								 {' ' + role.name + ' '}	
+								</>
+							)
+						})
+					}
+				</Card.Header>
+				<Card.Header>Panel { }</Card.Header>
 				<Card.Body>
 					<Card.Title>
 						Bienvenido, {user.nombre} {user.apellido}
@@ -60,7 +70,7 @@ const Dashboard = () => {
 					</Card.Text>
 
 					{/* Enlace a la ruta específica según el rol */}
-					<Link href={`/dashboard/${user.rol}`}>
+					{/* <Link href={`/dashboard/${user.Roles}`}>
 						<Button
 							variant='flat'
 							type='submit'
@@ -81,7 +91,7 @@ const Dashboard = () => {
 							}}>
 							Comencemos
 						</Button>
-					</Link>
+					</Link> */}
 
 					{/* Botón para cerrar sesión */}
 					{/* <Button

@@ -19,7 +19,7 @@ export interface User {
 	domicilioId: number;
 	contactoId: number;
 	rolId: number;
-	rol: Rol;
+	Roles: Roles[];
 	accessToken: string; // Agrega esta línea
 }
 
@@ -30,10 +30,11 @@ export interface UserSession{
 	telefono: string;
 }
 
-export interface Rol {
+export interface Roles {
+    name: string;
 	id: number;
-	name: string;
 }
+
 
 
 export interface Institucion {
@@ -90,4 +91,17 @@ export interface EmployeeFormData {
         contacto: string;
         email: string;
     };
+}
+
+export interface Session {
+	user: User;
+	expires: string;
+	id: number;
+	password: string;
+	roles: Roles;
+	nombre: string;
+	apellido: string;
+	dni: string;
+	telefono: string;
+	legajo: string;
 }

@@ -1,6 +1,6 @@
 import NextAuth  from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { User, Rol, UserSession  } from '../../../../types/interfaces'; // Assuming User, Rol and Session are defined in your interfaces
+import { User,Roles, UserSession  } from '../../../../types/interfaces'; // Assuming User, Rol and Session are defined in your interfaces
 import { JWT } from 'next-auth/jwt';
 
 
@@ -32,7 +32,6 @@ const handler = NextAuth({
         if (session.error) {
           throw new Error(session.error);
         }
-        console.log(session);
         return session 
       },
     }),
@@ -47,9 +46,7 @@ const handler = NextAuth({
       // Asigna directamente el objeto de usuario desde el token al objeto de sesión
       if (session) {
         session.user = token.user as User;
-        session.rol = token.rol as Rol;
         }
-      console.log(session);
       return session; // Cast the session to the correct type
     },
   },
