@@ -4,6 +4,9 @@ import { Button, Table, Modal, Form, Row, Col } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { Roles, User } from '../../../../model/types';
+import { autorizeNivel , autorizeRol } from '../../../../utils/autorizacionPorRoles';
+
 
 
 const VistaEmpleadosPage = () => {
@@ -13,26 +16,28 @@ const VistaEmpleadosPage = () => {
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
-	const [rol, setRol] = useState({ name: '', id: 0 });
-	const [user, setUser] = useState({
+	const [rol, setRol] = useState<Roles[]>([]);
+	const [user, setUser] = useState<User>({
 		nombre: '',
 		apellido: '',
 		legajo: '',
 		telefono: '',
-		accessToken:'',
+		Roles: rol
 	});
 	const { data: session, status } = useSession();
 
 	useEffect(() =>{
+		
 		if (session) {
 			setUser({
 				nombre: session.user.nombre,
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
 				telefono: session.user.telefono,
-				accessToken: session.accessToken,
+				Roles:session.user.Roles
 			});
-			setRol(session.rol);
+			setRol(session.user.Roles);
+			
 		}
 	},[session])
 
@@ -165,7 +170,7 @@ const VistaEmpleadosPage = () => {
 			<Row className='mb-3  justify-content-center'>
 				<Col>
 					{/* Botón para volver */}
-					<Link href={`/dashboard/${rol.name}`}>
+					<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
 						<Button
 							variant='secondary'
 							style={{
@@ -187,7 +192,7 @@ const VistaEmpleadosPage = () => {
 					</Link>
 				</Col>
 				<Col>
-					<Link href={`/dashboard/${rol.name}/regempleado`}>
+					<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/regempleado`}>
 						<Button
 							variant='flat'
 							style={{

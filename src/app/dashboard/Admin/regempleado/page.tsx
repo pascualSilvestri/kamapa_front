@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
-import { Rol, User, EmployeeFormData } from '../../../../model/types';
+import { Roles, User, EmployeeFormData } from '../../../../model/types';
+import { autorizeNivel , autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
@@ -40,25 +41,26 @@ const RegEmpleado = () => {
     const [formValid, setFormValid] = useState(false);
 
     const { data: session, status: sessionStatus } = useSession();
-    const [rol, setRol] = useState<Rol>({ name: '', id: 0 });
-
-    const [user, setUser] = useState<User>({
-        nombre: '',
-        apellido: '',
-        legajo: '',
-        telefono: '',
-    });
-
+    const [rol, setRol] = useState<Roles[]>([]);
+	const [user, setUser] = useState<User>({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+		Roles: rol
+	});
     useEffect(() => {
         if (session) {
-            setUser({
-                nombre: session.user.nombre,
-                apellido: session.user.apellido,
-                legajo: session.user.legajo,
-                telefono: session.user.telefono,
-            });
-            setRol(session.rol);
-        }
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+				Roles:session.user.Roles
+			});
+			setRol(session.user.Roles);
+			
+		}
     }, [session]);
 
     // Lógica para obtener provincias
@@ -307,7 +309,7 @@ const RegEmpleado = () => {
                         </Form.Group>
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
-                                <Link href={`/dashboard/${rol.name}/vistausuarios`}>
+                                <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/vistausuarios`}>
                                     <Button variant='secondary' style={{
                                         padding: '0.4rem 1rem',
                                         fontSize: '1rem',

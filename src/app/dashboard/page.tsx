@@ -6,6 +6,7 @@ import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Roles, User } from '../../model/types';
+import { autorizeNivel , autorizeRol } from '../../utils/autorizacionPorRoles';
 
 
 const Dashboard = () => {
@@ -33,8 +34,7 @@ const Dashboard = () => {
 				Roles: session.user.Roles,
 			});
 			setRol(session.user.Roles);
-			console.log(rol)
-
+		
 
 		}
 	}, [router, session]);
@@ -70,7 +70,7 @@ const Dashboard = () => {
 					</Card.Text>
 
 					{/* Enlace a la ruta específica según el rol */}
-					{/* <Link href={`/dashboard/${user.Roles}`}>
+					<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
 						<Button
 							variant='flat'
 							type='submit'
@@ -91,7 +91,7 @@ const Dashboard = () => {
 							}}>
 							Comencemos
 						</Button>
-					</Link> */}
+					</Link>
 
 					{/* Botón para cerrar sesión */}
 					{/* <Button

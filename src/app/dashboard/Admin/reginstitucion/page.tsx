@@ -1,10 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
-import useFormStatus from './../../../components/useFormStatus';
+import useFormStatus from '../../../components/useFormStatus';
 import Link from 'next/link';
 import { useSession, signIn } from 'next-auth/react';
-import { Provincia, User, Rol } from '../../../../model/types';
+import { Provincia, User, Roles } from '../../../../model/types';
 
 
 // Define la interfaz para los datos del formulario
@@ -36,13 +36,14 @@ const RegInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [modalMessage, setModalMessage] = useState('');
 	const { data: session, status: sessionStatus } = useSession();
+	const [rol, setRol] = useState<Roles[]>([]);
 	const [user, setUser] = useState<User>({
 		nombre: '',
 		apellido: '',
 		legajo: '',
 		telefono: '',
+		Roles: rol
 	});
-	const [rol, setRol] = useState<Rol>({name: '', id: 0});
 	// Estados para los datos del formulario, provincias, estado del modal y estado del formulario
 	const [formState, setFormState] = useState<FormData>({
 		institucion: {
@@ -72,8 +73,10 @@ const RegInstitucionPage = () => {
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
 				telefono: session.user.telefono,
+				Roles:session.user.Roles
 			});
-			setRol(session.rol);
+			setRol(session.user.Roles);
+			
 		}
 	}
 	, [session]);
@@ -406,7 +409,7 @@ const RegInstitucionPage = () => {
 				<Row className='mb-3'>
             
             <Col sm={6}>
-                <Link href={`/dashboard/vistainstitucion`}>
+                <Link href={`/dashboard/Admin/vistainstitucion`}>
                     <Button
                         variant='secondary'
                         style={{

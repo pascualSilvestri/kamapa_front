@@ -9,7 +9,9 @@ import { ModalType } from '../../../../utils/const';
 import ModalViewInstitucion from '../../../components/ModalViewInstitucion';
 import ModalUpdateInstitucion from '../../../components/ModalUpdateInstitucion';
 import { useRouter } from 'next/navigation';
-import { Rol, User, Institucion } from '../../../../model/types';
+import { Roles, User, Institucion } from '../../../../model/types';
+import { autorizeNivel , autorizeRol } from '../../../../utils/autorizacionPorRoles';
+
 
 
 const VistaInstitucionPage = () => {
@@ -27,13 +29,14 @@ const VistaInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { data: session, status } = useSession();
+	const [rol, setRol] = useState<Roles[]>([]);
 	const [user, setUser] = useState<User>({
 		nombre: '',
 		apellido: '',
 		legajo: '',
 		telefono: '',
+		Roles: rol
 	});
-	const [rol, setRol] = useState<Rol>({name: '', id: 0});
 	const router = useRouter();
 
 
@@ -45,10 +48,11 @@ const VistaInstitucionPage = () => {
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
 				telefono: session.user.telefono,
+				Roles:session.user.Roles
 			});
-			setRol(session.rol);
+			setRol(session.user.Roles);
+			
 		}
-
 		if (!session) {
 			router.push('/login');
 		}
@@ -151,7 +155,7 @@ const VistaInstitucionPage = () => {
 		<div className='p-3'>
 			<div className='mb-3 d-flex justify-content-center'>
 				<div className='me-1'>
-					<Link href={`/dashboard/${rol.name}`}>
+					<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
 						<Button variant='secondary' style={{
 							marginRight: '10px',
 							padding: '0.4rem 1rem',
@@ -170,7 +174,7 @@ const VistaInstitucionPage = () => {
 				</div>
 
 				<div>
-					<Link href={`/dashboard/${rol.name}/reginstitucion`}>
+					<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/reginstitucion`}>
 						<Button variant='flat' style={{
 							backgroundColor: 'purple',
 							color: 'white',

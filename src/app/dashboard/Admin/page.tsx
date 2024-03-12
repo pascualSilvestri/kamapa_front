@@ -13,19 +13,20 @@ import {
 	Col,
 } from 'react-bootstrap';
 import Link from 'next/link';
-import { Rol, User } from '../../../model/types';
+import { Roles, User } from '../../../model/types';
+import { autorizeNivel , autorizeRol } from '../../../utils/autorizacionPorRoles';
 
 
 export default function Page() {
 
 	const { data: session, status } = useSession();
-	const [rol, setRol] = useState<Rol>({name: '', id: 0});
-	const [user, setUser] = useState < User > ({
+	const [rol, setRol] = useState<Roles[]>([]);
+	const [user, setUser] = useState<User>({
 		nombre: '',
 		apellido: '',
 		legajo: '',
 		telefono: '',
-		rol:rol.name
+		Roles: rol
 	});
 	const router = useRouter();
 
@@ -42,11 +43,12 @@ export default function Page() {
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
 				telefono: session.user.telefono,
-				rol:session.rol.name
+				Roles:session.user.Roles
 			});
+			setRol(session.user.Roles);
 			
 		}
-	}, [rol, router, session]);
+	}, [router, session]);
 
 
 
@@ -94,7 +96,7 @@ export default function Page() {
 								Gestiona a los usuarios de tu aplicación
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${user.rol}/vistausuarios`}>
+							<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/vistausuarios`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -112,7 +114,7 @@ export default function Page() {
 								Administra las Instituciones Registradas
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${rol.name}/vistainstitucion`}>
+							<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/vistainstitucion`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -128,7 +130,7 @@ export default function Page() {
 							<CardTitle style={{ textAlign: 'center' }}>Roles</CardTitle>
 							<CardSubtitle>Asignacion de vistas Segun el Rol</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${rol.name}`}>
+							<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
@@ -146,7 +148,7 @@ export default function Page() {
 								Estadísticas de Usuarios & Instituciones Registrados
 							</CardSubtitle>
 							{/* Utiliza el componente Link para los enlaces */}
-							<Link href={`/dashboard/${rol.name}`}>
+							<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
 								<Button
 									variant='primary'
 									style={{ width: '100%' }}>
