@@ -1,13 +1,96 @@
+import { Nav, Navbar, NavDropdown, Container, Offcanvas } from 'react-bootstrap';
+import Link from 'next/link';
+import Image from 'next/image';
+import ButtonAuth from './ButtonAuth';
+import React from 'react';
 
-import { Nav, Navbar, NavDropdown, Container, Offcanvas } from 'react-bootstrap'
-import Link from 'next/link'
-import Image from 'next/image'
-import ButtonAuth from './ButtonAuth'
+import { useRouter } from 'next/navigation'; // Import corregido
+import { useEffect, useState, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 
-export function Navigation () {
+export function Navigation() {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [user, setUser] = useState({
+    nombre: '',
+    apellido: '',
+    legajo: '',
+    telefono: '',
+    Roles: []
+  });
+
+  console.log(session)
+  useEffect(() => {
+    if (!session) {
+      router.push('/login');
+    } else {
+      setUser({
+        nombre: session.user.nombre,
+        apellido: session.user.apellido,
+        legajo: session.user.legajo,
+        telefono: session.user.telefono,
+        Roles: session.user.Roles,
+      });
+    }
+  }, [router, session]);
+
+  console.log(router)
+  
+  // Definir las rutas según el rol del usuario
+  const routes = useMemo(() => ({
+    admin: [
+      { label: 'Inicio', href: '/dashboard' },
+      { label: 'Dirección', href: '/director' },
+      { label: 'Preceptores', href: '/preceptor' },
+      { label: 'Profesores', href: '/profesores' },
+      { label: 'Alumnos', href: '/alumnos' },
+      { label: 'Aulas', href: '/aulas' },
+      { label: 'About', href: '/about' },
+      {
+        label: 'Registros', items: [
+          { label: 'Institución', href: '/reginstitucion' },
+          { label: 'Aulas', href: '/regaulas' },
+          { label: 'Alumnos', href: '/regalumnos' },
+          { label: 'Personal', href: '/regempleado' },
+          { label: 'Asignación de Permisos', href: '/permisos' }
+        ]
+      }
+    ],
+    director: [
+      { label: 'Inicio', href: '/dashboard' },
+      { label: 'Dirección', href: '/director' },
+      { label: 'Secretario', href: '/secretario' },
+      { label: 'Preceptores', href: '/preceptor' },
+      { label: 'Profesores', href: '/profesores' },
+      { label: 'Alumnos', href: '/alumnos' },
+      { label: 'Aulas', href: '/aulas' },
+      { label: 'About', href: '/about' },
+      {
+        label: 'Registros', items: [
+          { label: 'Alumnos', href: '/regalumnos' },
+          { label: 'Personal', href: '/regempleado' },
+          { label: 'Asignación de Permisos', href: '/permisos' }
+        ]
+      }
+    ],
+    // Otras definiciones de rutas
+  }), []);
+
+  const [userRoutes, setUserRoutes] = useState([]);
+
+  useEffect(() => {
+    if (user.Roles && user.Roles.length > 0) {
+      const rol = user.Roles[0].name; // Obtener el primer rol del usuario
+      const userRoutes = routes[rol] || [];
+      setUserRoutes(userRoutes);
+    }
+  }, [user, routes]);
+  console.log(user);
+  console.log(routes);
+
   return (
     <header data-bs-theme='dark'>
-      {['xxl'].map((expand) => (
+      {['xxxl'].map((expand) => (
         <Navbar
           key={expand} expand={expand} className='bg-body-tertiary mb-3'
         >
@@ -49,43 +132,29 @@ export function Navigation () {
                   className='justify-content-center'
                   style={{ marginBottom: '10px' }}
                 />
-
               </Offcanvas.Header>
               <Offcanvas.Body>
-                <Nav className='justify-content-end flex-grow-1 pe-3'>
-                  {/* Aquí van los Link, y se enrrutan de la siguiente manera */}
-                  <Nav>
-                    <Link className='nav-link' href='/dashboard'>
-                      Inicio
+              <Nav className='justify-content-end flex-grow-1 pe-3'>
+              {userRoutes && userRoutes.map((route, index) => (
+                route.items ? (
+                    <div key={index}>
+                        <Link href="#">
+                            <a className='nav-link'>{route.label}</a>
+                        </Link>
+                        <div className="dropdown-menu">
+                            {route.items.map((item, idx) => (
+                                <Link href={item.href} key={idx}>
+                                    <a className='dropdown-item'>{item.label}</a>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <Link href={route.href} key={index}>
+                        <a className='nav-link'>{route.label}</a>
                     </Link>
-                  </Nav>
-                  <Nav>
-                    <Link className='nav-link' href='/alumnos'>
-                      Alumnos
-                    </Link>
-                  </Nav>
-                  <Nav>
-                    <Link className='nav-link' href='/profesores'>
-                      Profesores
-                    </Link>
-                  </Nav>
-                  <Nav>
-                    <Link className='nav-link' href='/aulas'>
-                      Aulas
-                    </Link>
-                  </Nav>
-                  <Nav>
-                    <Link className='nav-link' href='/about'>
-                      About
-                    </Link>
-                  </Nav>
-                  <NavDropdown title='Registros' id={`offcanvasNavbarDropdown-expand-${expand}`}>
-                    <NavDropdown.Item href='/form_alumnos'>Alumnos</NavDropdown.Item>
-                    <NavDropdown.Divider />
-                    <NavDropdown.Item href='/form_personal'>Personal</NavDropdown.Item>
-                    <NavDropdown.Divider />
-                    <NavDropdown.Item href='/form_roles'>Asignación de Permisos</NavDropdown.Item>
-                  </NavDropdown>
+                )
+            ))}
                 </Nav>
                 <hr />
                 {/* <Form className='d-flex'>
@@ -104,5 +173,5 @@ export function Navigation () {
         </Navbar>
       ))}
     </header>
-  )
+  );
 }
