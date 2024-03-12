@@ -1,6 +1,6 @@
 'use client';
 import { useSession, signOut } from 'next-auth/react';
-import { Card, Button } from 'react-bootstrap';
+import { Card, Button, Row, Col } from 'react-bootstrap';
 import Link from 'next/link';
 import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
@@ -44,73 +44,76 @@ const Dashboard = () => {
 		return <Loading />;
 	}
 
+	const generateRoute = (roles) => {
+		// Aquí debes implementar la lógica para determinar la ruta según los roles del usuario
+		// Por ejemplo, podrías retornar una ruta basada en el primer rol del usuario
+		// En esta implementación, supondremos que el primer rol es el más relevante
+		const role = roles[0];
+		switch (role) {
+		  case 'Admin':
+			return '/admin';
+		  case 'Director':
+			return '/director';
+		  case 'Secretario':
+			return '/secretario';
+		  case 'Preceptor':
+			return '/preceptor';
+		  case 'Docente':
+			return '/docente';
+		  case 'Alumno':
+			return '/alumno';
+		  default:
+			return '/login';
+		}
+	  };
+
 
 	return (
-		<div className='d-flex justify-content-center align-items-center mt-5'>
+		<Row className='justify-content-center mt-5'>
+		{rol.map((role, index) => (
+		  <Col key={index} xs={12} sm={6} md={4}>
 			<Card className='text-center'>
-				<Card.Header>	Roles<br/>
-					{
-						rol.map(role => {
-							return (
-								<>
-								 {' ' + role.name + ' '}	
-								</>
-							)
-						})
-					}
-				</Card.Header>
-				<Card.Header>Panel { }</Card.Header>
-				<Card.Body>
-					<Card.Title>
-						Bienvenido, {user.nombre} {user.apellido}
-					</Card.Title>
-					<Card.Text>
-						<strong>Legajo:</strong> {user.legajo} <br />
-						<strong>Teléfono:</strong> {user.telefono}
-					</Card.Text>
-
-					{/* Enlace a la ruta específica según el rol */}
-					<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
-						<Button
-							variant='flat'
-							type='submit'
-							style={{
-								backgroundColor: 'purple',
-								color: 'white',
-								padding: '0.4rem 1rem',
-								fontSize: '1rem',
-								transition: 'all 0.3s ease',
-							}}
-							onMouseEnter={(e) => {
-								e.currentTarget.style.backgroundColor = 'white';
-								e.currentTarget.style.color = 'black';
-							}}
-							onMouseLeave={(e) => {
-								e.currentTarget.style.backgroundColor = 'purple';
-								e.currentTarget.style.color = 'white';
-							}}>
-							Comencemos
-						</Button>
-					</Link>
-
-					{/* Botón para cerrar sesión */}
-					{/* <Button
-            variant='danger'
-            onClick={handleLogout}
-            style={{
-              marginTop: '1rem',
-              padding: '0.4rem 1rem',
-              fontSize: '1rem',
-              transition: 'all 0.3s ease',
-            }}>
-            Cerrar sesión
-          </Button> */}
-				</Card.Body>
-				<Card.Footer className='text-muted'>
-					{session ? 'Sesión activa' : 'No hay sesión activa'}
-				</Card.Footer>
+			  <Card.Header>{' ' + role.name + ' '}</Card.Header>
+			  <Card.Header>Panel { }</Card.Header>
+			  <Card.Body>
+				<Card.Title>
+				  Bienvenido, {user.nombre} {user.apellido}
+				</Card.Title>
+				<Card.Text>
+				  <strong>Legajo:</strong> {user.legajo} <br />
+				  <strong>Teléfono:</strong> {user.telefono}
+				</Card.Text>
+				{/* Enlace a la ruta específica según el rol */}
+				<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
+				  <Button
+					variant='flat'
+					type='submit'
+					style={{
+					  backgroundColor: 'purple',
+					  color: 'white',
+					  padding: '0.4rem 1rem',
+					  fontSize: '1rem',
+					  transition: 'all 0.3s ease',
+					}}
+					onMouseEnter={(e) => {
+					  e.currentTarget.style.backgroundColor = 'white';
+					  e.currentTarget.style.color = 'black';
+					}}
+					onMouseLeave={(e) => {
+					  e.currentTarget.style.backgroundColor = 'purple';
+					  e.currentTarget.style.color = 'white';
+					}}>
+					Comencemos
+				  </Button>
+				</Link>
+			  </Card.Body>
+			  <Card.Footer className='text-muted'>
+				{session ? 'Sesión activa' : 'No hay sesión activa'}
+			  </Card.Footer>
 			</Card>
-		</div>
+		  </Col>
+		))}
+	  </Row>
 	);
 };
 
