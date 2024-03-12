@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Roles, User } from '../../../../model/types';
+import { autorizeNivel , autorizeRol } from '../../../../utils/autorizacionPorRoles';
+
 
 // Define la interfaz para el objeto de provincia
 interface Provincia {
@@ -50,10 +54,17 @@ const RegAlumnoPage = () => {
 
 	// Estado para almacenar las provincias
 	const [provincias, setProvincias] = useState<Provincia[]>([]);
+	const router = useRouter();
 
 	// Estado para almacenar roles
-	const [roles, setRoles] = useState([]);
-
+	const [rol, setRol] = useState<Roles[]>([]);
+	const [user, setUser] = useState<User>({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+		Roles: rol
+	});
 	// Estado para almacenar el estado del formulario (éxito o error)
 	const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
@@ -92,6 +103,26 @@ const RegAlumnoPage = () => {
 
 	// Estado para mostrar/ocultar el modal
 	const [showModal, setShowModal] = useState(false);
+
+	useEffect(() => {
+		// Si no hay sesión, redirige a la página de inicio de sesión
+		if (!session) {
+			router.push('/login');
+		}
+
+		if (session) {
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+				Roles:session.user.Roles
+			});
+			setRol(session.user.Roles);
+			
+		}
+	}, [router, session]);
+
 
 	// Función para actualizar el estado del formulario cuando se cambia un campo
 	const handleChange = (
@@ -488,7 +519,7 @@ const RegAlumnoPage = () => {
 					</Col>
 					<Col>
 						{/* Botón para volver */}
-						<Link href={`/dashboard/${session?.user?.rol}/vistausuarios`}>
+						<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/vistausuarios`}>
 							<Button
 								variant='secondary'
 								style={{
