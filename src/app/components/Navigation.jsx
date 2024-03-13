@@ -2,10 +2,8 @@ import { Nav, Navbar, NavDropdown, Container, Offcanvas } from 'react-bootstrap'
 import Link from 'next/link';
 import Image from 'next/image';
 import ButtonAuth from './ButtonAuth';
-import React from 'react';
-
+import React,{ useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation'; // Import corregido
-import { useEffect, useState, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 
 export function Navigation() {
@@ -32,10 +30,9 @@ export function Navigation() {
         Roles: session.user.Roles,
       });
     }
-  }, [router, session]);
+  }, [session, router]);
 
-  console.log(router)
-  
+  // Definir las rutas según el rol del usuario
   // Definir las rutas según el rol del usuario
   const routes = useMemo(() => ({
     admin: [
@@ -73,7 +70,47 @@ export function Navigation() {
         ]
       }
     ],
-    // Otras definiciones de rutas
+    secretario: [
+      { label: 'Inicio', href: '/dashboard' },
+      { label: 'Preceptores', href: '/preceptor' },
+      { label: 'Profesores', href: '/profesores' },
+      { label: 'Aulas', href: '/aulas' },
+      { label: 'About', href: '/about' },
+      {
+        label: 'Registros', items: [
+          { label: 'Personal', href: '/regempleado' },
+        ]
+      }
+    ],
+    preceptor: [
+      { label: 'Inicio', href: '/dashboard' },
+      { label: 'Preceptores', href: '/preceptor' },
+      { label: 'Alumnos', href: '/alumnos' },
+      { label: 'Aulas', href: '/aulas' },
+      { label: 'About', href: '/about' },
+      {
+        label: 'Registros', items: [
+          { label: 'Alumnos', href: '/regalumnos' },
+        ]
+      }
+    ],
+    docente: [
+      { label: 'Inicio', href: '/dashboard' },
+      { label: 'Alumnos', href: '/alumnos' },
+      { label: 'Aulas', href: '/aulas' },
+      { label: 'About', href: '/about' },
+      {
+        label: 'Registros', items: [
+          { label: 'Notas', href: '/calificar' },
+        ]
+      }
+    ],
+    Alumno: [
+      { label: 'Inicio', href: '/dashboard' },
+      { label: 'calificaciones', href: '/calificaciones' },
+      { label: 'Aulas', href: '/aulas' },
+      { label: 'About', href: '/about' }
+    ]
   }), []);
 
   const [userRoutes, setUserRoutes] = useState([]);
@@ -81,13 +118,11 @@ export function Navigation() {
   useEffect(() => {
     if (user.Roles && user.Roles.length > 0) {
       const rol = user.Roles[0].name; // Obtener el primer rol del usuario
-      const userRoutes = routes[rol] || [];
+      const userRoutes = routes[rol];
       setUserRoutes(userRoutes);
     }
   }, [user, routes]);
-  console.log(user);
-  console.log(routes);
-
+  
   return (
     <header data-bs-theme='dark'>
       {['xxxl'].map((expand) => (
@@ -135,26 +170,21 @@ export function Navigation() {
               </Offcanvas.Header>
               <Offcanvas.Body>
               <Nav className='justify-content-end flex-grow-1 pe-3'>
-              {userRoutes && userRoutes.map((route, index) => (
-                route.items ? (
-                    <div key={index}>
-                        <Link href="#">
-                            <a className='nav-link'>{route.label}</a>
-                        </Link>
-                        <div className="dropdown-menu">
-                            {route.items.map((item, idx) => (
-                                <Link href={item.href} key={idx}>
-                                    <a className='dropdown-item'>{item.label}</a>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                ) : (
-                    <Link href={route.href} key={index}>
+                  {userRoutes && userRoutes.map((route, index) => (
+                    route.items ? (
+                      <NavDropdown title={route.label} key={index} id={`nav-dropdown-${index}`}>
+                        {route.items.map((item, idx) => (
+                          <Link href={item.href} key={idx}>
+                            <a className='dropdown-item'>{item.label}</a>
+                          </Link>
+                        ))}
+                      </NavDropdown>
+                    ) : (
+                      <Link href={route.href} key={index}>
                         <a className='nav-link'>{route.label}</a>
-                    </Link>
-                )
-            ))}
+                      </Link>
+                    )
+                  ))}
                 </Nav>
                 <hr />
                 {/* <Form className='d-flex'>
