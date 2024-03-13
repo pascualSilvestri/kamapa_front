@@ -56,8 +56,8 @@ export interface EmployeeFormData {
         create_for: string;
         update_for: string;
         password: string;
-        rolId: string;
     };
+    rols: any[]
     domicilio: {
         calle: string;
         numero: string;

@@ -30,6 +30,7 @@ const handler = NextAuth({
         const session = await res.json();
 
         if (session.error) {
+          console.log(session.error);
           throw new Error(session.error);
         }
         return session 

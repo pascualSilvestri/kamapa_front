@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
 import { Roles, User, EmployeeFormData } from '../../../../model/types';
-import { autorizeNivel , autorizeRol } from '../../../../utils/autorizacionPorRoles';
+import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
@@ -26,13 +26,6 @@ const RegEmpleado = () => {
     const [cuil, setCuil] = useState('');
     const [fechaNacimiento, setFechaNacimiento] = useState('');
     const [email, setEmail] = useState('');
-    const [roles, setRoles] = useState({
-        admin: false,
-        director: false,
-        secretario: false,
-        preseptor: false,
-        profesor: false
-    });
     const [showModal, setShowModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
@@ -41,29 +34,33 @@ const RegEmpleado = () => {
     const [formValid, setFormValid] = useState(false);
 
     const { data: session, status: sessionStatus } = useSession();
+    const [selectedRoleIds, setSelectedRoleIds] = useState([]);
+    const [roles, setRoles] = useState({});
     const [rol, setRol] = useState<Roles[]>([]);
-	const [user, setUser] = useState<User>({
-		nombre: '',
-		apellido: '',
-		legajo: '',
-		telefono: '',
-		Roles: rol
-	});
+    const [user, setUser] = useState<User>({
+        nombre: '',
+        apellido: '',
+        legajo: '',
+        telefono: '',
+        Roles: rol
+    });
     useEffect(() => {
         if (session) {
-			setUser({
-				nombre: session.user.nombre,
-				apellido: session.user.apellido,
-				legajo: session.user.legajo,
-				telefono: session.user.telefono,
-				Roles:session.user.Roles
-			});
-			setRol(session.user.Roles);
-			
-		}
+            setUser({
+                nombre: session.user.nombre,
+                apellido: session.user.apellido,
+                legajo: session.user.legajo,
+                telefono: session.user.telefono,
+                Roles: session.user.Roles
+            });
+            setRol(session.user.Roles);
+
+        }
     }, [session]);
 
-    // Lógica para obtener provincias
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Obtener las provincias de la base de datos para mostrarlos en los select
     useEffect(() => {
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/provincia`)
             .then(response => response.json())
@@ -73,12 +70,30 @@ const RegEmpleado = () => {
             .catch(error => console.error('Error fetching provinces:', error));
     }, []);
 
-    // Función para manejar el envío del formulario
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Obtener los roles de la base de datos para mostrarlos en los checkbox
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rols`)
+            .then(response => response.json())
+            .then((data: Roles[]) => {
+                const rolesObj = data.reduce((obj, rol) => {
+                    obj[rol.name] = { checked: false, id: rol.id };
+                    return obj;
+                }, {});
+
+                setRoles(rolesObj);
+            })
+            .catch(error => console.error('Error fetching provinces:', error));
+    }, [rol]);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///Obtengo los datos del formulario y los envio al backend
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (formValid) {
-            setShowModal(true);
-    
+            // setShowModal(true);
+
             const formData: EmployeeFormData = {
                 empleado: {
                     matricula: matriculaProfesional,
@@ -97,9 +112,10 @@ const RegEmpleado = () => {
                     is_active: true, // O ajusta esto según tus necesidades
                     create_for: '', // Puedes ajustar esto según tus necesidades
                     update_for: '', // Puedes ajustar esto según tus necesidades
-                    password: '', // Puedes ajustar esto según tus necesidades
-                    rolId: '', // Puedes ajustar esto según tus necesidades
+                    password: dni, // Puedes ajustar esto según tus necesidades
+                    // Puedes ajustar esto según tus necesidades
                 },
+                rols: selectedRoleIds,
                 domicilio: {
                     calle: domicilio,
                     numero: '', // Puedes ajustar esto según tus necesidades
@@ -108,11 +124,13 @@ const RegEmpleado = () => {
                     provinciaId: provinciaSeleccionada,
                 },
                 contacto: {
-                    contacto: '', // Puedes ajustar esto según tus necesidades
+                    contacto: telefono, // Puedes ajustar esto según tus necesidades
                     email: email,
                 },
             };
-    
+
+            console.log(formData);
+
             try {
                 const response = await fetch(
                     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,
@@ -124,7 +142,7 @@ const RegEmpleado = () => {
                         body: JSON.stringify(formData),
                     }
                 );
-    
+
                 if (response.ok) {
                     setShowSuccessModal(true);
                     setSuccessMessage('El empleado se registró con éxito.');
@@ -174,6 +192,7 @@ const RegEmpleado = () => {
             preseptor: false,
             profesor: false
         });
+        setSelectedRoleIds([]);
     };
 
     return (
@@ -185,17 +204,17 @@ const RegEmpleado = () => {
                     <Form onSubmit={handleSubmit}>
                         <Form.Group controlId="nombre">
                             <Form.Label>Nombre *</Form.Label>
-                            <Form.Control 
-                                type="text" 
+                            <Form.Control
+                                type="text"
                                 placeholder="Nombre"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
-                            /> 
+                            />
                         </Form.Group>
                         <Form.Group controlId="apellido">
                             <Form.Label>Apellido *</Form.Label>
-                            <Form.Control 
-                                type="text" 
+                            <Form.Control
+                                type="text"
                                 placeholder="Apellido"
                                 value={apellido}
                                 onChange={(e) => setApellido(e.target.value)}
@@ -203,8 +222,8 @@ const RegEmpleado = () => {
                         </Form.Group>
                         <Form.Group controlId="dni">
                             <Form.Label>DNI *</Form.Label>
-                            <Form.Control 
-                                type="text" 
+                            <Form.Control
+                                type="text"
                                 placeholder="DNI"
                                 value={dni}
                                 onChange={(e) => setDni(e.target.value)}
@@ -212,8 +231,8 @@ const RegEmpleado = () => {
                         </Form.Group>
                         <Form.Group controlId="domicilio">
                             <Form.Label>Domicilio *</Form.Label>
-                            <Form.Control 
-                                type="text" 
+                            <Form.Control
+                                type="text"
                                 placeholder="Domicilio"
                                 value={domicilio}
                                 onChange={(e) => setDomicilio(e.target.value)}
@@ -222,7 +241,7 @@ const RegEmpleado = () => {
                         <Form.Group controlId="provincias">
                             <Form.Label>Provincia *</Form.Label>
                             <div className="input-group">
-                                <Form.Control 
+                                <Form.Control
                                     as="select"
                                     value={provinciaSeleccionada}
                                     onChange={(e) => setProvinciaSeleccionada(e.target.value)}
@@ -243,8 +262,8 @@ const RegEmpleado = () => {
                         </Form.Group>
                         <Form.Group controlId="telefono">
                             <Form.Label>Teléfono *</Form.Label>
-                            <Form.Control 
-                                type="text" 
+                            <Form.Control
+                                type="text"
                                 placeholder="Teléfono"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}
@@ -252,8 +271,8 @@ const RegEmpleado = () => {
                         </Form.Group>
                         <Form.Group controlId="matriculaProfesional">
                             <Form.Label>Matrícula Profesional *</Form.Label>
-                            <Form.Control 
-                                type="text" 
+                            <Form.Control
+                                type="text"
                                 placeholder="Matrícula Profesional"
                                 value={matriculaProfesional}
                                 onChange={(e) => setMatriculaProfesional(e.target.value)}
@@ -261,8 +280,8 @@ const RegEmpleado = () => {
                         </Form.Group>
                         <Form.Group controlId="legajo">
                             <Form.Label>Legajo *</Form.Label>
-                            <Form.Control 
-                                type="text" 
+                            <Form.Control
+                                type="text"
                                 placeholder="Legajo"
                                 value={legajo}
                                 onChange={(e) => setLegajo(e.target.value)}
@@ -270,8 +289,8 @@ const RegEmpleado = () => {
                         </Form.Group>
                         <Form.Group controlId="cuil">
                             <Form.Label>CUIL *</Form.Label>
-                            <Form.Control 
-                                type="text" 
+                            <Form.Control
+                                type="text"
                                 placeholder="CUIL"
                                 value={cuil}
                                 onChange={(e) => setCuil(e.target.value)}
@@ -279,31 +298,40 @@ const RegEmpleado = () => {
                         </Form.Group>
                         <Form.Group controlId="fechaNacimiento">
                             <Form.Label>Fecha de Nacimiento *</Form.Label>
-                            <Form.Control 
-                                type="date" 
+                            <Form.Control
+                                type="date"
                                 value={fechaNacimiento}
                                 onChange={(e) => setFechaNacimiento(e.target.value)}
                             />
                         </Form.Group>
                         <Form.Group controlId="email">
                             <Form.Label>Email *</Form.Label>
-                            <Form.Control 
-                                type="email" 
+                            <Form.Control
+                                type="email"
                                 placeholder="Email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </Form.Group>
-                        <Form.Group controlId="roles">
+                        <Form.Group controlId='roles'>
                             <Form.Label>Roles *</Form.Label>
                             {Object.keys(roles).map((rol, index) => (
-                                <Form.Check 
+                                <Form.Check
                                     key={index}
                                     type="checkbox"
                                     id={rol}
                                     label={rol}
-                                    checked={roles[rol]}
-                                    onChange={(e) => setRoles({ ...roles, [rol]: e.target.checked })}
+                                    checked={roles[rol].checked}
+                                    onChange={(e) => {
+                                        const isChecked = e.target.checked;
+                                        setRoles({ ...roles, [rol]: { ...roles[rol], checked: isChecked } });
+
+                                        if (isChecked) {
+                                            setSelectedRoleIds([...selectedRoleIds, roles[rol].id]);
+                                        } else {
+                                            setSelectedRoleIds(selectedRoleIds.filter(id => id !== roles[rol].id));
+                                        }
+                                    }}
                                 />
                             ))}
                         </Form.Group>
@@ -326,7 +354,7 @@ const RegEmpleado = () => {
                                 </Link>
                             </div>
                             <div>
-                                <Button type="submit"  variant='flat' style={{
+                                <Button type="submit" variant='flat' style={{
                                     backgroundColor: 'purple',
                                     color: 'white',
                                     padding: '0.4rem 1rem',
@@ -357,38 +385,38 @@ const RegEmpleado = () => {
                             ¿Está seguro que desea registrar a: {nombre} {apellido} con permisos de: {Object.keys(roles).filter(rol => roles[rol]).join(', ')}?
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button  variant='secondary' style={{
-                                        padding: '0.4rem 1rem',
-                                        fontSize: '1rem',
-                                        transition: 'all 0.3s ease',
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'white';
-                                            e.currentTarget.style.color = 'black';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'grey';
-                                            e.currentTarget.style.color = 'white';
-                                        }} 
-                                        onClick={handleCloseModal}>
+                            <Button variant='secondary' style={{
+                                padding: '0.4rem 1rem',
+                                fontSize: '1rem',
+                                transition: 'all 0.3s ease',
+                            }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'white';
+                                    e.currentTarget.style.color = 'black';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'grey';
+                                    e.currentTarget.style.color = 'white';
+                                }}
+                                onClick={handleCloseModal}>
                                 Cancelar
                             </Button>
                             <Button variant='flat' style={{
-                                    backgroundColor: 'purple',
-                                    color: 'white',
-                                    padding: '0.4rem 1rem',
-                                    fontSize: '1rem',
-                                    transition: 'all 0.3s ease',
+                                backgroundColor: 'purple',
+                                color: 'white',
+                                padding: '0.4rem 1rem',
+                                fontSize: '1rem',
+                                transition: 'all 0.3s ease',
+                            }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'white';
+                                    e.currentTarget.style.color = 'black';
                                 }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'white';
-                                        e.currentTarget.style.color = 'black';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'purple';
-                                        e.currentTarget.style.color = 'white';
-                                    }}
-                                    onClick={handleCloseModal}>
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'purple';
+                                    e.currentTarget.style.color = 'white';
+                                }}
+                                onClick={handleCloseModal}>
                                 Confirmar Registro
                             </Button>
                         </Modal.Footer>

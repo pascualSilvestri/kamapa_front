@@ -1,7 +1,8 @@
 import { RoleEmun, AutorizedEmun } from './const';
 import { Roles } from '../types/interfaces';
 
-
+//////////////////////////////////////////////////////////////////////////////
+///Recibe un array de Roles y retorna el nivel de aurotizacion en formato int 
 export function autorizeNivel(roles: Roles[]) {
     const rolePriority = [RoleEmun.Admin, RoleEmun.Director, RoleEmun.Secretario, RoleEmun.Preceptor, RoleEmun.Profesor, RoleEmun.Alumno];
 
@@ -27,6 +28,9 @@ export function autorizeNivel(roles: Roles[]) {
     return -1;
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////
+/// recibe el nivel de autorizacion un Int y retorna el rol por la autorizacion 
 export function autorizeRol(autorizeNivel: number) {
     switch (autorizeNivel) {
         case AutorizedEmun.Admin:
@@ -46,8 +50,14 @@ export function autorizeRol(autorizeNivel: number) {
     }
 }
 
-export function getRole(roles: Roles[]){
-    
+///////////////////////////////////////////////////////////////////
+/// Recibe un array de Roles y retorna un array de nombre de roles
+export function getRoles(roles: Roles[]){
+    let rols = [];
+    for (let role of roles) {
+        rols.push(role.name);
+    }
+    return rols;
 }
 
 
