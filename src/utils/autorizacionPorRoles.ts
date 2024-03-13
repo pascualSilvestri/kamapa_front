@@ -46,4 +46,8 @@ export function autorizeRol(autorizeNivel: number) {
     }
 }
 
+export function getRole(roles: Roles[]){
+    
+}
+
 
