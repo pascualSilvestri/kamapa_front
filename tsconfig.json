@@ -12,6 +12,7 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"jsx": "preserve",
+		"baseUrl": "./src",
 		"plugins": [
 			{
 				"name": "next"
@@ -24,7 +25,7 @@
 		"**/*.ts",
 		"**/*.tsx",
 		"src/app/dashboard/Admin/page.tsx",
-		"src/app/dashboard/Admin/vistausuarios/page.tsx"
+		"src/app/dashboard/vistausuarios/page.tsx"
 , "src/app/layout.js"	],
 	"exclude": ["node_modules"]
 }

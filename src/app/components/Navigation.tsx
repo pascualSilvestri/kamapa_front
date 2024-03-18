@@ -106,7 +106,7 @@ export function Navigation() {
                         borderRadius: '5px',
                         backgroundColor: 'transparent',
                         border: '1px solid white '
-                      }} href={`dashboard/${route.href}`} key={index}>
+                      }} href={`/dashboard/${route.href}`} key={index}>
                       {route.label}
                       </Link>
 

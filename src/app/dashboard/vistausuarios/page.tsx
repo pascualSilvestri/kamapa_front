@@ -4,8 +4,8 @@ import { Button, Table, Modal, Form, Row, Col } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { Roles, User } from '../../../../model/types';
-import { autorizeNivel , autorizeRol } from '../../../../utils/autorizacionPorRoles';
+import { Roles, User } from '../../../model/types';
+import { autorizeNivel , autorizeRol } from '../../../utils/autorizacionPorRoles';
 
 
 

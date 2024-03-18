@@ -1,9 +1,10 @@
 import { Roles } from "../model/types"
 import { RoleEmun } from "./const"
+import path from 'path';
 
 
 export const router = {
-    'Inicio': { label : 'Inicio', href: '/dashboard' },
+    'Inicio': { label : 'Inicio', href: '/' },
     'Dirección': { label : 'Dirección', href: '/director' },
     'Preceptores': { label : 'Preceptores', href: '/preceptor' },
     'Profesores': { label : 'Profesores', href: '/profesores' },
@@ -14,11 +15,12 @@ export const router = {
     'InstituciónVista': { label : 'Vista Institucion', href: 'Admin/reginstitucion' },
     'AulasRegistro': { label : 'Aulas', href: '/regaulas' },
     'AlumnosRegistro': { label : 'Alumnos', href: '/regalumnos' },
-    'Personal': { label : 'Registrar Empleado', href: 'Admin/regempleado' },
+    'Personal': { label : 'Registrar Empleado', href: '/regempleado' },
     'Permisos': { label : 'Permisos', href: '/permisos' },
     'Secretario':{ label: 'Secretario', href: '/secretario' },
     'Notas':  { label: 'Notas', href: '/calificar' },
     'Calificaciones':{ label: 'calificaciones', href: '/calificaciones' },
+    'Empleados':{ label: 'Empleados', href: '/vistausuarios' },
 }
 
 export const adminAutorizeRouter = [
@@ -27,6 +29,7 @@ export const adminAutorizeRouter = [
     'Preceptores',
     'Profesores',
     'Alumnos',
+    'Empleados',
     'Aulas',
     'About',
     'InstituciónRegistro',

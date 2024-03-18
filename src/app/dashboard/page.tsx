@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Roles, User } from '../../model/types';
 import { autorizeNivel , autorizeRol } from '../../utils/autorizacionPorRoles';
+import path from 'path';
 
 
 const Dashboard = () => {
@@ -20,6 +21,8 @@ const Dashboard = () => {
 		telefono: '',
 		Roles: rol
 	});
+
+	console.log(path.join(__dirname, ''));
 
 	useEffect(() => {
 
