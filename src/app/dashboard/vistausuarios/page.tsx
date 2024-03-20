@@ -109,8 +109,9 @@ const VistaEmpleadosPage = () => {
             const legajo = (document.getElementById('formLegajo') as HTMLInputElement)?.value;
             const nombre = (document.getElementById('formNombre') as HTMLInputElement)?.value;
             const apellido = (document.getElementById('formApellido') as HTMLInputElement)?.value;
-            const roles = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
-
+			const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')) as HTMLInputElement[];
+			const roles = checkboxes.map(input => input.value);
+			
             const updatedEmpleado = {
                 ...selectedEmpleado,
                 usuario: {
