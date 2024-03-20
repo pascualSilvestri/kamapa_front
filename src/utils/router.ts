@@ -15,7 +15,7 @@ export const router = {
     'InstituciónVista': { label : 'Vista Institucion', href: 'Admin/reginstitucion' },
     'AulasRegistro': { label : 'Aulas', href: '/regaulas' },
     'AlumnosRegistro': { label : 'Alumnos', href: '/regalumnos' },
-    'Personal': { label : 'Registrar Empleado', href: '/regempleado' },
+    'PersonalRegistro': { label : 'Registrar Empleado', href: '/regempleado' },
     'Permisos': { label : 'Permisos', href: '/permisos' },
     'Secretario':{ label: 'Secretario', href: '/secretario' },
     'Notas':  { label: 'Notas', href: '/calificar' },
@@ -35,7 +35,7 @@ export const adminAutorizeRouter = [
     'InstituciónRegistro',
     'InstituciónVista',
     'AlumnosRegistro',
-    'Personal',
+    'PersonalRegistro',
     'Permisos',
     'AulasRegistro'
 ]
@@ -47,10 +47,11 @@ export const directorAutorizeRouter = [
     'Preceptores',
     'Profesores',
     'Alumnos',
+    'Empleados',
     'Aulas',
     'About',
     'AlumnosRegistro',
-    'Personal',
+    'PersonalRegistro',
     'Permisos',
 ]
 
@@ -60,7 +61,7 @@ export const secretarioAutorizeRouter = [
     'Profesores',
     'Aulas',
     'About',
-    'Personal',
+    'PersonalRegistro',
 ]
 
 export const preceptorAutorizeRouter = [
