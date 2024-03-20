@@ -7,441 +7,433 @@ import Link from 'next/link';
 import { Roles, User } from '../../../model/types';
 import { autorizeNivel , autorizeRol } from '../../../utils/autorizacionPorRoles';
 
-
-
 const VistaEmpleadosPage = () => {
-	const [empleados, setEmpleados] = useState([]);
-	const [selectedEmpleado, setSelectedEmpleado] = useState(null);
-	const [showModal, setShowModal] = useState(false);
-	const [showEditModal, setShowEditModal] = useState(false);
-	const [showConfirmModal, setShowConfirmModal] = useState(false);
-	const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
-	const [rol, setRol] = useState<Roles[]>([]);
-	const [user, setUser] = useState<User>({
-		nombre: '',
-		apellido: '',
-		legajo: '',
-		telefono: '',
-		Roles: rol
-	});
-	const { data: session, status } = useSession();
+    const [empleados, setEmpleados] = useState([]);
+    const [selectedEmpleado, setSelectedEmpleado] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
+    const [rol, setRol] = useState<Roles[]>([]);
+    const [user, setUser] = useState<User>({
+        nombre: '',
+        apellido: '',
+        legajo: '',
+        telefono: '',
+        Roles: rol
+    });
+    const { data: session, status } = useSession();
 
-	useEffect(() =>{
-		
-		if (session) {
-			setUser({
-				nombre: session.user.nombre,
-				apellido: session.user.apellido,
-				legajo: session.user.legajo,
-				telefono: session.user.telefono,
-				Roles:session.user.Roles
-			});
-			setRol(session.user.Roles);
-			
-		}
-	},[session])
+    useEffect(() =>{
+        
+        if (session) {
+            setUser({
+                nombre: session.user.nombre,
+                apellido: session.user.apellido,
+                legajo: session.user.legajo,
+                telefono: session.user.telefono,
+                Roles: session.user.Roles
+            });
+            setRol(session.user.Roles);
+        }
+    }, [session]);
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await fetch(
-					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,{
-						method: 'GET',
-						headers: {
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,{
+                        method: 'GET',
+                        headers: {
                             'Content-Type': 'application/json',
-							'Authorization': `Bearer ${session.accessToken}`,
+                            'Authorization': `Bearer ${session.accessToken}`,
                         },
-					}
-					);
-					console.log(session.accessToken);
+                    }
+                );
 
-				if (!response.ok) {
-					throw new Error(`Error ${response.status}: ${response.statusText}`);
-				}
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
 
-				const data = await response.json();
-				setEmpleados(data.empleados);
-				console.log(data);
-			} catch (error) {
-				console.error('Error al obtener empleados:', error.message);
-			}
-		};
+                const data = await response.json();
+                setEmpleados(data.empleados);
+            } catch (error) {
+                console.error('Error al obtener empleados:', error.message);
+            }
+        };
 
-		fetchData();
-	}, [session]); 
+        fetchData();
+    }, [session]); 
 
-	const handleConsultar = (empleado) => {
-		setSelectedEmpleado(empleado);
-		setShowModal(true);
-	};
+    const handleConsultar = (empleado) => {
+        setSelectedEmpleado(empleado);
+        setShowModal(true);
+    };
 
-	const handleEliminar = (empleado) => {
-		setSelectedEmpleado(empleado);
-		setShowConfirmModal(true);
-	};
+    const handleEliminar = (empleado) => {
+        setSelectedEmpleado(empleado);
+        setShowConfirmModal(true);
+    };
 
-	const handleConfirmDelete = async () => {
-		try {
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado/${selectedEmpleado}`,
-				{
-					method: 'DELETE',
-				},
-			);
-			console.log(selectedEmpleado);
+    const handleConfirmDelete = async () => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado/${selectedEmpleado}`,
+                {
+                    method: 'DELETE',
+                },
+            );
 
-			if (!response.ok) {
-				const errorData = await response.json();
-				console.log('Error status:', response.status);
-				console.log('Error data:', errorData);
-				throw new Error('Error en la eliminación');
-			}
+            if (!response.ok) {
+                throw new Error('Error en la eliminación');
+            }
 
-			setEmpleados(empleados.filter((emp) => emp.id !== selectedEmpleado));
-			setShowConfirmModal(false);
-		} catch (error) {
-			console.log(error);
-		}
-	};
+            setEmpleados(empleados.filter((emp) => emp.id !== selectedEmpleado));
+            setShowConfirmModal(false);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-	const handleModificar = (empleado) => {
-		setSelectedEmpleado(empleado);
-		setShowEditModal(true);
-	};
+    const handleModificar = (empleado) => {
+        setSelectedEmpleado(empleado);
+        setShowEditModal(true);
+    };
 
-	const handleSave = () => {
-		setShowSaveConfirmModal(true);
-	};
+    const handleSave = () => {
+        setShowSaveConfirmModal(true);
+    };
 
-	const handleConfirmSave = async () => {
-		try {
-			const legajo = (document.getElementById('formLegajo') as HTMLInputElement)?.value;
-			const nombre = (document.getElementById('formNombre') as HTMLInputElement)?.value;
-			const apellido = (document.getElementById('formApellido') as HTMLInputElement)?.value;
-			// const dni = (document.getElementById('formDNI') as HTMLInputElement)?.value;
+    const handleConfirmSave = async () => {
+        try {
+            const legajo = (document.getElementById('formLegajo') as HTMLInputElement)?.value;
+            const nombre = (document.getElementById('formNombre') as HTMLInputElement)?.value;
+            const apellido = (document.getElementById('formApellido') as HTMLInputElement)?.value;
+            const roles = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
 
-			const updatedEmpleado = {
-				...selectedEmpleado,
-				usuario: {
-					usuarioId: selectedEmpleado.usuarioId,
-					legajo: legajo,
-					nombre: nombre,
-					apellido: apellido,
-					// dni: dni,
-				},
-			};
+            const updatedEmpleado = {
+                ...selectedEmpleado,
+                usuario: {
+                    usuarioId: selectedEmpleado.usuarioId,
+                    legajo: legajo,
+                    nombre: nombre,
+                    apellido: apellido,
+                    roles: roles,
+                },
+            };
 
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado/${selectedEmpleado.id}`,
-				{
-					method: 'PUT',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(updatedEmpleado),
-				},
-			);
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado/${selectedEmpleado.id}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedEmpleado),
+                },
+            );
 
-			if (!response.ok) {
-				const errorData = await response.json();
-				console.error('Error status:', response.status);
-				console.error('Error data:', errorData);
-				throw new Error(`Error en la modificación: ${errorData.message}`);
-			}
+            if (!response.ok) {
+                throw new Error('Error en la modificación');
+            }
 
-			// Después de confirmar los cambios, realiza una nueva solicitud para obtener la lista actualizada de empleados
-			const updatedResponse = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,
-			);
-			const updatedData = await updatedResponse.json();
+            const updatedResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,
+            );
+            const updatedData = await updatedResponse.json();
 
-			// Actualiza el estado de empleados con la nueva lista
-			setEmpleados(updatedData.empleados);
+            setEmpleados(updatedData.empleados);
 
-			setShowEditModal(false);
-			setShowSaveConfirmModal(false);
-		} catch (error) {
-			console.error('Error al actualizar empleado:', error);
-		}
-	};
+            setShowEditModal(false);
+            setShowSaveConfirmModal(false);
+        } catch (error) {
+            console.error('Error al actualizar empleado:', error);
+        }
+    };
 
-	return (
-		<div className='p-3'>
-			<Row className='mb-3  justify-content-center'>
-				<Col>
-					{/* Botón para volver */}
-					<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
-						<Button
-							variant='secondary'
-							style={{
-								marginRight: '10px',
-								padding: '0.4rem 1rem',
-								fontSize: '1rem',
-								transition: 'all 0.3s ease',
-							}}
-							onMouseEnter={(e) => {
-								e.currentTarget.style.backgroundColor = 'white';
-								e.currentTarget.style.color = 'black';
-							}}
-							onMouseLeave={(e) => {
-								e.currentTarget.style.backgroundColor = 'grey';
-								e.currentTarget.style.color = 'white';
-							}}>
-							Volver
-						</Button>
-					</Link>
-				</Col>
-				<Col>
-					<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/regempleado`}>
-						<Button
-							variant='flat'
-							style={{
-								backgroundColor: 'purple',
-								color: 'white',
-								padding: '0.4rem 1rem',
-								fontSize: '1rem',
-								marginBottom: '1rem',
-								transition: 'all 0.3s ease',
-							}}
-							onMouseEnter={(e) => {
-								e.currentTarget.style.backgroundColor = 'white';
-								e.currentTarget.style.color = 'black';
-							}}
-							onMouseLeave={(e) => {
-								e.currentTarget.style.backgroundColor = 'purple';
-								e.currentTarget.style.color = 'white';
-							}}>
-							Registrar Empleado
-						</Button>
-					</Link>
-				</Col>
-			</Row>
+    return (
+        <div className='p-3'>
+            <Row className='mb-3  justify-content-center'>
+                <Col>
+                    <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
+                        <Button
+                            variant='secondary'
+                            style={{
+                                marginRight: '10px',
+                                padding: '0.4rem 1rem',
+                                fontSize: '1rem',
+                                transition: 'all 0.3s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = 'white';
+                                e.currentTarget.style.color = 'black';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'grey';
+                                e.currentTarget.style.color = 'white';
+                            }}>
+                            Volver
+                        </Button>
+                    </Link>
+                </Col>
+                <Col>
+                    <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/regempleado`}>
+                        <Button
+                            variant='flat'
+                            style={{
+                                backgroundColor: 'purple',
+                                color: 'white',
+                                padding: '0.4rem 1rem',
+                                fontSize: '1rem',
+                                marginBottom: '1rem',
+                                transition: 'all 0.3s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = 'white';
+                                e.currentTarget.style.color = 'black';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'purple';
+                                e.currentTarget.style.color = 'white';
+                            }}>
+                            Registrar Empleado
+                        </Button>
+                    </Link>
+                </Col>
+            </Row>
 
-			<Table
-				striped
-				bordered
-				hover>
-				<thead>
-					<tr>
-						<th>Legajo</th>
-						<th>Nombre</th>
-						<th>Telefono</th>
-						<th>Acciones</th>
-					</tr>
-				</thead>
+            <Table
+                striped
+                bordered
+                hover>
+                <thead>
+                    <tr>
+                        <th>Legajo</th>
+                        <th>Nombre</th>
+                        <th>Telefono</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
 
-				<tbody>
-					{Array.isArray(empleados) && empleados.length > 0 ? (
-						empleados.map((empleado) => (
-							<tr key={empleado.id}>
-								<td>{empleado?.UsuarioEmpleado?.legajo}</td>
-								<td>
-									{empleado.UsuarioEmpleado &&
-										`${empleado?.UsuarioEmpleado?.nombre}, ${empleado?.UsuarioEmpleado?.apellido}`}
-								</td>
-								<td>
-									{empleado.UsuarioEmpleado &&
-										empleado?.UsuarioEmpleado?.telefono}
-								</td>
-								<td>
-									<Button
-										variant='link'
-										onClick={() => handleConsultar(empleado)}
-										title='Consultar Empleado'>
-										<BsEye />
-									</Button>
+                <tbody>
+                    {Array.isArray(empleados) && empleados.length > 0 ? (
+                        empleados.map((empleado) => (
+                            <tr key={empleado.id}>
+                                <td>{empleado?.UsuarioEmpleado?.legajo}</td>
+                                <td>
+                                    {empleado.UsuarioEmpleado &&
+                                        `${empleado?.UsuarioEmpleado?.nombre}, ${empleado?.UsuarioEmpleado?.apellido}`}
+                                </td>
+                                <td>
+                                    {empleado.UsuarioEmpleado &&
+                                        empleado?.UsuarioEmpleado?.telefono}
+                                </td>
+                                <td>
+                                    <Button
+                                        variant='link'
+                                        onClick={() => handleConsultar(empleado)}
+                                        title='Consultar Empleado'>
+                                        <BsEye />
+                                    </Button>
 
-									<Button
-										variant='link'
-										onClick={() => handleModificar(empleado)}
-										title='Modificar Empleado'>
-										<BsPencil />
-									</Button>
+                                    <Button
+                                        variant='link'
+                                        onClick={() => handleModificar(empleado)}
+                                        title='Modificar Empleado'>
+                                        <BsPencil />
+                                    </Button>
 
-									<Button
-										variant='link'
-										onClick={() => handleEliminar(empleado.id)}
-										title='Eliminar Empleado'>
-										<BsTrash />
-									</Button>
-								</td>
-							</tr>
-						))
-					) : (
-						<tr>
-							<td colSpan={4}>No hay empleados disponibles</td>
-						</tr>
-					)}
-				</tbody>
-			</Table>
+                                    <Button
+                                        variant='link'
+                                        onClick={() => handleEliminar(empleado.id)}
+                                        title='Eliminar Empleado'>
+                                        <BsTrash />
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={4}>No hay empleados disponibles</td>
+                        </tr>
+                    )}
+                </tbody>
+            </Table>
 
-			<Modal
-				show={showModal}
-				onHide={() => setShowModal(false)}>
-				<Modal.Header closeButton>
-					<Modal.Title>Detalles del Empleado</Modal.Title>
-				</Modal.Header>
+            <Modal
+                show={showModal}
+                onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Detalles del Empleado</Modal.Title>
+                </Modal.Header>
 
-				<Modal.Body>
-					{selectedEmpleado && (
-						<>
-							<p>Legajo: {selectedEmpleado?.UsuarioEmpleado?.legajo}</p>
-							<p>
-								Fecha de ingreso:{' '}
-								{new Date(
-									selectedEmpleado?.UsuarioEmpleado?.fecha_ingreso,
-								).toLocaleDateString()}
-							</p>
-							<p>
-								Fecha de egreso:{' '}
-								{selectedEmpleado?.UsuarioEmpleado?.fecha_egreso
-									? new Date(
-											selectedEmpleado?.UsuarioEmpleado?.fecha_egreso,
-									).toLocaleDateString()
-									: 'N/A'}
-							</p>
-							<p>Nombre: {selectedEmpleado?.UsuarioEmpleado?.nombre}</p>
-							<p>Apellido: {selectedEmpleado?.UsuarioEmpleado?.apellido}</p>
-							<p>DNI: {selectedEmpleado?.UsuarioEmpleado?.dni}</p>
-							<p>CUIL: {selectedEmpleado?.UsuarioEmpleado?.cuil}</p>
-							<p>
-								Fecha de nacimiento:{' '}
-								{new Date(
-									selectedEmpleado?.UsuarioEmpleado?.fechaNacimiento,
-								).toLocaleDateString()}
-							</p>
-							<p>Teléfono: {selectedEmpleado?.UsuarioEmpleado?.telefono}</p>
-							<p>
-								Estado:{' '}
-								{selectedEmpleado?.UsuarioEmpleado?.is_active
-									? 'Activo'
-									: 'Inactivo'}
-							</p>
-						</>
-					)}
-				</Modal.Body>
+                <Modal.Body>
+                    {selectedEmpleado && (
+                        <>
+                            <p>Legajo: {selectedEmpleado?.UsuarioEmpleado?.legajo}</p>
+                            <p>
+                                Fecha de ingreso:{' '}
+                                {new Date(
+                                    selectedEmpleado?.UsuarioEmpleado?.fecha_ingreso,
+                                ).toLocaleDateString()}
+                            </p>
+                            <p>
+                                Fecha de egreso:{' '}
+                                {selectedEmpleado?.UsuarioEmpleado?.fecha_egreso
+                                    ? new Date(
+                                            selectedEmpleado?.UsuarioEmpleado?.fecha_egreso,
+                                    ).toLocaleDateString()
+                                    : 'N/A'}
+                            </p>
+                            <p>Nombre: {selectedEmpleado?.UsuarioEmpleado?.nombre}</p>
+                            <p>Apellido: {selectedEmpleado?.UsuarioEmpleado?.apellido}</p>
+                            <p>DNI: {selectedEmpleado?.UsuarioEmpleado?.dni}</p>
+                            <p>CUIL: {selectedEmpleado?.UsuarioEmpleado?.cuil}</p>
+                            <p>
+                                Fecha de nacimiento:{' '}
+                                {new Date(
+                                    selectedEmpleado?.UsuarioEmpleado?.fechaNacimiento,
+                                ).toLocaleDateString()}
+                            </p>
+                            <p>Teléfono: {selectedEmpleado?.UsuarioEmpleado?.telefono}</p>
+                            <p>
+                                Estado:{' '}
+                                {selectedEmpleado?.UsuarioEmpleado?.is_active
+                                    ? 'Activo'
+                                    : 'Inactivo'}
+                            </p>
+                        </>
+                    )}
+                </Modal.Body>
 
-				<Modal.Footer>
-					<Button
-						variant='secondary'
-						onClick={() => setShowModal(false)}>
-						Cerrar
-					</Button>
-				</Modal.Footer>
-			</Modal>
+                <Modal.Footer>
+                    <Button
+                        variant='secondary'
+                        onClick={() => setShowModal(false)}>
+                        Cerrar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
-			<Modal
-				show={showEditModal}
-				onHide={() => setShowEditModal(false)}>
-				<Modal.Header closeButton>
-					<Modal.Title>Editar Empleado</Modal.Title>
-				</Modal.Header>
+            <Modal
+                show={showEditModal}
+                onHide={() => setShowEditModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Editar Empleado</Modal.Title>
+                </Modal.Header>
 
-				<Modal.Body>
-					{selectedEmpleado && (
-						<Form>
-							<Form.Group controlId='formLegajo'>
-								<Form.Label>Legajo</Form.Label>
-								<Form.Control
-									type='text'
-									defaultValue={selectedEmpleado?.UsuarioEmpleado?.legajo}
-								/>
-							</Form.Group>
+                <Modal.Body>
+                    {selectedEmpleado && (
+                        <Form>
+                            <Form.Group controlId='formLegajo'>
+                                <Form.Label>Legajo</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedEmpleado?.UsuarioEmpleado?.legajo}
+                                />
+                            </Form.Group>
 
-							<Form.Group controlId='formNombre'>
-								<Form.Label>Nombre</Form.Label>
-								<Form.Control
-									type='text'
-									defaultValue={selectedEmpleado?.UsuarioEmpleado?.nombre}
-								/>
-							</Form.Group>
+                            <Form.Group controlId='formNombre'>
+                                <Form.Label>Nombre</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedEmpleado?.UsuarioEmpleado?.nombre}
+                                />
+                            </Form.Group>
 
-							<Form.Group controlId='formApellido'>
-								<Form.Label>Apellido</Form.Label>
-								<Form.Control
-									type='text'
-									defaultValue={selectedEmpleado?.UsuarioEmpleado?.apellido}
-								/>
-							</Form.Group>
-							{/* <Form.Group controlId='formDNI'>
-								<Form.Label>DNI</Form.Label>
-								<Form.Control
-									type='text'
-									defaultValue={selectedEmpleado?.UsuarioEmpleado?.dni}
-								/>
-							</Form.Group> */}
-						</Form>
-					)}
-				</Modal.Body>
+                            <Form.Group controlId='formApellido'>
+                                <Form.Label>Apellido</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedEmpleado?.UsuarioEmpleado?.apellido}
+                                />
+                            </Form.Group>
 
-				<Modal.Footer>
-					<Button
-						variant='secondary'
-						onClick={() => setShowEditModal(false)}>
-						Cancelar
-					</Button>
+                            <Form.Group controlId='formRoles'>
+                                <Form.Label>Roles</Form.Label>
+                                {Object.keys(rol).map((rol, index) => (
+                                    <Form.Check
+                                        key={index}
+                                        type="checkbox"
+                                        id={rol}
+                                        label={rol}
+                                        defaultChecked={selectedEmpleado && selectedEmpleado.roles ? selectedEmpleado.roles.includes(rol) : false}
+                                    />
+                                ))}
+                            </Form.Group>
+                        </Form>
+                    )}
+                </Modal.Body>
 
-					<Button
-						variant='primary'
-						onClick={handleSave}>
-						Guardar
-					</Button>
-				</Modal.Footer>
-			</Modal>
+                <Modal.Footer>
+                    <Button
+                        variant='secondary'
+                        onClick={() => setShowEditModal(false)}>
+                        Cancelar
+                    </Button>
 
-			<Modal
-				show={showSaveConfirmModal}
-				onHide={() => setShowSaveConfirmModal(false)}>
-				<Modal.Header closeButton>
-					<Modal.Title>Confirmar cambios</Modal.Title>
-				</Modal.Header>
+                    <Button
+                        variant='primary'
+                        onClick={handleSave}>
+                        Guardar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
-				<Modal.Body>
-					¿Estás seguro de que quieres guardar los cambios?
-				</Modal.Body>
+            <Modal
+                show={showSaveConfirmModal}
+                onHide={() => setShowSaveConfirmModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar cambios</Modal.Title>
+                </Modal.Header>
 
-				<Modal.Footer>
-					<Button
-						variant='secondary'
-						onClick={() => setShowSaveConfirmModal(false)}>
-						Cancelar
-					</Button>
+                <Modal.Body>
+                    ¿Estás seguro de que quieres guardar los cambios?
+                </Modal.Body>
 
-					<Button
-						variant='primary'
-						onClick={handleConfirmSave}>
-						Confirmar
-					</Button>
-				</Modal.Footer>
-			</Modal>
+                <Modal.Footer>
+                    <Button
+                        variant='secondary'
+                        onClick={() => setShowSaveConfirmModal(false)}>
+                        Cancelar
+                    </Button>
 
-			<Modal
-				show={showConfirmModal}
-				onHide={() => setShowConfirmModal(false)}>
-				<Modal.Header closeButton>
-					<Modal.Title>Confirmar eliminación</Modal.Title>
-				</Modal.Header>
+                    <Button
+                        variant='primary'
+                        onClick={handleConfirmSave}>
+                        Confirmar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
-				<Modal.Body>
-					¿Estás seguro de que quieres eliminar a este empleado?
-				</Modal.Body>
+            <Modal
+                show={showConfirmModal}
+                onHide={() => setShowConfirmModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar eliminación</Modal.Title>
+                </Modal.Header>
 
-				<Modal.Footer>
-					<Button
-						variant='secondary'
-						onClick={() => setShowConfirmModal(false)}>
-						No
-					</Button>
+                <Modal.Body>
+                    ¿Estás seguro de que quieres eliminar a este empleado?
+                </Modal.Body>
 
-					<Button
-						variant='danger'
-						onClick={handleConfirmDelete}>
-						Sí, eliminar
-					</Button>
-				</Modal.Footer>
-			</Modal>
-		</div>
-	);
+                <Modal.Footer>
+                    <Button
+                        variant='secondary'
+                        onClick={() => setShowConfirmModal(false)}>
+                        No
+                    </Button>
+
+                    <Button
+                        variant='danger'
+                        onClick={handleConfirmDelete}>
+                        Sí, eliminar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </div>
+    );
 };
 
 export default VistaEmpleadosPage;
+
