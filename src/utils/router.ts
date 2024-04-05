@@ -9,18 +9,20 @@ export const router = {
     'Preceptores': { label : 'Preceptores', href: '/preceptor' },
     'Profesores': { label : 'Profesores', href: '/profesores' },
     'Alumnos': { label : 'Alumnos', href: '/alumnos' },
+    'Empleados':{ label: 'Empleados', href: '/vistausuarios' },
     'Aulas': { label : 'Aulas', href: '/aulas' },
     'About': { label : 'About', href: '/about' },
+    'CiclosLectivos': { label : 'Ciclos Lectivos', href: '/ciclolectivo' },
+    'CrearCicloLectivo': { label : 'Crear Ciclo Lectivo', href: '/newciclolectivo' },
     'InstituciónRegistro': { label : 'Registrar Institucion', href: 'Admin/reginstitucion' },
     'InstituciónVista': { label : 'Vista Institucion', href: 'Admin/reginstitucion' },
     'AulasRegistro': { label : 'Aulas', href: '/regaulas' },
-    'AlumnosRegistro': { label : 'Alumnos', href: '/regalumnos' },
-    'PersonalRegistro': { label : 'Registrar Empleado', href: '/regempleado' },
+    'AlumnosRegistro': { label : 'Registro de Alumnos', href: '/regalumnos' },
+    'PersonalRegistro': { label : 'Registrar de Empleado', href: '/regempleado' },
     'Permisos': { label : 'Permisos', href: '/permisos' },
     'Secretario':{ label: 'Secretario', href: '/secretario' },
     'Notas':  { label: 'Notas', href: '/calificar' },
     'Calificaciones':{ label: 'calificaciones', href: '/calificaciones' },
-    'Empleados':{ label: 'Empleados', href: '/vistausuarios' },
 }
 
 export const adminAutorizeRouter = [
@@ -32,6 +34,7 @@ export const adminAutorizeRouter = [
     'Empleados',
     'Aulas',
     'About',
+    'CrearCicloLectivo',
     'InstituciónRegistro',
     'InstituciónVista',
     'AlumnosRegistro',
@@ -48,6 +51,7 @@ export const directorAutorizeRouter = [
     'Profesores',
     'Alumnos',
     'Empleados',
+    'CrearCicloLectivo',
     'Aulas',
     'About',
     'AlumnosRegistro',
@@ -62,6 +66,7 @@ export const secretarioAutorizeRouter = [
     'Aulas',
     'About',
     'PersonalRegistro',
+    'CrearCicloLectivo',
 ]
 
 export const preceptorAutorizeRouter = [
