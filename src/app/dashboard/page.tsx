@@ -19,22 +19,25 @@ const Dashboard = () => {
 		apellido: '',
 		legajo: '',
 		telefono: '',
-		Roles: rol
+		Roles: rol,
+		Instituciones:[]
 	});
 
-	console.log(path.join(__dirname, ''));
 
 	useEffect(() => {
 
 		if (!session) {
 			router.push('/login');
 		} else {
+			
 			setUser({
 				nombre: session.user.nombre,
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
 				telefono: session.user.telefono,
 				Roles: session.user.Roles,
+				Instituciones: session.user.Instituciones
+
 			});
 			setRol(session.user.Roles);
 		
@@ -70,7 +73,7 @@ const Dashboard = () => {
 		}
 	  };
 
-
+	  console.log(user);
 	return (
 		<Row className='justify-content-center mt-5'>
 		{rol.map((role, index) => (

@@ -1,11 +1,14 @@
 'use client'
-import { useState } from 'react';
+import { Roles, User } from 'model/types';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
 const NewCicloLectivoPage = () => {
   const [cicloLectivo, setCicloLectivo] = useState({
     nombre: '',
     fechaInicio: '',
     fechaFin: '',
+    institucionId:1,
     periodos: [],
   });
 
@@ -14,6 +17,38 @@ const NewCicloLectivoPage = () => {
     fechaInicio: '',
     fechaFin: '',
   });
+  const { data: session, status } = useSession();
+	
+	const [rol, setRol] = useState<Roles[]>([]);
+	const [user, setUser] = useState<User>({
+		nombre: '',
+		apellido: '',
+		legajo: '',
+		telefono: '',
+		Roles: rol,
+		Instituciones:[]
+	});
+
+
+	useEffect(() => {
+
+		if (session) {
+			
+			setUser({
+				nombre: session.user.nombre,
+				apellido: session.user.apellido,
+				legajo: session.user.legajo,
+				telefono: session.user.telefono,
+				Roles: session.user.Roles,
+				Instituciones: session.user.Instituciones
+
+			});
+			setRol(session.user.Roles);
+		
+
+		}
+	}, [session]);
+
 
   const handleChangeCicloLectivo = (e) => {
     const { name, value } = e.target;
@@ -58,8 +93,9 @@ const NewCicloLectivoPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ciclo-lectivo`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cicloElectivo`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +110,7 @@ const NewCicloLectivoPage = () => {
       console.error('Error al crear ciclo lectivo:', error.message);
     }
   };
-
+  
   return (
     <div className="container">
       <h2>Crear Nuevo Ciclo Lectivo</h2>

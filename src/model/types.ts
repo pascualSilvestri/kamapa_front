@@ -4,6 +4,7 @@ export interface User {
 	legajo: string;
 	telefono: string;
 	Roles?: Roles[];
+    Instituciones?: Institucion[];
 }
 
 export interface Roles {
