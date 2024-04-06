@@ -23,11 +23,16 @@ const NewCicloLectivoPage = () => {
     });
   };
 
-  const handleChangePeriodo = (e) => {
+  const handleChangePeriodo = (e, index) => {
     const { name, value } = e.target;
-    setNuevoPeriodo({
-      ...nuevoPeriodo,
+    const newPeriodos = [...cicloLectivo.periodos];
+    newPeriodos[index] = {
+      ...newPeriodos[index],
       [name]: value,
+    };
+    setCicloLectivo({
+      ...cicloLectivo,
+      periodos: newPeriodos,
     });
   };
 
@@ -81,6 +86,7 @@ const NewCicloLectivoPage = () => {
             name="nombre"
             value={cicloLectivo.nombre}
             onChange={handleChangeCicloLectivo}
+            required
           />
         </label>
         <br />
@@ -92,6 +98,7 @@ const NewCicloLectivoPage = () => {
             name="fechaInicio"
             value={cicloLectivo.fechaInicio}
             onChange={handleChangeCicloLectivo}
+            required
           />
         </label>
         <br />
@@ -103,6 +110,7 @@ const NewCicloLectivoPage = () => {
             name="fechaFin"
             value={cicloLectivo.fechaFin}
             onChange={handleChangeCicloLectivo}
+            required
           />
         </label>
         <br />
@@ -118,6 +126,7 @@ const NewCicloLectivoPage = () => {
                 name="nombre"
                 value={periodo.nombre}
                 onChange={(e) => handleChangePeriodo(e, index)}
+                required
               />
             </label>
             <br />
@@ -129,6 +138,7 @@ const NewCicloLectivoPage = () => {
                 name="fechaInicio"
                 value={periodo.fechaInicio}
                 onChange={(e) => handleChangePeriodo(e, index)}
+                required
               />
             </label>
             <br />
@@ -140,6 +150,7 @@ const NewCicloLectivoPage = () => {
                 name="fechaFin"
                 value={periodo.fechaFin}
                 onChange={(e) => handleChangePeriodo(e, index)}
+                required
               />
             </label>
             <br />
@@ -154,7 +165,15 @@ const NewCicloLectivoPage = () => {
                 fontSize: '1rem',
                 border: '2px solid red',
                 cursor: 'pointer',
-              }}
+                }} 
+                onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.color = 'red';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'red';
+                    e.currentTarget.style.color = 'white';
+                }}
             >
               Eliminar Periodo
             </button>
@@ -165,13 +184,22 @@ const NewCicloLectivoPage = () => {
             type="button"
             onClick={handleAddPeriodo}
             style={{
-              backgroundColor: 'purple',
-              color: 'white',
-              padding: '0.4rem 1rem',
-              fontSize: '1rem',
-              marginBottom: '10px',
-              border: '2px solid purple',
-              cursor: 'pointer',
+                backgroundColor: 'purple',
+                color: 'white',
+                padding: '0.4rem 1rem',
+                fontSize: '1rem',
+                transition: 'all 0.3s ease',
+                marginBottom: '10px',
+                border: '2px solid purple',
+                cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.color = 'black';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'purple';
+                e.currentTarget.style.color = 'white';
             }}
           >
             Agregar Periodo
@@ -180,12 +208,19 @@ const NewCicloLectivoPage = () => {
           <button
             type="submit"
             style={{
-              backgroundColor: 'purple',
-              color: 'white',
-              padding: '0.4rem 1rem',
-              fontSize: '1rem',
-              border: '2px solid purple',
-              cursor: 'pointer',
+                backgroundColor: 'purple',
+                color: 'white',
+                padding: '0.4rem 1rem',
+                fontSize: '1rem',
+                transition: 'all 0.3s ease',
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.color = 'black';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'purple';
+                e.currentTarget.style.color = 'white';
             }}
           >
             Crear Ciclo Lectivo
