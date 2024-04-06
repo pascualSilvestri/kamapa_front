@@ -44,7 +44,7 @@ const CrearAulasPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes enviar los datos del aula y sus materias a tu backend
+    //Aqui Hermano hacete el POST con el endpoint que corresponda
     console.log(aula);
   };
 
