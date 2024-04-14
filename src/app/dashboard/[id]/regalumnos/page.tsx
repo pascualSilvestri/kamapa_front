@@ -5,8 +5,8 @@ import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Roles, User } from '../../../model/types';
-import { autorizeNivel , autorizeRol } from '../../../utils/autorizacionPorRoles';
+import { Roles, User } from '../../../../model/types';
+import { autorizeNivel , autorizeRol } from '../../../../utils/autorizacionPorRoles';
 
 
 // Define la interfaz para el objeto de provincia

@@ -1,10 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
-import useFormStatus from '../../../components/useFormStatus';
+import useFormStatus from '../../../../components/useFormStatus';
 import Link from 'next/link';
 import { useSession, signIn } from 'next-auth/react';
-import { Provincia, User, Roles } from '../../../../model/types';
+import { Provincia, User, Roles } from '../../../../../model/types';
 
 
 // Define la interfaz para los datos del formulario

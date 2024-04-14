@@ -1,6 +1,6 @@
 'use client';
 import { useSession, signOut } from 'next-auth/react';
-import { Card, Button, Row, Col } from 'react-bootstrap';
+import { Card, Button, Row, Col, Image } from 'react-bootstrap';
 import Link from 'next/link';
 import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
@@ -76,21 +76,14 @@ const Dashboard = () => {
 	  console.log(user);
 	return (
 		<Row className='justify-content-center mt-5'>
-		{rol.map((role, index) => (
+		{user.Instituciones.map((institucion, index) => (
 		  <Col key={index} xs={12} sm={6} md={4}>
 			<Card className='text-center'>
-			  <Card.Header>{' ' + role.name + ' '}</Card.Header>
-			  <Card.Header>Panel { }</Card.Header>
+			  <Card.Header>{' ' + institucion.nombre + ' '}</Card.Header>
+			  <Image src={institucion.logo} alt={institucion.nombre} />
 			  <Card.Body>
-				<Card.Title>
-				  Bienvenido, {user.nombre} {user.apellido}
-				</Card.Title>
-				<Card.Text>
-				  <strong>Legajo:</strong> {user.legajo} <br />
-				  <strong>Teléfono:</strong> {user.telefono}
-				</Card.Text>
 				{/* Enlace a la ruta específica según el rol */}
-				<Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
+				<Link href={`/dashboard/${user.Instituciones[0].id}/newciclolectivo`}>
 				  <Button
 					variant='flat'
 					type='submit'
@@ -109,7 +102,7 @@ const Dashboard = () => {
 					  e.currentTarget.style.backgroundColor = 'purple';
 					  e.currentTarget.style.color = 'white';
 					}}>
-					Comencemos
+					Ingresar
 				  </Button>
 				</Link>
 			  </Card.Body>

@@ -3,7 +3,7 @@ import { Roles, User } from 'model/types';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
-const NewCicloLectivoPage = () => {
+const NewCicloLectivoPage = ({ params }: { params: { id: string } }) => {
   const [cicloLectivo, setCicloLectivo] = useState({
     nombre: '',
     fechaInicio: '',
@@ -11,6 +11,8 @@ const NewCicloLectivoPage = () => {
     institucionId:1,
     periodos: [],
   });
+
+  console.log(`soy id ${params.id}`);
 
   const [nuevoPeriodo, setNuevoPeriodo] = useState({
     nombre: '',

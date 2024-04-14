@@ -4,13 +4,13 @@ import { useState, useEffect, use } from 'react';
 import { Button, Table, Image } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import Link from 'next/link';
-import Modal2 from '../../../components/Modal';
-import { ModalType } from '../../../../utils/const';
-import ModalViewInstitucion from '../../../components/ModalViewInstitucion';
-import ModalUpdateInstitucion from '../../../components/ModalUpdateInstitucion';
+import Modal2 from '../../../../components/Modal';
+import { ModalType } from '../../../../../utils/const';
+import ModalViewInstitucion from '../../../../components/ModalViewInstitucion';
+import ModalUpdateInstitucion from '../../../../components/ModalUpdateInstitucion';
 import { useRouter } from 'next/navigation';
-import { Roles, User, Institucion } from '../../../../model/types';
-import { autorizeNivel , autorizeRol } from '../../../../utils/autorizacionPorRoles';
+import { Roles, User, Institucion } from '../../../../../model/types';
+import { autorizeNivel , autorizeRol } from '../../../../../utils/autorizacionPorRoles';
 
 
 

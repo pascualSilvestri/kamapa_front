@@ -13,8 +13,9 @@ import {
 	Col,
 } from 'react-bootstrap';
 import Link from 'next/link';
-import { Roles, User } from '../../../model/types';
-import { autorizeNivel , autorizeRol } from '../../../utils/autorizacionPorRoles';
+import { autorizeNivel, autorizeRol } from 'utils/autorizacionPorRoles';
+import { Roles, User } from 'model/types';
+
 
 
 export default function Page() {

@@ -24,8 +24,8 @@
 		".next/types/**/*.ts",
 		"**/*.ts",
 		"**/*.tsx",
-		"src/app/dashboard/Admin/page.tsx",
-		"src/app/dashboard/vistausuarios/page.tsx"
+		"src/app/dashboard/[id]/Admin/page.tsx",
+		"src/app/dashboard/[id]/vistausuarios/page.tsx"
 , "src/app/layout.js"	],
 	"exclude": ["node_modules"]
 }
