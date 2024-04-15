@@ -9,6 +9,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { getRolesRouters } from '../../utils/router';
+import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
 
 
 
@@ -17,13 +18,9 @@ export function Navigation() {
   const router = useRouter();
   const [rol, setRol] = useState<Roles[]>([]);
   const [userRoutes, setUserRoutes] = useState([]);
-  const [user, setUser] = useState<User>({
-    nombre: '',
-    apellido: '',
-    legajo: '',
-    telefono: '',
-    Roles: rol
-  });
+	const [user, setUser] = useUserContext();
+	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+
 
 
   useEffect(() => {
@@ -57,7 +54,7 @@ export function Navigation() {
             <Navbar.Brand href='#'>
               {/* Logo de KAMAPA */}
               <Image
-                src='/Logo.png'
+                src={institucionSelected.logo || '/Logo.png'}
                 alt='logo'
                 width={50}
                 height={50}
@@ -95,22 +92,37 @@ export function Navigation() {
               <Offcanvas.Body>
                 <Nav className='justify-content-end flex-grow-1 pe-3'>
                   {userRoutes && userRoutes.map((route, index) => {
-                    return (
 
-
-                      <Link style={{
-                        textDecoration: 'none',
-                        color: 'white',
-                        margin: '10px 0',
-                        padding: '10px 20px',
-                        borderRadius: '5px',
-                        backgroundColor: 'transparent',
-                        border: '1px solid white '
-                      }} href={`/dashboard/${route.href}`} key={index}>
-                      {route.label}
-                      </Link>
-
-                    )
+                    if(route.href == "Admin/reginstitucion" || route.href == "Admin/reginstitucion"){
+                      return (
+                        <Link style={{
+                          textDecoration: 'none',
+                          color: 'white',
+                          margin: '10px 0',
+                          padding: '10px 20px',
+                          borderRadius: '5px',
+                          backgroundColor: 'transparent',
+                          border: `1px solid white `
+                        }} href={`/dashboard/${route.href}`} key={index}>
+                        {route.label}
+                        </Link>
+                      )
+                    }else{
+                      return (
+                        <Link style={{
+                          textDecoration: 'none',
+                          color: 'white',
+                          margin: '10px 0',
+                          padding: '10px 20px',
+                          borderRadius: '5px',
+                          backgroundColor: 'transparent',
+                          border: '1px solid white '
+                        }} href={`/dashboard/${institucionSelected.id}/${route.href}`} key={index}>
+                        {route.label}
+                        </Link>
+                      )
+                    }
+                   
                   })}
                 </Nav>
                 <hr />

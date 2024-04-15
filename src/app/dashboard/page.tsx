@@ -96,17 +96,59 @@ const Dashboard = () => {
 					onMouseLeave={(e) => {
 					  e.currentTarget.style.backgroundColor = 'purple';
 					  e.currentTarget.style.color = 'white';
-					}}>
+					}}
+					onClick={
+						(e)=>{
+							const institucionSelected = user.Instituciones.filter((e)=> e.id === institucion.id);
+							setInstitucionSelected({
+								id: institucionSelected[0].id,
+                                nombre: institucionSelected[0].nombre,
+                                logo: institucionSelected[0].logo,
+								cue: institucionSelected[0].cue,
+                                email: institucionSelected[0].email,
+                                contacto: institucionSelected[0].contacto
+							});
+						}
+					}>
 					Ingresar
 				  </Button>
 				</Link>
 			  </Card.Body>
-			  <Card.Footer className='text-muted'>
-				{session ? 'Sesión activa' : 'No hay sesión activa'}
-			  </Card.Footer>
 			</Card>
 		  </Col>
 		))}
+		{
+			rol.find((e)=> e.name === 'Admin') ? 	<Card className='text-center'>
+			<Card.Header>{' Administrador '}</Card.Header>
+			
+			<Card.Body>
+			  {/* Enlace a la ruta específica según el rol */}
+			  <Link href={`/dashboard/admin`}>
+				<Button
+				  variant='flat'
+				  type='submit'
+				  style={{
+					backgroundColor: 'purple',
+					color: 'white',
+					padding: '0.4rem 1rem',
+					fontSize: '1rem',
+					transition: 'all 0.3s ease',
+				  }}
+				  onMouseEnter={(e) => {
+					e.currentTarget.style.backgroundColor = 'white';
+					e.currentTarget.style.color = 'black';
+				  }}
+				  onMouseLeave={(e) => {
+					e.currentTarget.style.backgroundColor = 'purple';
+					e.currentTarget.style.color = 'white';
+				  }}
+				  >
+				  Ingresar
+				</Button>
+			  </Link>
+			</Card.Body>
+		  </Card>:null
+		}
 	  </Row>
 	);
 };
