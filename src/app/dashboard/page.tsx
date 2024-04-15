@@ -8,20 +8,15 @@ import { useEffect, useState } from 'react';
 import { Roles, User } from '../../model/types';
 import { autorizeNivel , autorizeRol } from '../../utils/autorizacionPorRoles';
 import path from 'path';
+import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
 
 
 const Dashboard = () => {
 	const { data: session, status } = useSession();
 	const router = useRouter();
 	const [rol, setRol] = useState<Roles[]>([]);
-	const [user, setUser] = useState<User>({
-		nombre: '',
-		apellido: '',
-		legajo: '',
-		telefono: '',
-		Roles: rol,
-		Instituciones:[]
-	});
+	const [user, setUser] = useUserContext();
+	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
 
 	useEffect(() => {

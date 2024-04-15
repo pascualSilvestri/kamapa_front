@@ -36,6 +36,8 @@ export interface Institucion {
 	cue: string;
 	nombre: string;
 	logo: string;
+    email?: string;
+    contacto?: string;
 }
 
 export interface EmployeeFormData {
