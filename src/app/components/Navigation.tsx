@@ -63,7 +63,7 @@ export function Navigation() {
                   borderRadius: '50%'
                 }}
               />
-              <h2 className='float-end m-lg-2'>KAMAPA</h2>
+              <h2 className='float-end m-lg-2'>{institucionSelected.nombre}</h2>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
             <Navbar.Offcanvas
