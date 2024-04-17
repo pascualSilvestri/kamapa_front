@@ -2,10 +2,12 @@
 import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
-import { Roles, User, EmployeeFormData } from '../../../../model/types';
+import { Roles, User, UserFormData } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
+
 
 // Define la interfaz Provincia
 interface Provincia {
@@ -13,11 +15,14 @@ interface Provincia {
     provincia: string;
 }
 
-const RegEmpleado = () => {
+const RegUsuario = () => {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [dni, setDni] = useState('');
-    const [domicilio, setDomicilio] = useState('');
+    const [calle, setCalle] = useState('');
+    const [numero, setNumero] = useState('');
+    const [barrio, setBarrio] = useState('');
+    const [localidad, setLocalidad] = useState('');
     const [provincias, setProvincias] = useState<Provincia[]>([]);
     const [provinciaSeleccionada, setProvinciaSeleccionada] = useState<string>('');
     const [telefono, setTelefono] = useState('');
@@ -58,7 +63,7 @@ const RegEmpleado = () => {
         }
     }, [session]);
 
-
+    console.log(session);
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Obtener las provincias de la base de datos para mostrarlos en los select
     useEffect(() => {
@@ -94,13 +99,10 @@ const RegEmpleado = () => {
         if (formValid) {
             // setShowModal(true);
 
-            const formData: EmployeeFormData = {
-                empleado: {
-                    matricula: matriculaProfesional,
-                    isActive: null,
-                },
+            const formData: UserFormData = {
                 usuario: {
                     legajo: legajo,
+                    matricula: matriculaProfesional,
                     fecha_ingreso: new Date().toISOString(), // Puedes ajustar esto según tus necesidades
                     fecha_egreso: null,
                     nombre: nombre,
@@ -109,23 +111,21 @@ const RegEmpleado = () => {
                     cuil: cuil,
                     fechaNacimiento: fechaNacimiento,
                     telefono: telefono,
+                    email: email,
                     is_active: true, // O ajusta esto según tus necesidades
-                    create_for: '', // Puedes ajustar esto según tus necesidades
-                    update_for: '', // Puedes ajustar esto según tus necesidades
+                    create_for: session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
+                    update_for:  session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
                     password: dni, // Puedes ajustar esto según tus necesidades
+                    institucionId: institucionSelected.id, // Poked
                     // Puedes ajustar esto según tus necesidades
                 },
                 rols: selectedRoleIds,
                 domicilio: {
-                    calle: domicilio,
-                    numero: '', // Puedes ajustar esto según tus necesidades
-                    barrio: '', // Puedes ajustar esto según tus necesidades
-                    localidad: '', // Puedes ajustar esto según tus necesidades
+                    calle: calle,
+                    numero: numero, // Puedes ajustar esto según tus necesidades
+                    barrio: barrio, // Puedes ajustar esto según tus necesidades
+                    localidad: localidad, // Puedes ajustar esto según tus necesidades
                     provinciaId: provinciaSeleccionada,
-                },
-                contacto: {
-                    contacto: telefono, // Puedes ajustar esto según tus necesidades
-                    email: email,
                 },
             };
 
@@ -133,7 +133,7 @@ const RegEmpleado = () => {
 
             try {
                 const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/usuario`,
                     {
                         method: 'POST',
                         headers: {
@@ -142,6 +142,7 @@ const RegEmpleado = () => {
                         body: JSON.stringify(formData),
                     }
                 );
+                console.log(response)
 
                 if (response.ok) {
                     setShowSuccessModal(true);
@@ -165,19 +166,22 @@ const RegEmpleado = () => {
 
     // Función para validar el formulario
     useEffect(() => {
-        if (nombre && apellido && dni && domicilio && provinciaSeleccionada && telefono && matriculaProfesional && legajo && cuil && fechaNacimiento && email) {
+        if (nombre && apellido && dni && provinciaSeleccionada && telefono && matriculaProfesional && legajo && cuil && fechaNacimiento && email) {
             setFormValid(true);
         } else {
             setFormValid(false);
         }
-    }, [nombre, apellido, dni, domicilio, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email]);
+    }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email]);
 
     // Función para limpiar los campos del formulario
     const limpiarCampos = () => {
         setNombre('');
         setApellido('');
         setDni('');
-        setDomicilio('');
+        setCalle('');
+        setNumero('');
+        setBarrio('');
+        setLocalidad('');
         setProvinciaSeleccionada('');
         setTelefono('');
         setMatriculaProfesional('');
@@ -195,11 +199,14 @@ const RegEmpleado = () => {
         setSelectedRoleIds([]);
     };
 
+	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+
+
     return (
         <Container>
             <Row className="justify-content-md-center">
                 <Col md={6}>
-                    <h1>Registro de Empleado</h1>
+                    <h1>Registro de Usuarios</h1>
                     <h3>(Campos Obligatorios *)</h3>
                     <Form onSubmit={handleSubmit}>
                         <Form.Group controlId="nombre">
@@ -229,13 +236,61 @@ const RegEmpleado = () => {
                                 onChange={(e) => setDni(e.target.value)}
                             />
                         </Form.Group>
-                        <Form.Group controlId="domicilio">
-                            <Form.Label>Domicilio *</Form.Label>
+                        <Form.Group controlId="cuil">
+                            <Form.Label>CUIL *</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Domicilio"
-                                value={domicilio}
-                                onChange={(e) => setDomicilio(e.target.value)}
+                                placeholder="CUIL"
+                                value={cuil}
+                                onChange={(e) => setCuil(e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="fechaNacimiento">
+                            <Form.Label>Fecha de Nacimiento *</Form.Label>
+                            <Form.Control
+                                type="date"
+                                value={fechaNacimiento}
+                                onChange={(e) => setFechaNacimiento(e.target.value)}
+                            />
+                        </Form.Group>
+                        <hr />
+                        <Form.Group >
+                            <h1>Datos del Domicilio</h1>
+                        </Form.Group>
+                        <Form.Group controlId="calle">
+                            <Form.Label>Nombre de la Calle *</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Av. Ejemplo de Calle"
+                                value={calle}
+                                onChange={(e) => setCalle(e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="numero">
+                            <Form.Label>Numero o Altura del Domicilio *</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="123"
+                                value={numero}
+                                onChange={(e) => setNumero(e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="barrio">
+                            <Form.Label>Barrio *</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Ejemplo: V° Krausen"
+                                value={barrio}
+                                onChange={(e) => setBarrio(e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="localidad">
+                            <Form.Label>Localidad *</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Ejemplo de Localidad: Rawson"
+                                value={localidad}
+                                onChange={(e) => setLocalidad(e.target.value)}
                             />
                         </Form.Group>
                         <Form.Group controlId="provincias">
@@ -260,17 +315,34 @@ const RegEmpleado = () => {
                                 </div>
                             </div>
                         </Form.Group>
+                        <hr />
+                        <Form.Group >
+                            <h1>Datos de Contacto *</h1>
+                        </Form.Group>
                         <Form.Group controlId="telefono">
                             <Form.Label>Teléfono *</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Teléfono"
+                                placeholder="2645111111"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}
                             />
                         </Form.Group>
+                        <Form.Group controlId="email">
+                            <Form.Label>Email *</Form.Label>
+                            <Form.Control
+                                type="email"
+                                placeholder="Ejemplo@gmail.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </Form.Group>
+                        <hr />
+                        <Form.Group >
+                            <h1>Datos de Contacto *</h1>
+                        </Form.Group>
                         <Form.Group controlId="matriculaProfesional">
-                            <Form.Label>Matrícula Profesional *</Form.Label>
+                            <Form.Label>Matrícula Profesional ( Solo en caso de ser Profesional ).</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Matrícula Profesional"
@@ -287,35 +359,30 @@ const RegEmpleado = () => {
                                 onChange={(e) => setLegajo(e.target.value)}
                             />
                         </Form.Group>
-                        <Form.Group controlId="cuil">
-                            <Form.Label>CUIL *</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="CUIL"
-                                value={cuil}
-                                onChange={(e) => setCuil(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="fechaNacimiento">
-                            <Form.Label>Fecha de Nacimiento *</Form.Label>
-                            <Form.Control
-                                type="date"
-                                value={fechaNacimiento}
-                                onChange={(e) => setFechaNacimiento(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="email">
-                            <Form.Label>Email *</Form.Label>
-                            <Form.Control
-                                type="email"
-                                placeholder="Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+                        <hr />
+                        <Form.Group >
+                            <h1>Nivel de acceso segun el Rol *</h1>
                         </Form.Group>
                         <Form.Group controlId='roles'>
                             <Form.Label>Roles *</Form.Label>
-                            {Object.keys(roles).map((rol, index) => (
+                            {Object.keys(roles).filter(rol => {
+                                   // Determinar el rol de mayor jerarquía en la sesión del usuario
+                                const highestUserRole = session.user.Roles.reduce((highest, current) => {
+                                    return current.name === 'Admin' ? current.name :
+                                        current.name === 'Director' && highest !== 'Admin' ? current.name :
+                                        current.name === 'Secretario' && highest !== 'Admin' && highest !== 'Director' ? current.name :
+                                        current.name === 'Preceptor' && highest === 'Alumno' ? current.name :
+                                        current.name === 'Docente' && highest === 'Alumno' ? current.name :
+                                        highest;
+                                }, 'Alumno');
+
+                                // Filtrar los roles que se muestran en el formulario
+                                return (highestUserRole === 'Admin' || 
+                                        (highestUserRole === 'Director' && rol !== 'Admin') ||
+                                        (highestUserRole === 'Secretario' && rol !== 'Admin' && rol !== 'Director') ||
+                                        (highestUserRole === 'Preceptor' && rol === 'Alumno') ||
+                                        (highestUserRole === 'Docente' && rol === 'Alumno'));
+                            }).map((rol, index) => (
                                 <Form.Check
                                     key={index}
                                     type="checkbox"
@@ -335,6 +402,8 @@ const RegEmpleado = () => {
                                 />
                             ))}
                         </Form.Group>
+
+                        <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
                                 <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/vistausuarios`}>
@@ -446,8 +515,10 @@ const RegEmpleado = () => {
                     </Modal>
                 </Col>
             </Row>
+            <br />
+            <br />
         </Container>
     );
 };
 
-export default RegEmpleado;
+export default RegUsuario;

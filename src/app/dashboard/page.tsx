@@ -78,7 +78,7 @@ const Dashboard = () => {
 			  <Image src={institucion.logo} alt={institucion.nombre} />
 			  <Card.Body>
 				{/* Enlace a la ruta específica según el rol */}
-				<Link href={`/dashboard/${user.Instituciones[0].id}/newciclolectivo`}>
+				<Link href={`/dashboard/${user.Instituciones[0].id}/bienvenido`}>
 				  <Button
 					variant='flat'
 					type='submit'

@@ -178,7 +178,7 @@ const VistaEmpleadosPage = () => {
                     </Link>
                 </Col>
                 <Col>
-                    <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/regempleado`}>
+                    <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/regUsuario`}>
                         <Button
                             variant='flat'
                             style={{

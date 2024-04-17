@@ -73,3 +73,34 @@ export interface EmployeeFormData {
         email: string;
     };
 }
+
+
+export interface UserFormData {
+    usuario: {
+        legajo: string;
+		matricula: string;
+        fecha_ingreso: string;
+        fecha_egreso: null;
+        nombre: string;
+        apellido: string;
+        dni: string;
+        cuil: string;
+        fechaNacimiento: string;
+        telefono: string;
+		email: string;
+        is_active: boolean;
+        create_for: string;
+        update_for: string;
+        password: string;
+        institucionId: number;
+    };
+    rols: any;
+    domicilio: {
+        calle: string;
+        numero: string;
+        barrio: string;
+        localidad: string;
+        provinciaId: string;
+    }
+}
+
