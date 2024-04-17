@@ -91,10 +91,23 @@ export function Navigation() {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav className='justify-content-end flex-grow-1 pe-3'>
+
+                        <Link style={{
+                          textDecoration: 'none',
+                          color: 'white',
+                          margin: '10px 0',
+                          padding: '10px 20px',
+                          borderRadius: '5px',
+                          backgroundColor: 'transparent',
+                          border: '1px solid white '
+                        }} href='/dashboard'>
+                        Seleccionar Escuela
+                        </Link>
                   {userRoutes && userRoutes.map((route, index) => {
 
                     if(route.href == "Admin/reginstitucion" || route.href == "Admin/reginstitucion"){
                       return (
+                        
                         <Link style={{
                           textDecoration: 'none',
                           color: 'white',
