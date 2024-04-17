@@ -4,7 +4,7 @@ import path from 'path';
 
 
 export const router = {
-    'Inicio': { label : 'Inicio', href: '' },
+    'Inicio': { label : 'Inicio', href: '/' },
     'Dirección': { label : 'Dirección', href: '/director' },
     'Preceptores': { label : 'Preceptores', href: '/preceptor' },
     'Profesores': { label : 'Profesores', href: '/profesores' },
@@ -26,7 +26,6 @@ export const router = {
 }
 
 export const adminAutorizeRouter = [
-    'Inicio',
     'Dirección',
     'Preceptores',
     'Profesores',
