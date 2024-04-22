@@ -45,7 +45,7 @@ const VistaEmpleadosPage = () => {
      ///////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Obtener los roles de la base de datos para mostrarlos en los checkbox
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rols`)
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/rols`)
             .then(response => response.json())
             .then((data: Roles[]) => {
                 setRoles(data);
@@ -93,7 +93,7 @@ const VistaEmpleadosPage = () => {
     const handleConfirmDelete = async () => {
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/usuario/${selectedEmpleado}`,
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}api/usuario/${selectedEmpleado}`,
                 {
                     method: 'DELETE',
                 },

@@ -2,6 +2,7 @@ import NextAuth  from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { User,Roles, UserSession  } from '../../../../types/interfaces'; // Assuming User, Rol and Session are defined in your interfaces
 import { JWT } from 'next-auth/jwt';
+import { Environment } from 'utils/apiHelpers';
 
 
 
@@ -18,7 +19,7 @@ const handler = NextAuth({
         },
       },
       async authorize(credentials, req) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
+        const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.login)}`, {
           method: 'POST',
           body: JSON.stringify({
             dni: credentials?.dni,

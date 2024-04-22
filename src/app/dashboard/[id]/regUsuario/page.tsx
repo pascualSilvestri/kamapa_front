@@ -68,7 +68,7 @@ const RegUsuario = () => {
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Obtener las provincias de la base de datos para mostrarlos en los select
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/provincia`)
+        fetch(`${Environment.getEndPoint(Environment.endPoint.provincias)}`)
             .then(response => response.json())
             .then((data: Provincia[]) => {
                 setProvincias(data);
@@ -80,7 +80,7 @@ const RegUsuario = () => {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Obtener los roles de la base de datos para mostrarlos en los checkbox
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rols`)
+        fetch(`${Environment.getEndPoint(Environment.endPoint.roles)}`)
             .then(response => response.json())
             .then((data: Roles[]) => {
                 const rolesObj = data.reduce((obj, rol) => {

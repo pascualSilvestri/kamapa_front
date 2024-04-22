@@ -8,6 +8,10 @@ enum environment {
 
 
 export class Environment {
+
+
+    private static environment: environment = environment.prov;
+
     private static getEnvironment(env: environment): string {
         if (env == environment.prov) {
             return process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -18,6 +22,9 @@ export class Environment {
 
 
     public static endPoint = {
+        login:'api/auth/login',
+        provincias:'api/provincia',
+        roles:'api/rols',
         getInstitucionById: 'api/institucion/',
         /*
         traer institucion por el id
@@ -35,7 +42,7 @@ export class Environment {
         */
         getUsuarioWhereRolIsAlumno: 'api/usuario/alumnos',
         //url/api/usuario/alumnos
-        getUsuarioWhereRolIsNotAlumno: '/api/usuario/empleados',
+        getUsuarioWhereRolIsNotAlumno: 'api/usuario/empleados',
         //url/api/usuario/empleados
         getUsuarioWhereRolIsAlumnoByInstitucion: 'api/usuario/alumnos/',
         //url/api/usuario/alumnos/idInstitucion
@@ -80,7 +87,7 @@ export class Environment {
     }
 
     public static getEndPoint(endPoint: string): string {
-        return `${this.getEnvironment(environment.dev)}${endPoint}`;
+        return `${this.getEnvironment(this.environment)}${endPoint}`;
     }
 
 
