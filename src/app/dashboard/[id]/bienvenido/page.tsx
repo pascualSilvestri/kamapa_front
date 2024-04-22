@@ -1,19 +1,16 @@
 'use client'
 import React from 'react'
-import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
+import { useInstitucionSelectedContext } from 'context/userContext';
 
-
-
-function pageBienvenido() {
-
-const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+function PageBienvenido() {
+  const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
   console.log(institucionSelected);
   return (
     <div>
-        <h1>Bienvenido a </h1>
+        <h1>Bienvenido a {institucionSelected.nombre}</h1>
     </div>
   )
 }
 
-export default pageBienvenido
+export default PageBienvenido;

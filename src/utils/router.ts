@@ -18,7 +18,8 @@ export const router = {
     'InstituciónRegistro': { label : 'Registrar Institucion', href: 'Admin/reginstitucion' },
     'InstituciónVista': { label : 'Vista Institucion', href: 'Admin/reginstitucion' },
     'AulasRegistro': { label : 'Aulas', href: '/regaulas' },
-    'RegistroUsuarios': { label : 'Registrar de Usuarios', href: '/regUsuario' },
+    'RegistroUsuarios': { label : 'Registro de Usuarios', href: '/consultaUsuario' },
+    // 'RegistroUsuario': { label : 'Registrar Usuario', href: '/regUsuario' },
     'Permisos': { label : 'Permisos', href: '/permisos' },
     'Secretario':{ label: 'Secretario', href: '/secretario' },
     'Notas':  { label: 'Notas', href: '/calificar' },
@@ -99,11 +100,11 @@ export const alumnoAutorizeRouter = [
 export function getAuthorizedRoutes(router : {}, rolesAutorize: any) {
     const authorizedRoutes = [];
   
-    for (const routeName in router) {
-      if (rolesAutorize.includes(routeName)) {
-        authorizedRoutes.push(router[routeName]);
-      }
-    }
+        for (const routeName in router) {
+        if (rolesAutorize.includes(routeName)) {
+            authorizedRoutes.push(router[routeName]);
+        }
+        }
   
     return authorizedRoutes;
   };
