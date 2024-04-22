@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Table, Modal, Form, Row, Col } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
@@ -28,8 +28,25 @@ const VistaEmpleadosPage = () => {
     const { data: session, status } = useSession();
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
-    useEffect(() => {
+    // Estado local para el formulario de edición
+    const [editedEmpleado, setEditedEmpleado] = useState({
+        legajo: '',
+        nombre: '',
+        apellido: '',
+        dni: '',
+        cuil: '',
+        fechaNacimiento: '',
+        email: '',
+        domicilioUsuario: {
+            Localidad: '',
+            barrio: '',
+            calle: '',
+            numero: '',
+        },
+        roles: [],
+    });
 
+    useEffect(() => {
         if (session) {
             setUser({
                 nombre: session.user.nombre,
@@ -41,17 +58,6 @@ const VistaEmpleadosPage = () => {
             setRol(session.user.Roles);
         }
     }, [session]);
-
-     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Obtener los roles de la base de datos para mostrarlos en los checkbox
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/rols`)
-            .then(response => response.json())
-            .then((data: Roles[]) => {
-                setRoles(data);
-            })
-            .catch(error => console.error('Error fetching provinces:', error));
-    }, [rol]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -70,7 +76,6 @@ const VistaEmpleadosPage = () => {
                 }
 
                 const data = await response.json();
-                console.log(data);
                 setEmpleados(data.usuarios);
             } catch (error) {
                 console.error('Error al obtener empleados:', error.message);
@@ -112,6 +117,23 @@ const VistaEmpleadosPage = () => {
 
     const handleModificar = (empleado) => {
         setSelectedEmpleado(empleado);
+        // Establecer los valores iniciales del formulario de edición
+        setEditedEmpleado({
+            legajo: empleado.legajo,
+            nombre: empleado.nombre,
+            apellido: empleado.apellido,
+            dni: empleado.dni,
+            cuil: empleado.cuil,
+            fechaNacimiento: empleado.fechaNacimiento,
+            email: empleado.email,
+            domicilioUsuario: {
+                Localidad: empleado.domicilioUsuario.Localidad,
+                barrio: empleado.domicilioUsuario.barrio,
+                calle: empleado.domicilioUsuario.calle,
+                numero: empleado.domicilioUsuario.numero,
+            },
+            roles: empleado.Roles.map(role => role.id),
+        });
         setShowEditModal(true);
     };
 
@@ -121,27 +143,8 @@ const VistaEmpleadosPage = () => {
 
     const handleConfirmSave = async (e) => {
         e.preventDefault();
-        console.log(selectedEmpleado)
         try {
-            const legajo = (document.getElementById('formLegajo') as HTMLInputElement)?.value;
-            const nombre = (document.getElementById('formNombre') as HTMLInputElement)?.value;
-            const apellido = (document.getElementById('formApellido') as HTMLInputElement)?.value;
-            const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')) as HTMLInputElement[];
-            const roles = checkboxes.map(input => input.id);
-
-            const updatedEmpleado = {
-                
-                usuario: {
-                    usuarioId: selectedEmpleado.id,
-                    legajo: legajo,
-                    nombre: nombre,
-                    apellido: apellido,
-                    roles: roles,
-                },
-            };
-
-            console.log(updatedEmpleado);
-
+            // Envíar los datos del formulario de edición al servidor
             const response = await fetch(
                 `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedEmpleado.id}`,
                 {
@@ -170,7 +173,6 @@ const VistaEmpleadosPage = () => {
             console.error('Error al actualizar empleado:', error);
         }
     };
-
     console.log(empleados)
 
     return (
@@ -246,7 +248,7 @@ const VistaEmpleadosPage = () => {
                                     {empleado?.nombre} {empleado?.apellido}
                                 </td>
                                 <td>
-                                       { empleado?.telefono}
+                                    { empleado?.telefono}
                                 </td>
                                 <td>
                                     <Button
@@ -366,6 +368,70 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.apellido}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId='formDni'>
+                                <Form.Label>D.N.I:</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedEmpleado?.dni}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId='formCuil'>
+                                <Form.Label>C.U.I.L:</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedEmpleado?.cuil}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId='formFechaNacimiento'>
+                                <Form.Label>Fecha de Nacimiento</Form.Label>
+                                <Form.Control
+                                    type='calendar'
+                                    defaultValue={selectedEmpleado?.fechaNacimiento}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId='formEmail'>
+                                <Form.Label>Email</Form.Label>
+                                <Form.Control
+                                    type='email'
+                                    defaultValue={selectedEmpleado?.email}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId='formLocalidad'>
+                                <Form.Label>Localidad</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedEmpleado?.domicilioUsuario.Localidad}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId='formBarrio'>
+                                <Form.Label>Barrio</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedEmpleado?.domicilioUsuario.barrio}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId='formCalle'>
+                                <Form.Label>Calle</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedEmpleado?.domicilioUsuario.calle}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId='formNumero'>
+                                <Form.Label>Numeracion de la calle</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedEmpleado?.domicilioUsuario.numero}
                                 />
                             </Form.Group>
 
