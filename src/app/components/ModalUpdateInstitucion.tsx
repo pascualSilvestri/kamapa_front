@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
+import { Environment } from 'utils/apiHelpers';
 
 interface ModalUpdateInstitucionProps {
     id: number;
@@ -12,7 +13,6 @@ interface ModalUpdateInstitucionProps {
 
 const ModalUpdateInstitucion: React.FC<ModalUpdateInstitucionProps> = ({ id, showEditModal, setShowEditModal, institucion, setInstitucion }) => {
     const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
 
         // Asegúrate de que los elementos sean tratados como HTMLInputElement para acceder a la propiedad 'value'
         const cue = (document.getElementById('formCue') as HTMLInputElement).value;
@@ -34,7 +34,7 @@ const ModalUpdateInstitucion: React.FC<ModalUpdateInstitucionProps> = ({ id, sho
         if (logo) formData.append('logo', logo);
         formData.append('id', id.toString());
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`, {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.institucion)}${id}`, {
             method: 'PUT',
             body: formData
         });

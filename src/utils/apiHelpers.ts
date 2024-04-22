@@ -22,15 +22,16 @@ export class Environment {
 
 
     public static endPoint = {
-        login:'api/auth/login',
-        provincias:'api/provincia',
-        roles:'api/rols',
+        login:'api/auth/login/',
+        provincias:'api/provincia/',
+        roles:'api/rols/',
+        institucion:'api/institucion//',
         getInstitucionById: 'api/institucion/',
         /*
         traer institucion por el id
         url/api/institucion/id
         */
-        usuario: 'api/usuario',
+        usuario: 'api/usuario/',
         /*
         Traer a todos los usuarios
           url/api/usuario
@@ -40,15 +41,15 @@ export class Environment {
         Traer a todos los usuarios
           url/api/usuario/institucion/idInstitucion
         */
-        getUsuarioWhereRolIsAlumno: 'api/usuario/alumnos',
+        getUsuarioWhereRolIsAlumno: 'api/usuario/alumnos/',
         //url/api/usuario/alumnos
-        getUsuarioWhereRolIsNotAlumno: 'api/usuario/empleados',
+        getUsuarioWhereRolIsNotAlumno: 'api/usuario/empleados/',
         //url/api/usuario/empleados
         getUsuarioWhereRolIsAlumnoByInstitucion: 'api/usuario/alumnos/',
         //url/api/usuario/alumnos/idInstitucion
         getUsuarioWhereRolIsNotAlumnoByIntitucion: 'api/usuario/empleados/',
         //url/api/usuario/empleados/idInstitucion
-        getUsuarioWhereRolIsNotAlumnoByIntitucionByUsuario: 'api/usuario/empleado',
+        getUsuarioWhereRolIsNotAlumnoByIntitucionByUsuario: 'api/usuario/empleado/',
             //url/api/usuario/empleado
         /*
         traer usuarion con rol que no sea alumno por el id de la institucion y id del usuario
@@ -76,7 +77,7 @@ export class Environment {
          */
 
     
-        getUsuarioWhereRolIsAlumnoByIntitucionByUsuario: 'api/usuario/alumno'
+        getUsuarioWhereRolIsAlumnoByIntitucionByUsuario: 'api/usuario/alumno',
         //url/api/usuario/alumno
         /*
             {
@@ -84,6 +85,14 @@ export class Environment {
                 "idUsuario":1
             }
         */
+       addInstitucion:'api/usuario/addInstitucion'
+       /*
+    {
+        "usuarioId":4,
+        "institucionId":3,
+        "roles":[1,3,4]
+    }
+       */
     }
 
     public static getEndPoint(endPoint: string): string {

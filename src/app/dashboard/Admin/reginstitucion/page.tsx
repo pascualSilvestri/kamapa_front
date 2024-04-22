@@ -1,10 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
-import useFormStatus from '../../../../components/useFormStatus';
+
 import Link from 'next/link';
 import { useSession, signIn } from 'next-auth/react';
-import { Provincia, User, Roles } from '../../../../../model/types';
+
+import { Environment } from 'utils/apiHelpers';
+import { Provincia, Roles, User } from 'model/types';
 
 
 // Define la interfaz para los datos del formulario
@@ -88,7 +90,7 @@ const RegInstitucionPage = () => {
 		const fetchProvincias = async () => {
 			try {
 				const response = await fetch(
-					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/provincia`,
+					`${Environment.getEndPoint(Environment.endPoint.provincias)}`,
 				);
 				if (response.ok) {
 					const data = await response.json();
@@ -204,7 +206,7 @@ const RegInstitucionPage = () => {
 
 		try {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion`,
+				`${Environment.getEndPoint(Environment.endPoint.institucion)}`,
 				{
 					method: 'POST',
 					body: formData,

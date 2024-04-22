@@ -25,8 +25,8 @@ const ModalViewInstitucion: React.FC<IModalViewInstitucion> = ({institucion,show
               Domiciolio:{institucion.domicilioInstitucion?.calle}
             </p>
             <p>Nombre: {institucion?.nombre}</p>
-            <p>Tel: {institucion.contactoInstitucion?.contacto}</p>
-            <p>Email: {institucion.contactoInstitucion?.email}</p>
+            <p>Tel: {institucion?.contacto}</p>
+            <p>Email: {institucion?.email}</p>
             <p>
               Estado:{" "}
               {institucion?.isActive

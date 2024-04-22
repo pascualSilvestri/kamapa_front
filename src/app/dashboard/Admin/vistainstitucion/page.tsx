@@ -11,6 +11,7 @@ import { ModalType } from 'utils/const';
 import { autorizeNivel, autorizeRol } from 'utils/autorizacionPorRoles';
 import ModalViewInstitucion from 'app/components/ModalViewInstitucion';
 import ModalUpdateInstitucion from 'app/components/ModalUpdateInstitucion';
+import { Environment } from 'utils/apiHelpers';
 
 
 
@@ -70,7 +71,7 @@ const VistaInstitucionPage = () => {
 	useEffect(() => {
 		if (confirmar) {
 			const response = fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`,
+				`${Environment.getEndPoint(Environment.endPoint.institucion)}${id}`,
 				{
 					method: 'DELETE',
 				},
@@ -85,7 +86,7 @@ const VistaInstitucionPage = () => {
 	const fetchData = async () => {
 		try {
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion`,
+				`${Environment.getEndPoint(Environment.endPoint.institucion)}`,
 			);
 
 			if (!response.ok) {
@@ -122,7 +123,7 @@ const VistaInstitucionPage = () => {
 		try {
 			// Envía la solicitud al backend para eliminar el elemento con el ID especificado
 			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/institucion/${id}`,
+				`${Environment.getEndPoint(Environment.endPoint.institucion)}${id}`,
 				{
 					method: 'DELETE', // Utiliza el método DELETE para la eliminación
 					headers: {
