@@ -9,6 +9,7 @@ import { Roles, User } from '../../model/types';
 import { autorizeNivel , autorizeRol } from '../../utils/autorizacionPorRoles';
 import path from 'path';
 import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
+import { Environment } from 'utils/apiHelpers';
 
 
 const Dashboard = () => {
@@ -68,7 +69,6 @@ const Dashboard = () => {
 		}
 	  };
 
-	  console.log(user);
 	  return (
 			<Row className='justify-content-center mt-5'>
 			{user.Instituciones && user.Instituciones.length > 0 && user.Instituciones.map((institucion, index) => (
@@ -80,7 +80,8 @@ const Dashboard = () => {
 					</div>
 					<Card.Body>
 					{/* Enlace a la ruta específica según el rol */}
-					<Link href={`/dashboard/${user.Instituciones[0].id}/bienvenido`}>
+					<Link href={`/dashboard/${institucion.id}/bienvenido`}>
+					
 						<Button
 						variant='flat'
 						type='submit'
@@ -99,17 +100,24 @@ const Dashboard = () => {
 							e.currentTarget.style.backgroundColor = 'purple';
 							e.currentTarget.style.color = 'white';
 						}}
-						onClick={(e) => {
-							const institucionSelected = user.Instituciones.filter(
-							(e) => e.id === institucion.id
-							);
+						onClick={ async (e) => {
+							const inst = await fetch(`${Environment.getEndPoint(Environment.endPoint.getInstitucionById)}${institucion.id}`,{
+								method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'Authorization': `Bearer ${session.accessToken}`
+                                }
+							})
+							const institucionSelected = await inst.json();
+							
 							setInstitucionSelected({
-							id: institucionSelected[0].id,
-							nombre: institucionSelected[0].nombre,
-							logo: institucionSelected[0].logo,
-							cue: institucionSelected[0].cue,
-							email: institucionSelected[0].email,
-							contacto: institucionSelected[0].contacto,
+							id: institucionSelected.id,
+							nombre: institucionSelected.nombre,
+							logo: institucionSelected.logo,
+							cue: institucionSelected.cue,
+							email: institucionSelected.email,
+							contacto: institucionSelected.contacto,
 							});
 						}}>
 						Ingresar

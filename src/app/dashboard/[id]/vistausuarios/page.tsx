@@ -5,7 +5,9 @@ import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Roles, User } from '../../../../model/types';
-import { autorizeNivel , autorizeRol } from '../../../../utils/autorizacionPorRoles';
+import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
+import { Environment } from 'utils/apiHelpers';
+import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
 
 const VistaEmpleadosPage = () => {
     const [empleados, setEmpleados] = useState([]);
@@ -15,6 +17,7 @@ const VistaEmpleadosPage = () => {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
     const [rol, setRol] = useState<Roles[]>([]);
+    const [roles, setRoles] = useState([]);
     const [user, setUser] = useState<User>({
         nombre: '',
         apellido: '',
@@ -23,9 +26,10 @@ const VistaEmpleadosPage = () => {
         Roles: rol
     });
     const { data: session, status } = useSession();
+    const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
-    useEffect(() =>{
-        
+    useEffect(() => {
+
         if (session) {
             setUser({
                 nombre: session.user.nombre,
@@ -38,32 +42,43 @@ const VistaEmpleadosPage = () => {
         }
     }, [session]);
 
+     ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Obtener los roles de la base de datos para mostrarlos en los checkbox
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/rols`)
+            .then(response => response.json())
+            .then((data: Roles[]) => {
+                setRoles(data);
+            })
+            .catch(error => console.error('Error fetching provinces:', error));
+    }, [rol]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,{
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${session.accessToken}`,
-                        },
-                    }
+                    `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.accessToken}`,
+                    },
+                }
                 );
-
                 if (!response.ok) {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
 
                 const data = await response.json();
-                setEmpleados(data.empleados);
+                console.log(data);
+                setEmpleados(data.usuarios);
             } catch (error) {
                 console.error('Error al obtener empleados:', error.message);
             }
         };
 
         fetchData();
-    }, [session]); 
+    }, [session]);
 
     const handleConsultar = (empleado) => {
         setSelectedEmpleado(empleado);
@@ -78,7 +93,7 @@ const VistaEmpleadosPage = () => {
     const handleConfirmDelete = async () => {
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado/${selectedEmpleado}`,
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/usuario/${selectedEmpleado}`,
                 {
                     method: 'DELETE',
                 },
@@ -104,18 +119,20 @@ const VistaEmpleadosPage = () => {
         setShowSaveConfirmModal(true);
     };
 
-    const handleConfirmSave = async () => {
+    const handleConfirmSave = async (e) => {
+        e.preventDefault();
+        console.log(selectedEmpleado)
         try {
             const legajo = (document.getElementById('formLegajo') as HTMLInputElement)?.value;
             const nombre = (document.getElementById('formNombre') as HTMLInputElement)?.value;
             const apellido = (document.getElementById('formApellido') as HTMLInputElement)?.value;
-			const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')) as HTMLInputElement[];
-			const roles = checkboxes.map(input => input.value);
-			
+            const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')) as HTMLInputElement[];
+            const roles = checkboxes.map(input => input.id);
+
             const updatedEmpleado = {
-                ...selectedEmpleado,
+                
                 usuario: {
-                    usuarioId: selectedEmpleado.usuarioId,
+                    usuarioId: selectedEmpleado.id,
                     legajo: legajo,
                     nombre: nombre,
                     apellido: apellido,
@@ -123,8 +140,10 @@ const VistaEmpleadosPage = () => {
                 },
             };
 
+            console.log(updatedEmpleado);
+
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado/${selectedEmpleado.id}`,
+                `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedEmpleado.id}`,
                 {
                     method: 'PUT',
                     headers: {
@@ -139,11 +158,11 @@ const VistaEmpleadosPage = () => {
             }
 
             const updatedResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/empleado`,
+                `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`,
             );
             const updatedData = await updatedResponse.json();
 
-            setEmpleados(updatedData.empleados);
+            setEmpleados(updatedData.usuarios);
 
             setShowEditModal(false);
             setShowSaveConfirmModal(false);
@@ -151,6 +170,8 @@ const VistaEmpleadosPage = () => {
             console.error('Error al actualizar empleado:', error);
         }
     };
+
+    console.log(empleados)
 
     return (
         <div className='p-3'>
@@ -220,14 +241,12 @@ const VistaEmpleadosPage = () => {
                     {Array.isArray(empleados) && empleados.length > 0 ? (
                         empleados.map((empleado) => (
                             <tr key={empleado.id}>
-                                <td>{empleado?.UsuarioEmpleado?.legajo}</td>
+                                <td>{empleado?.legajo}</td>
                                 <td>
-                                    {empleado.UsuarioEmpleado &&
-                                        `${empleado?.UsuarioEmpleado?.nombre}, ${empleado?.UsuarioEmpleado?.apellido}`}
+                                    {empleado?.nombre} {empleado?.apellido}
                                 </td>
                                 <td>
-                                    {empleado.UsuarioEmpleado &&
-                                        empleado?.UsuarioEmpleado?.telefono}
+                                       { empleado?.telefono}
                                 </td>
                                 <td>
                                     <Button
@@ -271,35 +290,35 @@ const VistaEmpleadosPage = () => {
                 <Modal.Body>
                     {selectedEmpleado && (
                         <>
-                            <p>Legajo: {selectedEmpleado?.UsuarioEmpleado?.legajo}</p>
+                            <p>Legajo: {selectedEmpleado?.legajo}</p>
                             <p>
                                 Fecha de ingreso:{' '}
                                 {new Date(
-                                    selectedEmpleado?.UsuarioEmpleado?.fecha_ingreso,
+                                    selectedEmpleado?.fecha_ingreso,
                                 ).toLocaleDateString()}
                             </p>
                             <p>
                                 Fecha de egreso:{' '}
-                                {selectedEmpleado?.UsuarioEmpleado?.fecha_egreso
+                                {selectedEmpleado?.fecha_egreso
                                     ? new Date(
-                                            selectedEmpleado?.UsuarioEmpleado?.fecha_egreso,
+                                        selectedEmpleado?.fecha_egreso,
                                     ).toLocaleDateString()
                                     : 'N/A'}
                             </p>
-                            <p>Nombre: {selectedEmpleado?.UsuarioEmpleado?.nombre}</p>
-                            <p>Apellido: {selectedEmpleado?.UsuarioEmpleado?.apellido}</p>
-                            <p>DNI: {selectedEmpleado?.UsuarioEmpleado?.dni}</p>
-                            <p>CUIL: {selectedEmpleado?.UsuarioEmpleado?.cuil}</p>
+                            <p>Nombre: {selectedEmpleado?.nombre}</p>
+                            <p>Apellido: {selectedEmpleado?.apellido}</p>
+                            <p>DNI: {selectedEmpleado?.dni}</p>
+                            <p>CUIL: {selectedEmpleado?.cuil}</p>
                             <p>
                                 Fecha de nacimiento:{' '}
                                 {new Date(
-                                    selectedEmpleado?.UsuarioEmpleado?.fechaNacimiento,
+                                    selectedEmpleado?.fechaNacimiento,
                                 ).toLocaleDateString()}
                             </p>
-                            <p>Teléfono: {selectedEmpleado?.UsuarioEmpleado?.telefono}</p>
+                            <p>Teléfono: {selectedEmpleado?.telefono}</p>
                             <p>
                                 Estado:{' '}
-                                {selectedEmpleado?.UsuarioEmpleado?.is_active
+                                {selectedEmpleado?.is_active
                                     ? 'Activo'
                                     : 'Inactivo'}
                             </p>
@@ -330,7 +349,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Label>Legajo</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.UsuarioEmpleado?.legajo}
+                                    defaultValue={selectedEmpleado?.legajo}
                                 />
                             </Form.Group>
 
@@ -338,7 +357,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Label>Nombre</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.UsuarioEmpleado?.nombre}
+                                    defaultValue={selectedEmpleado?.nombre}
                                 />
                             </Form.Group>
 
@@ -346,21 +365,25 @@ const VistaEmpleadosPage = () => {
                                 <Form.Label>Apellido</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.UsuarioEmpleado?.apellido}
+                                    defaultValue={selectedEmpleado?.apellido}
                                 />
                             </Form.Group>
 
                             <Form.Group controlId='formRoles'>
                                 <Form.Label>Roles</Form.Label>
-                                {Object.keys(rol).map((rol, index) => (
-                                    <Form.Check
-                                        key={index}
-                                        type="checkbox"
-                                        id={rol}
-                                        label={rol}
-                                        defaultChecked={selectedEmpleado && selectedEmpleado.roles ? selectedEmpleado.roles.includes(rol) : false}
-                                    />
-                                ))}
+                                {roles.map((rol) => {
+                                    console.log(selectedEmpleado)
+                                    const isChecked = selectedEmpleado.Roles.some((r) => r.id === rol.id);
+                                    return (
+                                        <Form.Check
+                                            key={rol.id}
+                                            type="checkbox"
+                                            id={rol.id}
+                                            label={rol.name}
+                                            defaultChecked={isChecked}
+                                        />
+                                    )
+                                })}
                             </Form.Group>
                         </Form>
                     )}

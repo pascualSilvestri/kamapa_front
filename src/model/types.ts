@@ -79,8 +79,8 @@ export interface UserFormData {
     usuario: {
         legajo: string;
 		matricula: string;
-        fecha_ingreso: string;
-        fecha_egreso: null;
+        fechaIngreso: string;
+        fechaEgreso: null;
         nombre: string;
         apellido: string;
         dni: string;

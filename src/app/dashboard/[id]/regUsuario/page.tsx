@@ -7,6 +7,7 @@ import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRol
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
+import { Environment } from 'utils/apiHelpers';
 
 
 // Define la interfaz Provincia
@@ -103,8 +104,8 @@ const RegUsuario = () => {
                 usuario: {
                     legajo: legajo,
                     matricula: matriculaProfesional,
-                    fecha_ingreso: new Date().toISOString(), // Puedes ajustar esto según tus necesidades
-                    fecha_egreso: null,
+                    fechaIngreso: new Date().toISOString(), // Puedes ajustar esto según tus necesidades
+                    fechaEgreso: null,
                     nombre: nombre,
                     apellido: apellido,
                     dni: dni,
@@ -133,7 +134,7 @@ const RegUsuario = () => {
 
             try {
                 const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/usuario`,
+                    `${Environment.getEndPoint(Environment.endPoint.usuario)}`,
                     {
                         method: 'POST',
                         headers: {
@@ -142,7 +143,7 @@ const RegUsuario = () => {
                         body: JSON.stringify(formData),
                     }
                 );
-                console.log(response)
+                console.log(await response.json())
 
                 if (response.ok) {
                     setShowSuccessModal(true);
