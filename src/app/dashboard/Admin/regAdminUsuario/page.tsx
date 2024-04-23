@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
-import { Roles, User, UserFormData } from '../../../../model/types';
+import { Institucion, Roles, User, UserFormData } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ interface Provincia {
     provincia: string;
 }
 
-const regUsuario = () => {
+const regAdminUsuario = () => {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [dni, setDni] = useState('');
@@ -56,6 +56,20 @@ const regUsuario = () => {
             })
             .catch(error => console.error('Error fetching provinces:', error));
     }, []);
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        fetch(`${Environment.getEndPoint(Environment.endPoint.institucion)}`)
+            .then(response => response.json())
+            .then((data: Institucion[]) => {
+                const institucionObj = data.reduce((obj, institucion) => {
+                    obj[institucion.id] = institucion;
+                    return institucion;
+                }, {});
+                setRoles(institucionObj);
+            })
+            .catch(error => console.error('Error fetching roles:', error));
+    })
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,12 +162,12 @@ const regUsuario = () => {
 
     // Función para validar el formulario
     useEffect(() => {
-        if (nombre && apellido && dni && provinciaSeleccionada && telefono && matriculaProfesional && legajo && cuil && fechaNacimiento && email) {
+        if (nombre && apellido && dni && provinciaSeleccionada && telefono && legajo && cuil && fechaNacimiento && email) {
             setFormValid(true);
         } else {
             setFormValid(false);
         }
-    }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email]);
+    }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email, calle,barrio]);
 
     // Función para limpiar los campos del formulario
     const limpiarCampos = () => {
@@ -321,8 +335,35 @@ const regUsuario = () => {
                         </Form.Group>
                         <hr />
                         <Form.Group >
-                            <h1>Datos de Contacto *</h1>
+                            <h1>Tramite e Institucion *</h1>
                         </Form.Group>
+
+                        <Form.Group controlId='roles'>
+                            <Form.Label>Roles *</Form.Label>
+                            {['Admin', 'Director', 'Secretario', 'Preceptor', 'Docente', 'Alumno']
+                                .filter(rol => roles.hasOwnProperty(rol))
+                                .map((rol, index) => (
+                                    <Form.Check
+                                        key={index}
+                                        type="checkbox"
+                                        id={rol}
+                                        label={rol}
+                                        checked={roles[rol].checked}
+                                        onChange={(e) => {
+                                            const isChecked = e.target.checked;
+                                            setRoles(prevRoles => ({ ...prevRoles, [rol]: { ...prevRoles[rol], checked: isChecked } }));
+
+                                            if (isChecked) {
+                                                setSelectedRoleIds(prevIds => [...prevIds, roles[rol].id]);
+                                            } else {
+                                                setSelectedRoleIds(prevIds => prevIds.filter(id => id !== roles[rol].id));
+                                            }
+                                        }}
+                                    />
+                                ))}
+                        </Form.Group>
+
+
                         <Form.Group controlId="matriculaProfesional">
                             <Form.Label>Matrícula Profesional ( Solo en caso de ser Profesional ).</Form.Label>
                             <Form.Control
@@ -347,7 +388,9 @@ const regUsuario = () => {
                         </Form.Group>
                         <Form.Group controlId='roles'>
                             <Form.Label>Roles *</Form.Label>
-                            {Object.keys(roles).filter(rol => {
+                            {Object.keys(roles)
+                            .sort((a, b) => a.localeCompare(b)) // Ordenar los roles de forma descendente   
+                            .filter(rol => {
                                    // Determinar el rol de mayor jerarquía en la sesión del usuario
                                 const highestUserRole = session.user.Roles.reduce((highest, current) => {
                                     return current.name === 'Admin' ? current.name :
@@ -503,4 +546,4 @@ const regUsuario = () => {
     );
 };
 
-export default regUsuario;
+export default regAdminUsuario;

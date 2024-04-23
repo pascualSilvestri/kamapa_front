@@ -15,7 +15,7 @@ export default function AlumnoPage () {
               <CardTitle style={{ textAlign: 'center' }}>Usuarios</CardTitle>
               <CardSubtitle>Gestiona a los usuarios de tu aplicación</CardSubtitle>
               {/* Utiliza el componente Link para los enlaces */}
-              <Link href='/admin/regusuarios'>
+              <Link href='/admin/regUsuarios'>
 
                 <Button variant='primary' style={{ width: '100%' }}>Ir</Button>
 
