@@ -10,7 +10,7 @@ enum environment {
 export class Environment {
 
 
-    private static environment: environment = environment.prov;
+    private static environment: environment = environment.dev;
 
     private static getEnvironment(env: environment): string {
         if (env == environment.prov) {
@@ -27,9 +27,16 @@ export class Environment {
         roles:'api/rols/',
         institucion:'api/institucion//',
         getInstitucionById: 'api/institucion/',
-        /*
+         /*
         traer institucion por el id
         url/api/institucion/id
+        */
+        getInstitucionForRolsForUser: 'api/institucion/userRolsInstitucion/',
+       /*
+       url/api/institucion/userRolsInstitucion/idInstitucion
+       {
+         "usuarioId":1
+        }
         */
         usuario: 'api/usuario/',
         /*
@@ -50,6 +57,7 @@ export class Environment {
         getUsuarioWhereRolIsNotAlumnoByIntitucion: 'api/usuario/empleados/',
         //url/api/usuario/empleados/idInstitucion
         getUsuarioWhereRolIsNotAlumnoByIntitucionByUsuario: 'api/usuario/empleado/',
+        getUsuarioByDni:'api/usuario/searchUsuarioById/',
             //url/api/usuario/empleado
         /*
         traer usuarion con rol que no sea alumno por el id de la institucion y id del usuario

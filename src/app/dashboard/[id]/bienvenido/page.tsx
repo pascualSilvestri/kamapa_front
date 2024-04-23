@@ -1,11 +1,11 @@
 'use client'
 import React from 'react'
-import { useInstitucionSelectedContext } from 'context/userContext';
+import { useInstitucionSelectedContext, useRolesContext } from 'context/userContext';
 
 function PageBienvenido() {
   const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+  const [rol, setRol] = useRolesContext();
 
-  console.log(institucionSelected);
   return (
     <div>
         <h1>Bienvenido a {institucionSelected.nombre}</h1>

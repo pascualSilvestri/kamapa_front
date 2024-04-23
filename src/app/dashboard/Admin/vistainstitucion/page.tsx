@@ -12,6 +12,7 @@ import { autorizeNivel, autorizeRol } from 'utils/autorizacionPorRoles';
 import ModalViewInstitucion from 'app/components/ModalViewInstitucion';
 import ModalUpdateInstitucion from 'app/components/ModalUpdateInstitucion';
 import { Environment } from 'utils/apiHelpers';
+import { useRolesContext, useUserContext } from 'context/userContext';
 
 
 
@@ -31,30 +32,12 @@ const VistaInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const { data: session, status } = useSession();
-	const [rol, setRol] = useState<Roles[]>([]);
-	const [user, setUser] = useState<User>({
-		nombre: '',
-		apellido: '',
-		legajo: '',
-		telefono: '',
-		Roles: rol
-	});
+	const [rol, setRol] = useRolesContext();
+	const [user, setUser] = useUserContext();
 	const router = useRouter();
 
 
 	useEffect(() => {
-
-		if (session) {
-			setUser({
-				nombre: session.user.nombre,
-				apellido: session.user.apellido,
-				legajo: session.user.legajo,
-				telefono: session.user.telefono,
-				Roles:session.user.Roles
-			});
-			setRol(session.user.Roles);
-			
-		}
 		if (!session) {
 			router.push('/login');
 		}

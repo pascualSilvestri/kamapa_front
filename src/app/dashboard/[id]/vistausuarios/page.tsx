@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Roles, User } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { Environment } from 'utils/apiHelpers';
-import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
+import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 
 const VistaEmpleadosPage = () => {
     const [empleados, setEmpleados] = useState([]);
@@ -16,17 +16,14 @@ const VistaEmpleadosPage = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
-    const [rol, setRol] = useState<Roles[]>([]);
+    const [rol, setRol] = useRolesContext();
     const [roles, setRoles] = useState([]);
-    const [user, setUser] = useState<User>({
-        nombre: '',
-        apellido: '',
-        legajo: '',
-        telefono: '',
-        Roles: rol
-    });
+    const [user, setUser] = useUserContext();
     const { data: session, status } = useSession();
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+    const [selectedRoles, setSelectedRoles] = useState([]);
+
+
 
     // Estado local para el formulario de edición
     const [editedEmpleado, setEditedEmpleado] = useState({
@@ -47,17 +44,33 @@ const VistaEmpleadosPage = () => {
     });
 
     useEffect(() => {
-        if (session) {
-            setUser({
-                nombre: session.user.nombre,
-                apellido: session.user.apellido,
-                legajo: session.user.legajo,
-                telefono: session.user.telefono,
-                Roles: session.user.Roles
-            });
-            setRol(session.user.Roles);
-        }
+        const fetchRoles = async () => {
+            try {
+                const response = await fetch(
+                    `${Environment.getEndPoint(Environment.endPoint.roles)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.accessToken}`,
+                    },
+                }
+                );
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+
+
+                const data = await response.json();
+                console.log(data);
+                setRoles(data);
+            } catch (error) {
+                console.error('Error al obtener empleados:', error.message);
+            }
+        };
+
+        fetchRoles();
     }, [session]);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -75,7 +88,9 @@ const VistaEmpleadosPage = () => {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
 
+
                 const data = await response.json();
+                console.log(data);
                 setEmpleados(data.usuarios);
             } catch (error) {
                 console.error('Error al obtener empleados:', error.message);
@@ -86,6 +101,8 @@ const VistaEmpleadosPage = () => {
     }, [session]);
 
     const handleConsultar = (empleado) => {
+        
+        setSelectedRoles(empleado.Roles.map(role => role.id));
         setSelectedEmpleado(empleado);
         setShowModal(true);
     };
@@ -93,6 +110,15 @@ const VistaEmpleadosPage = () => {
     const handleEliminar = (empleado) => {
         setSelectedEmpleado(empleado);
         setShowConfirmModal(true);
+    };
+
+    // Función para manejar el cambio en los checkboxes
+    const handleRoleChange = (roleId, isChecked) => {
+        if (isChecked) {
+            setSelectedRoles(prevRoles => [...prevRoles, roleId]);
+        } else {
+            setSelectedRoles(prevRoles => prevRoles.filter(id => id !== roleId));
+        }
     };
 
     const handleConfirmDelete = async () => {
@@ -116,6 +142,8 @@ const VistaEmpleadosPage = () => {
     };
 
     const handleModificar = (empleado) => {
+        
+        setSelectedRoles(empleado.Roles.map(role => role.id));
         setSelectedEmpleado(empleado);
         // Establecer los valores iniciales del formulario de edición
         setEditedEmpleado({
@@ -142,7 +170,6 @@ const VistaEmpleadosPage = () => {
     };
 
     const handleConfirmSave = async (e) => {
-        e.preventDefault();
         try {
             // Envíar los datos del formulario de edición al servidor
             const response = await fetch(
@@ -152,12 +179,20 @@ const VistaEmpleadosPage = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(updatedEmpleado),
+                    body: JSON.stringify({
+                        legajo:editedEmpleado.legajo,
+                        nombre:editedEmpleado.nombre,
+                        apellido:editedEmpleado.apellido,
+                        institucionId:institucionSelected.id,
+                        roles:selectedRoles
+                    }),
                 },
             );
+            const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error('Error en la modificación');
+            if (!response.ok) {;
+                console.log(data)
+                throw new Error(data);
             }
 
             const updatedResponse = await fetch(
@@ -248,7 +283,7 @@ const VistaEmpleadosPage = () => {
                                     {empleado?.nombre} {empleado?.apellido}
                                 </td>
                                 <td>
-                                    { empleado?.telefono}
+                                    {empleado?.telefono}
                                 </td>
                                 <td>
                                     <Button
@@ -346,6 +381,7 @@ const VistaEmpleadosPage = () => {
 
                 <Modal.Body>
                     {selectedEmpleado && (
+                        
                         <Form>
                             <Form.Group controlId='formLegajo'>
                                 <Form.Label>Legajo</Form.Label>
@@ -438,7 +474,6 @@ const VistaEmpleadosPage = () => {
                             <Form.Group controlId='formRoles'>
                                 <Form.Label>Roles</Form.Label>
                                 {roles.map((rol) => {
-                                    console.log(selectedEmpleado)
                                     const isChecked = selectedEmpleado.Roles.some((r) => r.id === rol.id);
                                     return (
                                         <Form.Check
@@ -447,6 +482,7 @@ const VistaEmpleadosPage = () => {
                                             id={rol.id}
                                             label={rol.name}
                                             defaultChecked={isChecked}
+                                            onChange={(e) => handleRoleChange(rol.id, e.target.checked)}
                                         />
                                     )
                                 })}

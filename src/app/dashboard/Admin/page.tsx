@@ -15,20 +15,15 @@ import {
 import Link from 'next/link';
 import { autorizeNivel, autorizeRol } from 'utils/autorizacionPorRoles';
 import { Roles, User } from 'model/types';
+import { useRolesContext, useUserContext } from 'context/userContext';
 
 
 
 export default function Page() {
 
 	const { data: session, status } = useSession();
-	const [rol, setRol] = useState<Roles[]>([]);
-	const [user, setUser] = useState<User>({
-		nombre: '',
-		apellido: '',
-		legajo: '',
-		telefono: '',
-		Roles: rol
-	});
+	const [rol, setRol] = useRolesContext();
+	const [user, setUser] = useUserContext();
 	const router = useRouter();
 
 
@@ -36,18 +31,6 @@ export default function Page() {
 		// Si no hay sesión, redirige a la página de inicio de sesión
 		if (!session) {
 			router.push('/login');
-		}
-
-		if (session) {
-			setUser({
-				nombre: session.user.nombre,
-				apellido: session.user.apellido,
-				legajo: session.user.legajo,
-				telefono: session.user.telefono,
-				Roles:session.user.Roles
-			});
-			setRol(session.user.Roles);
-			
 		}
 	}, [router, session]);
 

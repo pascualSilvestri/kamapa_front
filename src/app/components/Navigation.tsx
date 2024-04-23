@@ -9,38 +9,33 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { getRolesRouters } from '../../utils/router';
-import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
+import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 
 
 
 export function Navigation() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [rol, setRol] = useState<Roles[]>([]);
+  const [rol, setRol] = useRolesContext();
   const [userRoutes, setUserRoutes] = useState([]);
 	const [user, setUser] = useUserContext();
 	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
-
+console.log(rol)
 
   useEffect(() => {
     // Si no hay sesión, redirige a la página de inicio de sesión
     if (!session) {
       router.push('/login');
     }
+      
+    
+  }, []);
 
-    if (session) {
-      setUser({
-        nombre: session.user.nombre,
-        apellido: session.user.apellido,
-        legajo: session.user.legajo,
-        telefono: session.user.telefono,
-        Roles: session.user.Roles
-      });
-      setRol(session.user.Roles);
-      setUserRoutes(getRolesRouters(session.user.Roles));
-    }
-  }, [router, session]);
+  useEffect(()=>{
+
+    setUserRoutes(getRolesRouters(rol));
+  },[rol])
 
 
 

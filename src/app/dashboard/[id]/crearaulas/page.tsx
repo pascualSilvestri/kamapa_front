@@ -1,4 +1,5 @@
 'use client'
+import { useRolesContext, useUserContext } from 'context/userContext';
 import { User } from 'model/types';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
@@ -13,35 +14,11 @@ const CrearAulasPage = () => {
   });
 
   const [nuevaMateria, setNuevaMateria] = useState('');
-  const [rol, setRol] = useState<Roles[]>([]);
-  const [user, setUser] = useState<User>({
-		nombre: '',
-		apellido: '',
-		legajo: '',
-		telefono: '',
-		Roles: rol,
-		Instituciones:[]
-	});
+  const [rol, setRol] = useRolesContext();
+  const [user, setUser] = useUserContext();
 
   const { data: session, status } = useSession();
 
-  useEffect(() => {
-
-		if (session) {
-			setUser({
-				nombre: session.user.nombre,
-				apellido: session.user.apellido,
-				legajo: session.user.legajo,
-				telefono: session.user.telefono,
-				Roles: session.user.Roles,
-				Instituciones: session.user.Instituciones
-
-			});
-			setRol(session.user.Roles);
-		
-
-		}
-	}, [session]);
 
   const handleChangeAula = (e) => {
     const { name, value } = e.target;

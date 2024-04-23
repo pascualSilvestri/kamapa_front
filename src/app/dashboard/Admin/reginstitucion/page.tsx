@@ -7,6 +7,7 @@ import { useSession, signIn } from 'next-auth/react';
 
 import { Environment } from 'utils/apiHelpers';
 import { Provincia, Roles, User } from 'model/types';
+import { useRolesContext, useUserContext } from 'context/userContext';
 
 
 // Define la interfaz para los datos del formulario
@@ -38,14 +39,8 @@ const RegInstitucionPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [modalMessage, setModalMessage] = useState('');
 	const { data: session, status: sessionStatus } = useSession();
-	const [rol, setRol] = useState<Roles[]>([]);
-	const [user, setUser] = useState<User>({
-		nombre: '',
-		apellido: '',
-		legajo: '',
-		telefono: '',
-		Roles: rol
-	});
+	const [rol, setRol] = useRolesContext();
+	const [user, setUser] = useUserContext();
 	// Estados para los datos del formulario, provincias, estado del modal y estado del formulario
 	const [formState, setFormState] = useState<FormData>({
 		institucion: {
@@ -67,21 +62,6 @@ const RegInstitucionPage = () => {
 		},
 	});
 
-	useEffect(() => {
-
-		if (session) {
-			setUser({
-				nombre: session.user.nombre,
-				apellido: session.user.apellido,
-				legajo: session.user.legajo,
-				telefono: session.user.telefono,
-				Roles:session.user.Roles
-			});
-			setRol(session.user.Roles);
-			
-		}
-	}
-	, [session]);
 
 
 	

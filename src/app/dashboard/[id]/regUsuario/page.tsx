@@ -6,7 +6,7 @@ import { Roles, User, UserFormData } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
+import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { Environment } from 'utils/apiHelpers';
 
 
@@ -42,27 +42,8 @@ const RegUsuario = () => {
     const { data: session, status: sessionStatus } = useSession();
     const [selectedRoleIds, setSelectedRoleIds] = useState([]);
     const [roles, setRoles] = useState({});
-    const [rol, setRol] = useState<Roles[]>([]);
-    const [user, setUser] = useState<User>({
-        nombre: '',
-        apellido: '',
-        legajo: '',
-        telefono: '',
-        Roles: rol
-    });
-    useEffect(() => {
-        if (session) {
-            setUser({
-                nombre: session.user.nombre,
-                apellido: session.user.apellido,
-                legajo: session.user.legajo,
-                telefono: session.user.telefono,
-                Roles: session.user.Roles
-            });
-            setRol(session.user.Roles);
-
-        }
-    }, [session]);
+    const [rol, setRol] = useRolesContext();
+    const [user, setUser] = useUserContext();
 
     console.log(session);
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +176,7 @@ const RegUsuario = () => {
             director: false,
             secretario: false,
             preseptor: false,
-            profesor: false
+            profesor: false,
         });
         setSelectedRoleIds([]);
     };

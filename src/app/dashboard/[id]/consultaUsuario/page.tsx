@@ -17,12 +17,13 @@ const ConsultaUsuarioPage = () => {
             setLoading(true); // Activamos el estado de carga
 
             // Llamada a la API para buscar el usuario por DNI
-            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}/${dni}`);
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getUsuarioByDni)}${dni}`);
             if (!response.ok) {
                 throw new Error('Usuario no encontrado');
             }
             const userData = await response.json();
-            setUserData(userData);
+            console.log(userData);
+            setUserData(userData.usuarios[0]);
         } catch (error) {
             console.error('Error al buscar usuario:', error);
             setUserData(null);
@@ -41,7 +42,7 @@ const ConsultaUsuarioPage = () => {
 
     const handleRegisterNewUser = () => {
         if (!userData) {
-            router.push(`dashboard/${institucionSelected.id}/regUsuario`); // Redirecciona a la página de registro de usuario
+            router.push(`/dashboard/${institucionSelected.id}/regUsuario`); // Redirecciona a la página de registro de usuario
         } else {
             // Lógica para registrar el usuario en la institución
             console.log('Registrando usuario en esta institución:', userData);

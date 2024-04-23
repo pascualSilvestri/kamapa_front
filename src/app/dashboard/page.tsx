@@ -4,20 +4,21 @@ import { Card, Button, Row, Col, Image } from 'react-bootstrap';
 import Link from 'next/link';
 import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { Roles, User } from '../../model/types';
 import { autorizeNivel , autorizeRol } from '../../utils/autorizacionPorRoles';
 import path from 'path';
-import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
+import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { Environment } from 'utils/apiHelpers';
 
 
 const Dashboard = () => {
 	const { data: session, status } = useSession();
 	const router = useRouter();
-	const [rol, setRol] = useState<Roles[]>([]);
+	const [rolAdmin, setRolAdmin] = useState<Roles[]>([]);
 	const [user, setUser] = useUserContext();
 	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+	const [rol, setRol] = useRolesContext();
 
 
 	useEffect(() => {
@@ -27,6 +28,7 @@ const Dashboard = () => {
 		} else {
 			
 			setUser({
+				id: session.user.id,
 				nombre: session.user.nombre,
 				apellido: session.user.apellido,
 				legajo: session.user.legajo,
@@ -35,7 +37,7 @@ const Dashboard = () => {
 				Instituciones: session.user.Instituciones
 
 			});
-			setRol(session.user.Roles);
+			setRolAdmin(session.user.Roles);
 		
 
 		}
@@ -101,24 +103,32 @@ const Dashboard = () => {
 							e.currentTarget.style.color = 'white';
 						}}
 						onClick={ async (e) => {
-							const inst = await fetch(`${Environment.getEndPoint(Environment.endPoint.getInstitucionById)}${institucion.id}`,{
-								method: 'GET',
+							
+							console.log(user.id);
+							const inst = await fetch(`${Environment.getEndPoint(Environment.endPoint.getInstitucionForRolsForUser)}${institucion.id}`,{
+								method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                     'Accept': 'application/json',
                                     'Authorization': `Bearer ${session.accessToken}`
-                                }
+                                },
+								body: JSON.stringify({
+									usuarioId: user.id,
+								})
 							})
 							const institucionSelected = await inst.json();
 							
+							
 							setInstitucionSelected({
-							id: institucionSelected.id,
-							nombre: institucionSelected.nombre,
-							logo: institucionSelected.logo,
-							cue: institucionSelected.cue,
-							email: institucionSelected.email,
-							contacto: institucionSelected.contacto,
+							id: institucionSelected.institucion.id,
+							nombre: institucionSelected.institucion.nombre,
+							logo: institucionSelected.institucion.logo,
+							cue: institucionSelected.institucion.cue,
+							email: institucionSelected.institucion.email,
+							contacto: institucionSelected.institucion.contacto,
 							});
+
+							setRol(institucionSelected.Roles);
 						}}>
 						Ingresar
 						</Button>
@@ -127,7 +137,7 @@ const Dashboard = () => {
 				</Card>
 				</Col>
 			))}
-			{rol.find((e) => e.name === 'Admin') && (
+			{rolAdmin.find((e) => e.name === 'Admin') && (
 				<Col xs={12} sm={6} md={4}>
 				<Card className='text-center'>
 					<Card.Header>{' Administrador '}</Card.Header>

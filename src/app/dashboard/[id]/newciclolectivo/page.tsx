@@ -1,4 +1,5 @@
 'use client'
+import { useRolesContext, useUserContext } from 'context/userContext';
 import { Roles, User } from 'model/types';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
@@ -21,37 +22,9 @@ const NewCicloLectivoPage = ({ params }: { params: { id: string } }) => {
   });
   const { data: session, status } = useSession();
 	
-	const [rol, setRol] = useState<Roles[]>([]);
-	const [user, setUser] = useState<User>({
-		nombre: '',
-		apellido: '',
-		legajo: '',
-		telefono: '',
-		Roles: rol,
-		Instituciones:[]
-	});
-
-
-	useEffect(() => {
-
-		if (session) {
-			
-			setUser({
-				nombre: session.user.nombre,
-				apellido: session.user.apellido,
-				legajo: session.user.legajo,
-				telefono: session.user.telefono,
-				Roles: session.user.Roles,
-				Instituciones: session.user.Instituciones
-
-			});
-			setRol(session.user.Roles);
-		
-
-		}
-	}, [session]);
-
-
+	const [rol, setRol] = useRolesContext();
+  const [user, setUser] = useUserContext();
+	
   const handleChangeCicloLectivo = (e) => {
     const { name, value } = e.target;
     setCicloLectivo({
