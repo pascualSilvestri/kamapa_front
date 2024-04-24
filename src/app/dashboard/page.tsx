@@ -146,7 +146,7 @@ const Dashboard = () => {
 					</div>
 					<Card.Body>
 					{/* Enlace a la ruta específica según el rol */}
-					<Link href={`/dashboard/admin`}>
+					<Link href={`/dashboard/Admin/adminHome`}>
 						<Button
 						variant='flat'
 						type='submit'

@@ -15,8 +15,6 @@ export const router = {
     'CiclosLectivos': { label : 'Ciclos Lectivos', href: '/ciclolectivo' },
     'CrearCicloLectivo': { label : 'Crear Ciclo Lectivo', href: '/newciclolectivo' },
     'CrearAulas': { label : 'Crear Aulas', href: '/crearaulas' },
-    'InstituciónRegistro': { label : 'Registrar Institucion', href: 'Admin/reginstitucion' },
-    'InstituciónVista': { label : 'Vista Institucion', href: 'Admin/reginstitucion' },
     'AulasRegistro': { label : 'Aulas', href: '/regaulas' },
     'RegistroUsuarios': { label : 'Registro de Usuarios', href: '/consultaUsuario' },
     // 'RegistroUsuario': { label : 'Registrar Usuario', href: '/regUsuario' },
@@ -28,20 +26,7 @@ export const router = {
 }
 
 export const adminAutorizeRouter = [
-    'Dirección',
-    'Preceptores',
-    'Profesores',
-    'Alumnos',
-    'Empleados',
-    'Aulas',
-    'About',
-    'CrearCicloLectivo',
-    'CrearAulas',
-    'InstituciónRegistro',
-    'InstituciónVista',
-    'RegistroUsuarios',
-    'Permisos',
-    'AulasRegistro',
+
 ]
 
 export const directorAutorizeRouter = [

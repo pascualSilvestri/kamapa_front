@@ -1,27 +1,19 @@
 'use client'
 import { Nav, Navbar, NavDropdown, Container, Offcanvas } from 'react-bootstrap';
-import { Roles, User } from '../../model/types';
-import { autorizeNivel, autorizeRol, getRoles } from '../../utils/autorizacionPorRoles';
 import Link from 'next/link';
 import Image from 'next/image';
 import ButtonAuth from './ButtonAuth';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { getRolesRouters } from '../../utils/router';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 
 
 
-export function Navigation() {
+export function NavigationAdmin() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [rol, setRol] = useRolesContext();
-  const [userRoutes, setUserRoutes] = useState([]);
-	const [user, setUser] = useUserContext();
 	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
-
-console.log(rol)
 
   useEffect(() => {
     // Si no hay sesión, redirige a la página de inicio de sesión
@@ -31,12 +23,6 @@ console.log(rol)
       
     
   }, []);
-
-  useEffect(()=>{
-
-    setUserRoutes(getRolesRouters(rol));
-  },[rol])
-
 
 
   return (
@@ -98,11 +84,6 @@ console.log(rol)
                         }} href='/dashboard'>
                         Seleccionar Escuela
                         </Link>
-                  {userRoutes && userRoutes.map((route, index) => {
-
-                    if(route.href == "Admin/reginstitucion" || route.href == "Admin/reginstitucion"){
-                      return (
-                        
                         <Link style={{
                           textDecoration: 'none',
                           color: 'white',
@@ -111,12 +92,9 @@ console.log(rol)
                           borderRadius: '5px',
                           backgroundColor: 'transparent',
                           border: `1px solid white `
-                        }} href={`/dashboard/${route.href}`} key={index}>
-                        {route.label}
+                        }} href={`/dashboard/Admin/reginstitucion`} >
+                        Registrar una institucion
                         </Link>
-                      )
-                    }else{
-                      return (
                         <Link style={{
                           textDecoration: 'none',
                           color: 'white',
@@ -124,14 +102,10 @@ console.log(rol)
                           padding: '10px 20px',
                           borderRadius: '5px',
                           backgroundColor: 'transparent',
-                          border: '1px solid white '
-                        }} href={`/dashboard/${institucionSelected.id}/${route.href}`} key={index}>
-                        {route.label}
+                          border: `1px solid white `
+                        }} href={`/dashboard/Admin/vistainstitucion`} >
+                        Instituciones
                         </Link>
-                      )
-                    }
-                   
-                  })}
                 </Nav>
                 <hr />
                 {/* <Form className='d-flex'>
