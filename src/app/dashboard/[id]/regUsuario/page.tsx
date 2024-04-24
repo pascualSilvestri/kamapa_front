@@ -16,7 +16,7 @@ interface Provincia {
     provincia: string;
 }
 
-const regUsuario = () => {
+const RegUsuario = () => {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [dni, setDni] = useState('');
@@ -388,7 +388,7 @@ const regUsuario = () => {
                         <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
-                                <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/vistausuarios`}>
+                                <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/consultaUsuario`}>
                                     <Button variant='secondary' style={{
                                         padding: '0.4rem 1rem',
                                         fontSize: '1rem',
@@ -503,4 +503,4 @@ const regUsuario = () => {
     );
 };
 
-export default regUsuario;
+export default RegUsuario;

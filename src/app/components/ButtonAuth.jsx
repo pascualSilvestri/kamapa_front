@@ -11,7 +11,6 @@ export default function ButtonAuth() {
 	if (session) {
 		return (
 			<>
-				<p>Inicio Seccion con {session.user?.rol?.name}</p>
 				<button
 					onClick={() => signOut()}
 					className='btn btn-danger'>

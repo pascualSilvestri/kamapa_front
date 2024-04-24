@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
 import { Institucion, Roles, User, UserFormData } from '../../../../model/types';
@@ -16,7 +16,12 @@ interface Provincia {
     provincia: string;
 }
 
-const regAdminUsuario = () => {
+
+const RegAdminUsuario = () => {
+
+    const [instituciones, setInstituciones] = useState([]);
+    const [institucionSeleccionada, setInstitucionSeleccionada] = useState('');
+
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [dni, setDni] = useState('');
@@ -61,16 +66,12 @@ const regAdminUsuario = () => {
     useEffect(() => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.institucion)}`)
             .then(response => response.json())
-            .then((data: Institucion[]) => {
+            .then((data) => {
                 console.log(data);
-                const institucionObj = data.reduce((obj, institucion) => {
-                    obj[institucion.id] = institucion;
-                    return institucion;
-                }, {});
-                // setRoles(institucionObj);
+                setInstituciones(data);
             })
-            .catch(error => console.error('Error fetching roles:', error));
-    })
+            .catch(error => console.error('Error fetching institutions:', error));
+    }, []);
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -340,30 +341,28 @@ const regAdminUsuario = () => {
                             <h1>Tramite e Institucion *</h1>
                         </Form.Group>
 
-                        {/* <Form.Group controlId='roles'>
-                            <Form.Label>Roles *</Form.Label>
-                            {['Admin', 'Director', 'Secretario', 'Preceptor', 'Docente', 'Alumno']
-                                .filter(rol => roles.hasOwnProperty(rol))
-                                .map((rol, index) => (
-                                    <Form.Check
-                                        key={index}
-                                        type="checkbox"
-                                        id={rol}
-                                        label={rol}
-                                        checked={roles[rol].checked}
-                                        onChange={(e) => {
-                                            const isChecked = e.target.checked;
-                                            setRoles(prevRoles => ({ ...prevRoles, [rol]: { ...prevRoles[rol], checked: isChecked } }));
-
-                                            if (isChecked) {
-                                                setSelectedRoleIds(prevIds => [...prevIds, roles[rol].id]);
-                                            } else {
-                                                setSelectedRoleIds(prevIds => prevIds.filter(id => id !== roles[rol].id));
-                                            }
-                                        }}
-                                    />
-                                ))}
-                        </Form.Group> */}
+                        <Form.Group controlId="institucion">
+                            <Form.Label>Selecciona la institución *</Form.Label>
+                            <div className="input-group">
+                                <Form.Control
+                                    as="select"
+                                    value={institucionSeleccionada}
+                                    onChange={(e) => setInstitucionSeleccionada(e.target.value)}
+                                >
+                                    <option value="">Selecciona una institución</option>
+                                    {instituciones.map((institucion) => (
+                                        <option key={institucion.id} value={institucion.id}>
+                                            {institucion.nombre}
+                                        </option>
+                                    ))}
+                                </Form.Control>
+                                {/* <div className="input-group-append">
+                                    <span className="input-group-text">
+                                        <Image src={instituciones.find(inst => inst.id === parseInt(institucionSeleccionada))?.logo} rounded style={{ width: '30px', height: '30px' }} />
+                                    </span>
+                                </div> */}
+                            </div>
+                        </Form.Group>
 
 
                         <Form.Group controlId="matriculaProfesional">
@@ -548,4 +547,4 @@ const regAdminUsuario = () => {
     );
 };
 
-export default regAdminUsuario;
+export default RegAdminUsuario;

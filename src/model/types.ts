@@ -95,7 +95,7 @@ export interface UserFormData {
         password: string;
         institucionId: number;
     };
-    rols: any;
+    rols: any[];
     domicilio: {
         calle: string;
         numero: string;
