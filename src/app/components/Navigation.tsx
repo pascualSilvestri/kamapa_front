@@ -1,7 +1,5 @@
 'use client'
 import { Nav, Navbar, NavDropdown, Container, Offcanvas } from 'react-bootstrap';
-import { Roles, User } from '../../model/types';
-import { autorizeNivel, autorizeRol, getRoles } from '../../utils/autorizacionPorRoles';
 import Link from 'next/link';
 import Image from 'next/image';
 import ButtonAuth from './ButtonAuth';

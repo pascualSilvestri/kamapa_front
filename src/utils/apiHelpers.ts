@@ -25,7 +25,7 @@ export class Environment {
         login:'api/auth/login/',
         provincias:'api/provincia/',
         roles:'api/rols/',
-        institucion:'api/institucion//',
+        institucion:'api/institucion/',
         getInstitucionById: 'api/institucion/',
          /*
         traer institucion por el id

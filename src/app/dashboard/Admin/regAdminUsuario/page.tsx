@@ -62,11 +62,12 @@ const regAdminUsuario = () => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.institucion)}`)
             .then(response => response.json())
             .then((data: Institucion[]) => {
+                console.log(data);
                 const institucionObj = data.reduce((obj, institucion) => {
                     obj[institucion.id] = institucion;
                     return institucion;
                 }, {});
-                setRoles(institucionObj);
+                // setRoles(institucionObj);
             })
             .catch(error => console.error('Error fetching roles:', error));
     })
@@ -78,6 +79,7 @@ const regAdminUsuario = () => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.roles)}`)
             .then(response => response.json())
             .then((data: Roles[]) => {
+                console.log(data)
                 const rolesObj = data.reduce((obj, rol) => {
                     obj[rol.name] = { checked: false, id: rol.id };
                     return obj;
@@ -338,7 +340,7 @@ const regAdminUsuario = () => {
                             <h1>Tramite e Institucion *</h1>
                         </Form.Group>
 
-                        <Form.Group controlId='roles'>
+                        {/* <Form.Group controlId='roles'>
                             <Form.Label>Roles *</Form.Label>
                             {['Admin', 'Director', 'Secretario', 'Preceptor', 'Docente', 'Alumno']
                                 .filter(rol => roles.hasOwnProperty(rol))
@@ -361,7 +363,7 @@ const regAdminUsuario = () => {
                                         }}
                                     />
                                 ))}
-                        </Form.Group>
+                        </Form.Group> */}
 
 
                         <Form.Group controlId="matriculaProfesional">
