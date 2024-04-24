@@ -35,7 +35,7 @@ const VistaEmpleadosPage = () => {
         fechaNacimiento: '',
         email: '',
         domicilioUsuario: {
-            Localidad: '',
+            localidad: '',
             barrio: '',
             calle: '',
             numero: '',
@@ -155,7 +155,7 @@ const VistaEmpleadosPage = () => {
             fechaNacimiento: empleado.fechaNacimiento,
             email: empleado.email,
             domicilioUsuario: {
-                Localidad: empleado.domicilioUsuario.Localidad,
+                localidad: empleado.domicilioUsuario.localidad,
                 barrio: empleado.domicilioUsuario.barrio,
                 calle: empleado.domicilioUsuario.calle,
                 numero: empleado.domicilioUsuario.numero,
@@ -172,6 +172,24 @@ const VistaEmpleadosPage = () => {
     const handleConfirmSave = async (e) => {
         try {
             // Envíar los datos del formulario de edición al servidor
+            // e.preventDefault();
+            // console.log({
+            //     legajo:editedEmpleado.legajo,
+            //     nombre:editedEmpleado.nombre,
+            //     apellido:editedEmpleado.apellido,   
+            //     dni: editedEmpleado.dni,
+            //     cuil: editedEmpleado.cuil,
+            //     fechaNacimiento: editedEmpleado.fechaNacimiento,
+            //     email: editedEmpleado.email,
+            //     domicilioUsuario: {
+            //         localidad: editedEmpleado.domicilioUsuario.localidad,
+            //         barrio: editedEmpleado.domicilioUsuario.barrio,
+            //         calle: editedEmpleado.domicilioUsuario.calle,
+            //         numero: editedEmpleado.domicilioUsuario.numero,
+            //     },
+            //     institucionId:institucionSelected.id,
+            //     roles:selectedRoles
+            // });
             const response = await fetch(
                 `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedEmpleado.id}`,
                 {
@@ -182,13 +200,24 @@ const VistaEmpleadosPage = () => {
                     body: JSON.stringify({
                         legajo:editedEmpleado.legajo,
                         nombre:editedEmpleado.nombre,
-                        apellido:editedEmpleado.apellido,
+                        apellido:editedEmpleado.apellido,   
+                        dni: editedEmpleado.dni,
+                        cuil: editedEmpleado.cuil,
+                        fechaNacimiento: editedEmpleado.fechaNacimiento,
+                        email: editedEmpleado.email,
+                        domicilio: {
+                            localidad: editedEmpleado.domicilioUsuario.localidad,
+                            barrio: editedEmpleado.domicilioUsuario.barrio,
+                            calle: editedEmpleado.domicilioUsuario.calle,
+                            numero: editedEmpleado.domicilioUsuario.numero,
+                        },
                         institucionId:institucionSelected.id,
                         roles:selectedRoles
                     }),
                 },
             );
             const data = await response.json();
+            console.log(data);
 
             if (!response.ok) {;
                 console.log(data)
@@ -388,6 +417,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.legajo}
+                                    onChange={(e)=>{ editedEmpleado.legajo = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -396,6 +426,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.nombre}
+                                    onChange={(e)=>{ editedEmpleado.nombre = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -404,6 +435,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.apellido}
+                                    onChange={(e)=>{ editedEmpleado.apellido = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -412,6 +444,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.dni}
+                                    onChange={(e)=>{ editedEmpleado.dni = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -420,6 +453,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.cuil}
+                                    onChange={(e)=>{ editedEmpleado.cuil = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -428,6 +462,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='calendar'
                                     defaultValue={selectedEmpleado?.fechaNacimiento}
+                                    onChange={(e)=>{ editedEmpleado.fechaNacimiento = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -436,6 +471,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='email'
                                     defaultValue={selectedEmpleado?.email}
+                                    onChange={(e)=>{ editedEmpleado.email = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -443,7 +479,8 @@ const VistaEmpleadosPage = () => {
                                 <Form.Label>Localidad</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.domicilioUsuario.Localidad}
+                                    defaultValue={selectedEmpleado?.domicilioUsuario.localidad}
+                                    onChange={(e)=>{ editedEmpleado.domicilioUsuario.localidad = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -452,6 +489,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.domicilioUsuario.barrio}
+                                    onChange={(e)=>{ editedEmpleado.domicilioUsuario.barrio = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -460,6 +498,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.domicilioUsuario.calle}
+                                    onChange={(e)=>{ editedEmpleado.domicilioUsuario.calle = e.target.value}}
                                 />
                             </Form.Group>
 
@@ -468,6 +507,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.domicilioUsuario.numero}
+                                    onChange={(e)=>{ editedEmpleado.domicilioUsuario.numero = e.target.value}}
                                 />
                             </Form.Group>
 

@@ -13,7 +13,7 @@ interface ModalUpdateInstitucionProps {
 
 const ModalUpdateInstitucion: React.FC<ModalUpdateInstitucionProps> = ({ id, showEditModal, setShowEditModal, institucion, setInstitucion }) => {
     const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-
+        event.preventDefault();
         // Asegúrate de que los elementos sean tratados como HTMLInputElement para acceder a la propiedad 'value'
         const cue = (document.getElementById('formCue') as HTMLInputElement).value;
         const nombre = (document.getElementById('formNombre') as HTMLInputElement).value;
