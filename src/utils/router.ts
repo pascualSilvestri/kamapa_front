@@ -31,18 +31,17 @@ export const adminAutorizeRouter = [
 
 export const directorAutorizeRouter = [
     'Inicio',
-    'Dirección',
-    'Secretario',
-    'Preceptores',
-    'Profesores',
-    'Alumnos',
-    'Empleados',
+    // 'Dirección',
+    // 'Secretario',
+    // 'Preceptores',
+    // 'Profesores',
+    // 'Alumnos',
     'CrearCicloLectivo',
-    'CrearAulas',
-    'Aulas',
-    'About',
+    // 'CrearAulas',
+    // 'Aulas',
+    // 'About',
     'RegistroUsuarios',
-    'Permisos',
+    // 'Permisos',
     'VistaUsuarios'
 ]
 
