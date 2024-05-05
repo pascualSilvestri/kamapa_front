@@ -67,14 +67,14 @@ console.log(rol)
             >
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title id={`offcanvasNavbarLabel-expand-${expand}`}>
-                  Esc. Sec. José Rudecindo Rojo
+                    {institucionSelected.nombre}
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <hr />
               <Offcanvas.Header className='justify-content-center'>
                 {/* Logo de la Escuela, traer Link de la BD luego */}
                 <Image
-                  src='/LogoJRR.png'
+                  src={institucionSelected.logo || '/Logo.png'}
                   alt='logo'
                   width={100}
                   height={100}

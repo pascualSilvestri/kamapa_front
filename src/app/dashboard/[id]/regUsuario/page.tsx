@@ -321,7 +321,7 @@ const RegUsuario = () => {
                         </Form.Group>
                         <hr />
                         <Form.Group >
-                            <h1>Datos de Contacto *</h1>
+                            <h1>Datos Institucional *</h1>
                         </Form.Group>
                         <Form.Group controlId="matriculaProfesional">
                             <Form.Label>Matrícula Profesional ( Solo en caso de ser Profesional ).</Form.Label>
