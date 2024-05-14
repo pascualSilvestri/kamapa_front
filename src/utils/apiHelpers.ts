@@ -61,10 +61,10 @@ export class Environment {
             //url/api/usuario/empleado
         /*
         traer usuarion con rol que no sea alumno por el id de la institucion y id del usuario
-            {
-                "idInstitucion":1,
-                "idUsuario":1
-            }
+        {
+            "idInstitucion":1,
+            "idUsuario":1
+        }
         */
         updateUsuarioById: 'api/usuario/update/',
 
@@ -88,20 +88,32 @@ export class Environment {
         getUsuarioWhereRolIsAlumnoByIntitucionByUsuario: 'api/usuario/alumno',
         //url/api/usuario/alumno
         /*
-            {
-                "idInstitucion":1,
-                "idUsuario":1
-            }
+        {
+           "idInstitucion":1,
+            "idUsuario":1
+        }
         */
        addInstitucion:'api/usuario/addInstitucion',
        /*
-    {
-        "usuarioId":4,
-        "institucionId":3,
-        "roles":[1,3,4]
-    }
+        {
+            "usuarioId":4,
+            "institucionId":3,
+            "roles":[1,3,4]
+        }
        */
-        changePasswordFirst: 'api/password/changePassword'
+        changePasswordFirst: 'api/password/changePassword',
+        /*
+        {
+            userId:1,
+            password:'123'
+        }
+        */
+        resetPassword: 'api/password/resetPassword',
+        /*
+        {
+            dni:99777333
+        }
+        */
     }
 
     public static getEndPoint(endPoint: string): string {
