@@ -34,6 +34,7 @@ const handler = NextAuth({
           console.log(session.error);
           throw new Error(session.error);
         }
+
         return session 
       },
     }),

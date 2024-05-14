@@ -21,13 +21,16 @@ const Dashboard = () => {
 	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 	const [rol, setRol] = useRolesContext();
 
+	console.log('dashboard');
+	console.log(user);
 
 	useEffect(() => {
 
 		if (!session) {
 			router.push('/login');
-		} else {
-			
+		}else if (session?.user?.first_session === false) {
+			router.push('/changePassword');
+		  } else if (session?.user) {
 			setUser({
 				id: session.user.id,
 				nombre: session.user.nombre,

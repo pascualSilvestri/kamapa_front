@@ -19,6 +19,7 @@ export interface User {
 	domicilioId: number;
 	contactoId: number;
 	rolId: number;
+    first_session: boolean;
 	Roles: Roles[];
 	Instituciones : Institucion[];
 	accessToken: string; // Agrega esta línea

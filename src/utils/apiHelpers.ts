@@ -10,7 +10,7 @@ enum environment {
 export class Environment {
 
 
-    private static environment: environment = environment.prov;
+    private static environment: environment = environment.dev;
 
     private static getEnvironment(env: environment): string {
         if (env == environment.prov) {
@@ -93,7 +93,7 @@ export class Environment {
                 "idUsuario":1
             }
         */
-       addInstitucion:'api/usuario/addInstitucion'
+       addInstitucion:'api/usuario/addInstitucion',
        /*
     {
         "usuarioId":4,
@@ -101,6 +101,7 @@ export class Environment {
         "roles":[1,3,4]
     }
        */
+        changePasswordFirst: 'api/password/changePassword'
     }
 
     public static getEndPoint(endPoint: string): string {
