@@ -14,7 +14,7 @@ export class Environment {
 
     private static getEnvironment(env: environment): string {
         if (env == environment.prov) {
-            return process.env.NEXT_PUBLIC_BACKEND_URL;
+            return 'https://kamapabackend-production.up.railway.app/';
         } else {
             return environment.dev;
         }
