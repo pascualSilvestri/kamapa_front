@@ -28,6 +28,8 @@ const handler = NextAuth({
           headers: { 'Content-Type': 'application/json' },
         })
 
+        console.log(credentials);
+
         const session = await res.json();
 
         if (session.error) {
