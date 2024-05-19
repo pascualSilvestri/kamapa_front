@@ -9,21 +9,17 @@ interface CicloLectivoProviderProps {
   children: ReactNode;
 }
 
-// Define el provider del contexto
 export const CicloLectivoProvider: React.FC<CicloLectivoProviderProps> = ({ children }) => {
   const [cicloLectivo, setCicloLectivo] = useState<CicloLectivo | null>(null);
 
   useEffect(() => {
-    // Aquí puedes hacer una llamada a una API para obtener los ciclos lectivos activos
     const fetchCicloLectivoActivo = async () => {
-      // Simulando una llamada a una API
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cicloLectivo`); // Reemplaza con tu llamada a API real
       const data: CicloLectivo = await response.json();
       setCicloLectivo(data);
     };
 
     fetchCicloLectivoActivo();
-    console.log(fetchCicloLectivoActivo)
   }, []);
 
   return (

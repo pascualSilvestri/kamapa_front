@@ -1,21 +1,19 @@
+'use client'
 import React from 'react';
 
-import {useCicloLectivoContext, useCicloLectivo} from '../../model/types';
+import {useCicloLectivo} from '../../context/CicloLectivoContext';
 
 
 
 
 const DashboardLayout = ({ children }) => {
-
-
-  return (
-   
+    const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
+  
+    return (
       <>
-        
-        <main>{children}</main>
+           {children}
       </>
-     
-  );
-};
+    );
+  };
 
 export default DashboardLayout;
