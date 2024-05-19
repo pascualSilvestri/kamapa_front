@@ -75,6 +75,26 @@ export interface EmployeeFormData {
     };
 }
 
+export interface Periodo {
+    id: number;
+    nombre: string;
+    fechaInicio: string;
+    fechaFin: string;
+    institucionId: number;
+}
+
+export interface CicloLectivo {
+    cicloLectivo: {
+      id: number;
+      nombre: string;
+      fechaInicio: string;
+      fechaFin: string;
+      estado: boolean;
+      periodos: Periodo[]; // Cambiado a un array de objetos Periodo
+    };
+}
+  
+
 
 export interface UserFormData {
     usuario: {
