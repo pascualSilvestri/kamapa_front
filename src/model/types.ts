@@ -80,7 +80,7 @@ export interface Periodo {
     nombre: string;
     fechaInicio: string;
     fechaFin: string;
-    institucionId: number;
+    cicloLectivoId: number;
 }
 
 export interface CicloLectivo {
