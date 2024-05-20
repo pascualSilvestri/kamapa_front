@@ -8,9 +8,9 @@ const DashboardLayout = ({ children }) => {
     const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
   
     return (
-      <>
+      <main >
           {children}
-      </>
+      </main>
     );
   };
 

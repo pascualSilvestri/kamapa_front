@@ -90,10 +90,10 @@ export interface CicloLectivo {
       fechaInicio: string;
       fechaFin: string;
       estado: boolean;
-      periodos: Periodo[]; // Cambiado a un array de objetos Periodo
+      periodos: Periodo[] | Periodo; // Cambiado a un array de objetos Periodo
     };
 }
-  
+
 
 
 export interface UserFormData {
