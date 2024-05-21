@@ -5,13 +5,8 @@ import { CicloLectivo, Periodo } from 'model/types';
 const CicloLectivoContext = createContext<[CicloLectivo | null, React.Dispatch<React.SetStateAction<CicloLectivo | null>>] | undefined>(undefined);
 
 // Hook para usar el contexto
-export const useCicloLectivo = () => {
-  const context = useContext(CicloLectivoContext);
-  if (context === undefined) {
-    throw new Error('useCicloLectivo debe ser usado dentro de un CicloLectivoProvider');
-  }
-  return context;
-};
+export const useCicloLectivo = () => useContext(CicloLectivoContext);
+ 
 
 // Define el tipo de las propiedades del provider
 interface CicloLectivoProviderProps {
@@ -19,17 +14,17 @@ interface CicloLectivoProviderProps {
 }
 
 export const CicloLectivoProvider: React.FC<CicloLectivoProviderProps> = ({ children }) => {
-  const [cicloLectivo, setCicloLectivo] = useState<CicloLectivo | null>(null);
+  const [cicloLectivo, setCicloLectivo] = useState<CicloLectivo>({
 
-  // useEffect(() => {
-  //   const fetchCicloLectivoActivo = async () => {
-  //     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cicloLectivo`); // Reemplaza con tu llamada a API real
-  //     const data: CicloLectivo = await response.json();
-  //     setCicloLectivo(data);
-  //   };
+    id: 0,
+    nombre: '',
+    fechaInicio: '',
+    fechaFin: '',
+    isActive: false,
+    Periodos: [],
 
-  //   fetchCicloLectivoActivo();
-  // }, []);
+  });
+
 
   return (
     <CicloLectivoContext.Provider value={[cicloLectivo, setCicloLectivo]}>

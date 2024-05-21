@@ -85,7 +85,7 @@ export class Environment {
          */
 
     
-        getUsuarioWhereRolIsAlumnoByIntitucionByUsuario: 'api/usuario/alumno',
+        getUsuarioWhereRolIsAlumnoByIntitucionByUsuario: 'api/usuario/alumno/',
         //url/api/usuario/alumno
         /*
         {
@@ -93,7 +93,7 @@ export class Environment {
             "idUsuario":1
         }
         */
-       addInstitucion:'api/usuario/addInstitucion',
+       addInstitucion:'api/usuario/addInstitucion/',
        /*
         {
             "usuarioId":4,
@@ -101,19 +101,20 @@ export class Environment {
             "roles":[1,3,4]
         }
        */
-        changePasswordFirst: 'api/password/changePassword',
+        changePasswordFirst: 'api/password/changePassword/',
         /*
         {
             userId:1,
             password:'123'
         }
         */
-        resetPassword: 'api/password/resetPassword',
+        resetPassword: 'api/password/resetPassword/',
         /*
         {
             dni:99777333
         }
         */
+       getCicloLectivo:'api/cicloElectivo/ciclo/'
     }
 
     public static getEndPoint(endPoint: string): string {

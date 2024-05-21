@@ -1,42 +1,42 @@
 export interface User {
     id: number | string;
-	nombre: string;
-	apellido: string;
-	legajo: string;
-	telefono: string;
-	Roles?: Roles[];
+    nombre: string;
+    apellido: string;
+    legajo: string;
+    telefono: string;
+    Roles?: Roles[];
     Instituciones?: Institucion[];
 }
 
 export interface Roles {
     name: string;
-	id: number;
+    id: number;
 }
 
 export interface Session {
-	user: User;
-	expires: string;
-	id: number;
-	password: string;
-	roles: Roles;
-	nombre: string;
-	apellido: string;
-	dni: string;
-	telefono: string;
-	legajo: string;
+    user: User;
+    expires: string;
+    id: number;
+    password: string;
+    roles: Roles;
+    nombre: string;
+    apellido: string;
+    dni: string;
+    telefono: string;
+    legajo: string;
 }
 
 export interface Provincia {
-	id: string;
-	provincia: string;
+    id: string;
+    provincia: string;
 }
 
 
 export interface Institucion {
-	id: number;
-	cue: string;
-	nombre: string;
-	logo: string;
+    id: number;
+    cue: string;
+    nombre: string;
+    logo: string;
     email?: string;
     contacto?: string;
 }
@@ -80,18 +80,16 @@ export interface Periodo {
     nombre: string;
     fechaInicio: string;
     fechaFin: string;
-    cicloLectivoId: number;
+    cicloId: number;
 }
 
 export interface CicloLectivo {
-    cicloLectivo: {
-      id: number;
-      nombre: string;
-      fechaInicio: string;
-      fechaFin: string;
-      estado: boolean;
-      periodos: Periodo[] | Periodo; // Cambiado a un array de objetos Periodo
-    };
+    id: number;
+    nombre: string;
+    fechaInicio: string;
+    fechaFin: string;
+    isActive: boolean;
+    Periodos: Periodo[]; // Cambiado a un array de objetos Periodo
 }
 
 
@@ -99,7 +97,7 @@ export interface CicloLectivo {
 export interface UserFormData {
     usuario: {
         legajo: string;
-		matricula: string;
+        matricula: string;
         fechaIngreso: string;
         fechaEgreso: null;
         nombre: string;
@@ -108,7 +106,7 @@ export interface UserFormData {
         cuil: string;
         fechaNacimiento: string;
         telefono: string;
-		email: string;
+        email: string;
         is_active: boolean;
         create_for: string;
         update_for: string;

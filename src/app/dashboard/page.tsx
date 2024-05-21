@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Roles, User } from '../../model/types';
+import { CicloLectivo, Roles, User } from '../../model/types';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { Environment } from 'utils/apiHelpers';
 import ButtonAuth from '../components/ButtonAuth';
@@ -17,9 +17,7 @@ const Dashboard = () => {
     const [user, setUser] = useUserContext();
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
     const [rol, setRol] = useRolesContext();
-
-    console.log('dashboard');
-    console.log(user);
+ 
 
     useEffect(() => {
         if (!session) {
@@ -48,6 +46,7 @@ const Dashboard = () => {
         await signOut();
         router.push('/');
     };
+
 
     return (
         <Container>
