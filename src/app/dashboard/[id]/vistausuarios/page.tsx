@@ -243,7 +243,7 @@ const VistaEmpleadosPage = () => {
         <div className='p-3'>
             <Row className='mb-3  justify-content-center'>
                 <Col>
-                    <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}`}>
+                    <Link href={`/dashboard/${institucionSelected.id}/bienvenido`}>
                         <Button
                             variant='secondary'
                             style={{
