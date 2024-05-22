@@ -4,7 +4,7 @@ import path from 'path';
 
 
 export const router = {
-    'Inicio': { label : 'Inicio', href: '/' },
+    'Inicio': { label : 'Inicio', href: `/bienvenido` },
     'Dirección': { label : 'Dirección', href: '/director' },
     'Preceptores': { label : 'Preceptores', href: '/preceptor' },
     'Profesores': { label : 'Profesores', href: '/profesores' },
@@ -98,7 +98,8 @@ export function getAuthorizedRoutes(router : {}, rolesAutorize: any) {
 export function getRouterForRols(rol:string){
     switch (rol){
         case RoleEmun.Admin:
-            return router;
+            return router
+            // return getAuthorizedRoutes(router, adminAutorizeRouter);
         case RoleEmun.Director:
             return getAuthorizedRoutes(router,directorAutorizeRouter);
         case RoleEmun.Secretario:

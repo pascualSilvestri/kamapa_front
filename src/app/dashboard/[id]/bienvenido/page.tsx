@@ -21,15 +21,29 @@ function PageBienvenido({ params }: { params: { id: string } }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Bienvenido a {institucionSelected.nombre}</h1>
-        <div className="mt-8 bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <h2 className="mt-2 text-center text-2xl font-extrabold text-gray-900">{cicloLectivo.nombre}</h2>
-          <h2 className="mt-2 text-center text-2xl font-extrabold text-gray-900">{cicloLectivo.isActive ? 'Activo' : 'Inactivo'}</h2>
-          {cicloLectivo.Periodos.map((periodo, index) => (
-            <h2 key={index} className="mt-2 text-center text-2xl font-extrabold text-gray-900">{periodo.nombre}</h2>
-          ))}
+    <div className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out" style={{ backgroundImage: "url('/path/to/background-image.jpg')" }}>
+      <div className="sm:mx-auto sm:w-full sm:max-w-md bg-white bg-opacity-90 shadow-lg rounded-lg overflow-hidden transform transition duration-500 hover:scale-105">
+        <div className="px-4 py-5 sm:p-6">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-4">
+            Bienvenido a {institucionSelected.nombre}
+          </h1>
+          <div className="mt-6">
+            <div className="text-center">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+                {cicloLectivo.nombre}
+              </h2>
+              <p className={`mt-1 text-lg sm:text-xl font-semibold ${cicloLectivo.isActive ? 'text-green-600' : 'text-red-600'}`}>
+                {cicloLectivo.isActive ? 'Activo' : 'Inactivo'}
+              </p>
+            </div>
+            <div className="mt-4">
+              {cicloLectivo.Periodos.map((periodo, index) => (
+                <div key={index} className="mt-2 text-center">
+                  <span className="text-md sm:text-lg font-medium text-gray-700">{periodo.nombre}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
