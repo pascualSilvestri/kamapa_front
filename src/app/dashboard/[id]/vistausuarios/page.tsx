@@ -33,6 +33,7 @@ const VistaEmpleadosPage = () => {
         dni: '',
         cuil: '',
         fechaNacimiento: '',
+        telefono:'',
         email: '',
         domicilioUsuario: {
             localidad: '',
@@ -153,6 +154,7 @@ const VistaEmpleadosPage = () => {
             dni: empleado.dni,
             cuil: empleado.cuil,
             fechaNacimiento: empleado.fechaNacimiento,
+            telefono: empleado.telefono,
             email: empleado.email,
             domicilioUsuario: {
                 localidad: empleado.domicilioUsuario.localidad,
@@ -204,6 +206,7 @@ const VistaEmpleadosPage = () => {
                         dni: editedEmpleado.dni,
                         cuil: editedEmpleado.cuil,
                         fechaNacimiento: editedEmpleado.fechaNacimiento,
+                        telefono: editedEmpleado.telefono,
                         email: editedEmpleado.email,
                         domicilio: {
                             localidad: editedEmpleado.domicilioUsuario.localidad,
@@ -463,6 +466,15 @@ const VistaEmpleadosPage = () => {
                                     type='calendar'
                                     defaultValue={selectedEmpleado?.fechaNacimiento}
                                     onChange={(e)=>{ editedEmpleado.fechaNacimiento = e.target.value}}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId='formTelefono'>
+                                <Form.Label>Telefono</Form.Label>
+                                <Form.Control
+                                    type='telefono'
+                                    defaultValue={selectedEmpleado?.telefono}
+                                    onChange={(e)=>{ editedEmpleado.telefono = e.target.value}}
                                 />
                             </Form.Group>
 

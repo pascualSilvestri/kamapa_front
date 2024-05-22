@@ -72,6 +72,7 @@ const ConsultaUsuarioPage = () => {
                             <p>Nombre: {userData.nombre}</p>
                             <p>Apellido: {userData.apellido}</p>
                             <p>D.N.I: {userData.dni}</p>
+                            <p>Telefono: {userData.telefono}</p>
                             {/* Otros datos del usuario */}
                             <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
                                 Registrar en esta Institución
