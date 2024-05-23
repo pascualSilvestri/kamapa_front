@@ -3,17 +3,17 @@ import { useRolesContext, useUserContext } from 'context/userContext';
 import { Roles, User } from 'model/types';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import { Environment } from 'utils/apiHelpers';
 
 const NewCicloLectivoPage = ({ params }: { params: { id: string } }) => {
   const [cicloLectivo, setCicloLectivo] = useState({
     nombre: '',
     fechaInicio: '',
     fechaFin: '',
-    institucionId:1,
+    institucionId:params.id,
     periodos: [],
   });
 
-  console.log(`soy id ${params.id}`);
 
   const [nuevoPeriodo, setNuevoPeriodo] = useState({
     nombre: '',
@@ -70,7 +70,7 @@ const NewCicloLectivoPage = ({ params }: { params: { id: string } }) => {
     e.preventDefault();
     
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/cicloElectivo`, {
+      const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createCicloLectivo)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

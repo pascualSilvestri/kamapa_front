@@ -114,7 +114,8 @@ export class Environment {
             dni:99777333
         }
         */
-       getCicloLectivo:'api/cicloElectivo/ciclo/'
+       getCicloLectivo:'api/cicloElectivo/ciclo/',
+       createCicloLectivo:'api/cicloElectivo/',
     }
 
     public static getEndPoint(endPoint: string): string {
