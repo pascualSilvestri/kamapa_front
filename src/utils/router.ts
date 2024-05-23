@@ -23,6 +23,7 @@ export const router = {
     'Notas':  { label: 'Notas', href: '/calificar' },
     'Calificaciones':{ label: 'calificaciones', href: '/calificaciones' },
     'VistaUsuarios': { label: 'Usuarios', href: '/vistausuarios'},
+    'resetearPasswordUsuario': { label: 'Resetear contraseña a usuario', href: '/resetPassword'},
 }
 
 export const adminAutorizeRouter = [
@@ -42,7 +43,8 @@ export const directorAutorizeRouter = [
     // 'About',
     'RegistroUsuarios',
     // 'Permisos',
-    'VistaUsuarios'
+    'VistaUsuarios',
+    'resetearPasswordUsuario'
 ]
 
 export const secretarioAutorizeRouter = [
