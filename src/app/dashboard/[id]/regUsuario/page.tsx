@@ -421,7 +421,7 @@ const RegUsuario = () => {
                                         e.currentTarget.style.color = 'white';
                                     }}
                                     disabled={!formValid}>
-                                    Registrar Empleado
+                                    Registrar
                                 </Button>
                             </div>
                         </Form.Group>
