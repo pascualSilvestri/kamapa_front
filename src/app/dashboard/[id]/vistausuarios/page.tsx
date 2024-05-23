@@ -287,7 +287,7 @@ const VistaEmpleadosPage = () => {
                                 e.currentTarget.style.backgroundColor = 'purple';
                                 e.currentTarget.style.color = 'white';
                             }}>
-                            Registrar Empleado
+                            Registrar Usuario
                         </Button>
                     </Link>
                 </Col>
