@@ -150,8 +150,10 @@ export class Environment {
                 }
          */
         getAllCicloLectivo: 'api/cicloElectivo/ciclos/',
-        /*
-           api/cicloElectivo/ciclo/id
+        /**
+         * Trae todos los ciclos lectivos de la institucion seleccionada
+         * @param {int} idInstitucion
+           api/cicloElectivo/ciclo/idInstitucion
         */
 
     }
