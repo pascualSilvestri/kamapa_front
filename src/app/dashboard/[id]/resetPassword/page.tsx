@@ -58,7 +58,21 @@ const Page = () => {
                                         onChange={(e) => setDni(e.target.value)}
                                     />
                                 </Form.Group>
-                                <Button variant='primary' type='submit'>
+                                <Button variant='primary' type='submit'style={{
+                                    backgroundColor: 'purple',
+                                    color: 'white',
+                                    padding: '0.4rem 1rem',
+                                    fontSize: '1rem',
+                                    transition: 'all 0.3s ease',
+                                }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'white';
+                                        e.currentTarget.style.color = 'black';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'purple';
+                                        e.currentTarget.style.color = 'white';
+                                    }}>
                                     Enviar
                                 </Button>
                             </Form>
