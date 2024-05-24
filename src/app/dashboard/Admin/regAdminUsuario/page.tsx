@@ -112,7 +112,7 @@ const RegAdminUsuario = () => {
                     create_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
                     update_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
                     password: dni, // Puedes ajustar esto según tus necesidades
-                    institucion: institucionSeleccionada, // Cambiado para usar el id de la institución seleccionada
+                    institucionId: parseInt(institucionSeleccionada), // Cambiado para usar el id de la institución seleccionada
                 },
                 rols: selectedRoleIds,
                 domicilio: {
@@ -187,6 +187,7 @@ const RegAdminUsuario = () => {
         setInstitucionSeleccionada('');
         setRoles({});
         setSelectedRoleIds([]);
+        setShowSuccessModal(false)
     };
 
 	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
@@ -424,7 +425,7 @@ const RegAdminUsuario = () => {
                 </Modal.Header>
                 <Modal.Body>{successMessage}</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="success" onClick={() => setShowSuccessModal(false)} onClick={()=> limpiarCampos()}>
+                    <Button variant="success" onClick={() => limpiarCampos() } >
                         Cerrar
                     </Button>
                 </Modal.Footer>

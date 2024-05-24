@@ -1,14 +1,17 @@
 'use client'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useInstitucionSelectedContext, useRolesContext } from 'context/userContext';
 import { useCicloLectivo } from 'context/CicloLectivoContext';
 import { Environment } from 'utils/apiHelpers';
 import { CicloLectivo } from 'model/types';
+import { useRouter } from 'next/navigation';
 
 function PageBienvenido({ params }: { params: { id: string } }) {
   const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
   const [rol, setRol] = useRolesContext();
   const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true); // Estado para manejar la carga
 
   useEffect(() => {
     fetchCicloLectivoActivo();
@@ -16,9 +19,25 @@ function PageBienvenido({ params }: { params: { id: string } }) {
 
   const fetchCicloLectivoActivo = async () => {
     const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCicloLectivo)}${params.id}`);
+
+    console.log(rol);
+    
+    if (response.status !== 200) {
+      if (rol.some(rol => rol.name == 'Director')) {
+        router.push(`/dashboard/${params.id}/newciclolectivo`);
+      } else {
+        router.push(`/dashboard/${params.id}/panel`);
+      }
+      return; // Asegúrate de no continuar con la ejecución
+    }
     const data: CicloLectivo = await response.json();
     setCicloLectivo(data);
+    setLoading(false); // Marcar como cargado
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Mostrar un indicador de carga mientras se cargan los datos
+  }
 
   return (
     <div className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out" style={{ backgroundImage: "url('/path/to/background-image.jpg')" }}>
@@ -47,7 +66,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default PageBienvenido;

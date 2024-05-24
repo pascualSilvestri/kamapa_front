@@ -117,6 +117,17 @@ export function NavigationAdmin() {
                         }} href={`/dashboard/Admin/regAdminUsuario`} >
                         Registrar usuario
                         </Link>
+                        <Link style={{
+                          textDecoration: 'none',
+                          color: 'white',
+                          margin: '10px 0',
+                          padding: '10px 20px',
+                          borderRadius: '5px',
+                          backgroundColor: 'transparent',
+                          border: `1px solid white `
+                        }} href={`/dashboard/Admin/consultaUsuario`} >
+                        Consulta Usuario
+                        </Link>
                 </Nav>
                 <hr />
                 {/* <Form className='d-flex'>
