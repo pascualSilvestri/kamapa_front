@@ -9,13 +9,11 @@ import Link from 'next/link';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { Environment } from 'utils/apiHelpers';
 
-
 // Define la interfaz Provincia
 interface Provincia {
     id: string;
     provincia: string;
 }
-
 
 const RegAdminUsuario = () => {
 
@@ -51,8 +49,9 @@ const RegAdminUsuario = () => {
     const [user, setUser] = useUserContext();
 
     console.log(session);
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Obtener las provincias de la base de datos para mostrarlos en los select
+    /// Obtener las provincias de la base de datos para mostrarlas en el select
     useEffect(() => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.provincias)}`)
             .then(response => response.json())
@@ -63,6 +62,7 @@ const RegAdminUsuario = () => {
     }, []);
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Obtener las instituciones de la base de datos
     useEffect(() => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.institucion)}`)
             .then(response => response.json())
@@ -72,7 +72,6 @@ const RegAdminUsuario = () => {
             })
             .catch(error => console.error('Error fetching institutions:', error));
     }, []);
-
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Obtener los roles de la base de datos para mostrarlos en los checkbox
@@ -92,12 +91,10 @@ const RegAdminUsuario = () => {
     }, [rol]);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///Obtengo los datos del formulario y los envio al backend
+    /// Obtengo los datos del formulario y los envio al backend
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (formValid) {
-            // setShowModal(true);
-
             const formData: UserFormData = {
                 usuario: {
                     legajo: legajo,
@@ -112,11 +109,10 @@ const RegAdminUsuario = () => {
                     telefono: telefono,
                     email: email,
                     is_active: true, // O ajusta esto según tus necesidades
-                    create_for: session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
-                    update_for:  session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
+                    create_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
+                    update_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
                     password: dni, // Puedes ajustar esto según tus necesidades
-                    institucionId: institucionSelected.id, // Poked
-                    // Puedes ajustar esto según tus necesidades
+                    institucion: institucionSeleccionada, // Cambiado para usar el id de la institución seleccionada
                 },
                 rols: selectedRoleIds,
                 domicilio: {
@@ -165,12 +161,12 @@ const RegAdminUsuario = () => {
 
     // Función para validar el formulario
     useEffect(() => {
-        if (nombre && apellido && dni && provinciaSeleccionada && telefono && legajo && cuil && fechaNacimiento && email) {
+        if (nombre && apellido && dni && provinciaSeleccionada && telefono && legajo && cuil && fechaNacimiento && email && institucionSeleccionada) {
             setFormValid(true);
         } else {
             setFormValid(false);
         }
-    }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email, calle,barrio]);
+    }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email, calle, barrio, institucionSeleccionada]);
 
     // Función para limpiar los campos del formulario
     const limpiarCampos = () => {
@@ -188,18 +184,12 @@ const RegAdminUsuario = () => {
         setCuil('');
         setFechaNacimiento('');
         setEmail('');
-        setRoles({
-            admin: false,
-            director: false,
-            secretario: false,
-            preseptor: false,
-            profesor: false,
-        });
+        setInstitucionSeleccionada('');
+        setRoles({});
         setSelectedRoleIds([]);
     };
 
 	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
-
 
     return (
         <Container>
@@ -248,125 +238,73 @@ const RegAdminUsuario = () => {
                             <Form.Label>Fecha de Nacimiento *</Form.Label>
                             <Form.Control
                                 type="date"
+                                placeholder="Fecha de Nacimiento"
                                 value={fechaNacimiento}
                                 onChange={(e) => setFechaNacimiento(e.target.value)}
                             />
                         </Form.Group>
-                        <hr />
-                        <Form.Group >
-                            <h1>Datos del Domicilio</h1>
-                        </Form.Group>
                         <Form.Group controlId="calle">
-                            <Form.Label>Nombre de la Calle *</Form.Label>
+                            <Form.Label>Calle</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Av. Ejemplo de Calle"
+                                placeholder="Calle"
                                 value={calle}
                                 onChange={(e) => setCalle(e.target.value)}
                             />
                         </Form.Group>
                         <Form.Group controlId="numero">
-                            <Form.Label>Numero o Altura del Domicilio *</Form.Label>
+                            <Form.Label>Altura</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="123"
+                                placeholder="Altura"
                                 value={numero}
                                 onChange={(e) => setNumero(e.target.value)}
                             />
                         </Form.Group>
                         <Form.Group controlId="barrio">
-                            <Form.Label>Barrio *</Form.Label>
+                            <Form.Label>Barrio</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Ejemplo: V° Krausen"
+                                placeholder="Barrio"
                                 value={barrio}
                                 onChange={(e) => setBarrio(e.target.value)}
                             />
                         </Form.Group>
                         <Form.Group controlId="localidad">
-                            <Form.Label>Localidad *</Form.Label>
+                            <Form.Label>Localidad</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Ejemplo de Localidad: Rawson"
+                                placeholder="Localidad"
                                 value={localidad}
                                 onChange={(e) => setLocalidad(e.target.value)}
                             />
                         </Form.Group>
-                        <Form.Group controlId="provincias">
+                        <Form.Group controlId="provincia">
                             <Form.Label>Provincia *</Form.Label>
-                            <div className="input-group">
-                                <Form.Control
-                                    as="select"
-                                    value={provinciaSeleccionada}
-                                    onChange={(e) => setProvinciaSeleccionada(e.target.value)}
-                                >
-                                    <option value="">Selecciona una provincia</option>
-                                    {provincias.map((provincia) => (
-                                        <option key={provincia.id} value={provincia.id}>
-                                            {provincia.provincia}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                                <div className="input-group-append">
-                                    <span className="input-group-text">
-                                        <BsChevronDown />
-                                    </span>
-                                </div>
-                            </div>
-                        </Form.Group>
-                        <hr />
-                        <Form.Group >
-                            <h1>Datos de Contacto *</h1>
+                            <Form.Control
+                                as="select"
+                                value={provinciaSeleccionada}
+                                onChange={(e) => setProvinciaSeleccionada(e.target.value)}
+                            >
+                                <option value="">Selecciona una provincia</option>
+                                {provincias.map((provincia) => (
+                                    <option key={provincia.id} value={provincia.id}>
+                                        {provincia.provincia}
+                                    </option>
+                                ))}
+                            </Form.Control>
                         </Form.Group>
                         <Form.Group controlId="telefono">
                             <Form.Label>Teléfono *</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="2645111111"
+                                placeholder="Teléfono"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}
                             />
                         </Form.Group>
-                        <Form.Group controlId="email">
-                            <Form.Label>Email *</Form.Label>
-                            <Form.Control
-                                type="email"
-                                placeholder="Ejemplo@gmail.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </Form.Group>
-                        <hr />
-                        <Form.Group >
-                            <h1>Tramite e Institucion *</h1>
-                        </Form.Group>
-
-                        <Form.Group controlId="institucion">
-                            <Form.Label>Selecciona la institución *</Form.Label>
-                            <div className="input-group">
-                                <Form.Control
-                                    as="select"
-                                    value={institucionSeleccionada}
-                                    onChange={(e) => setInstitucionSeleccionada(e.target.value)}
-                                >
-                                    <option value="">Selecciona una institución</option>
-                                    {instituciones.map((institucion) => (
-                                        <option key={institucion.id} value={institucion.id}>
-                                            {institucion.nombre}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                                {/* <div className="input-group-append">
-                                    <span className="input-group-text">
-                                        <Image src={instituciones.find(inst => inst.id === parseInt(institucionSeleccionada))?.logo} rounded style={{ width: '30px', height: '30px' }} />
-                                    </span>
-                                </div> */}
-                            </div>
-                        </Form.Group>
-
-
                         <Form.Group controlId="matriculaProfesional">
-                            <Form.Label>Matrícula Profesional ( Solo en caso de ser Profesional ).</Form.Label>
+                            <Form.Label>Matrícula Profesional</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Matrícula Profesional"
@@ -383,56 +321,63 @@ const RegAdminUsuario = () => {
                                 onChange={(e) => setLegajo(e.target.value)}
                             />
                         </Form.Group>
-                        <hr />
-                        <Form.Group >
-                            <h1>Nivel de acceso segun el Rol *</h1>
+                        <Form.Group controlId="institucion">
+                            <Form.Label>Institución *</Form.Label>
+                            <Form.Control
+                                as="select"
+                                value={institucionSeleccionada}
+                                onChange={(e) => setInstitucionSeleccionada(e.target.value)}
+                            >
+                                <option value="">Selecciona una institución</option>
+                                {instituciones.map((institucion) => (
+                                    <option key={institucion.id} value={institucion.id}>
+                                        {institucion.nombre}
+                                    </option>
+                                ))}
+                            </Form.Control>
                         </Form.Group>
-                        <Form.Group controlId='roles'>
+                        <Form.Group controlId="email">
+                            <Form.Label>Email *</Form.Label>
+                            <Form.Control
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="roles">
                             <Form.Label>Roles *</Form.Label>
-                            {Object.keys(roles)
-                            .sort((a, b) => a.localeCompare(b)) // Ordenar los roles de forma descendente   
-                            .filter(rol => {
-                                   // Determinar el rol de mayor jerarquía en la sesión del usuario
-                                const highestUserRole = session.user.Roles.reduce((highest, current) => {
-                                    return current.name === 'Admin' ? current.name :
-                                        current.name === 'Director' && highest !== 'Admin' ? current.name :
-                                        current.name === 'Secretario' && highest !== 'Admin' && highest !== 'Director' ? current.name :
-                                        current.name === 'Preceptor' && highest === 'Alumno' ? current.name :
-                                        current.name === 'Docente' && highest === 'Alumno' ? current.name :
-                                        highest;
-                                }, 'Alumno');
-
-                                // Filtrar los roles que se muestran en el formulario
-                                return (highestUserRole === 'Admin' || 
-                                        (highestUserRole === 'Director' && rol !== 'Admin') ||
-                                        (highestUserRole === 'Secretario' && rol !== 'Admin' && rol !== 'Director') ||
-                                        (highestUserRole === 'Preceptor' && rol === 'Alumno') ||
-                                        (highestUserRole === 'Docente' && rol === 'Alumno'));
-                            }).map((rol, index) => (
-                                <Form.Check
-                                    key={index}
-                                    type="checkbox"
-                                    id={rol}
-                                    label={rol}
-                                    checked={roles[rol].checked}
-                                    onChange={(e) => {
-                                        const isChecked = e.target.checked;
-                                        setRoles({ ...roles, [rol]: { ...roles[rol], checked: isChecked } });
-
-                                        if (isChecked) {
-                                            setSelectedRoleIds([...selectedRoleIds, roles[rol].id]);
-                                        } else {
-                                            setSelectedRoleIds(selectedRoleIds.filter(id => id !== roles[rol].id));
-                                        }
-                                    }}
-                                />
-                            ))}
+                            <div>
+                                {Object.keys(roles).map((rolName) => (
+                                    <Form.Check
+                                        key={rolName}
+                                        type="checkbox"
+                                        label={rolName}
+                                        checked={roles[rolName].checked}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            setRoles((prevRoles) => ({
+                                                ...prevRoles,
+                                                [rolName]: {
+                                                    ...prevRoles[rolName],
+                                                    checked,
+                                                },
+                                            }));
+                                            if (checked) {
+                                                setSelectedRoleIds((prevSelected) => [...prevSelected, roles[rolName].id]);
+                                            } else {
+                                                setSelectedRoleIds((prevSelected) => prevSelected.filter((id) => id !== roles[rolName].id));
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            </div>
                         </Form.Group>
-
+                        
                         <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
-                                <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/vistausuarios`}>
+                                <Link href={`/dashboard/admin/adminHome`}>
                                     <Button variant='secondary' style={{
                                         padding: '0.4rem 1rem',
                                         fontSize: '1rem',
@@ -465,84 +410,37 @@ const RegAdminUsuario = () => {
                                         e.currentTarget.style.color = 'white';
                                     }}
                                     disabled={!formValid}>
-                                    Registrar Empleado
+                                    Registrar
                                 </Button>
                             </div>
                         </Form.Group>
                     </Form>
-
-                    {/* Modal para confirmar el registro */}
-                    <Modal show={showModal} onHide={handleCloseModal}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Confirmar Registro</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            ¿Está seguro que desea registrar a: {nombre} {apellido} con permisos de: {Object.keys(roles).filter(rol => roles[rol]).join(', ')}?
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant='secondary' style={{
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease',
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'white';
-                                    e.currentTarget.style.color = 'black';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'grey';
-                                    e.currentTarget.style.color = 'white';
-                                }}
-                                onClick={handleCloseModal}>
-                                Cancelar
-                            </Button>
-                            <Button variant='flat' style={{
-                                backgroundColor: 'purple',
-                                color: 'white',
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease',
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'white';
-                                    e.currentTarget.style.color = 'black';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'purple';
-                                    e.currentTarget.style.color = 'white';
-                                }}
-                                onClick={handleCloseModal}>
-                                Confirmar Registro
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-                    <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Éxito</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{successMessage}</Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="purple" onClick={() => setShowSuccessModal(false)}>
-                                Cerrar
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-
-                    <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Error</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{errorMessage}</Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="danger" onClick={() => setShowErrorModal(false)}>
-                                Cerrar
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
                 </Col>
             </Row>
-            <br />
-            <br />
+
+            <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Éxito</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{successMessage}</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="success" onClick={() => setShowSuccessModal(false)} onClick={()=> limpiarCampos()}>
+                        Cerrar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Error</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{errorMessage}</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="danger" onClick={() => setShowErrorModal(false)}>
+                        Cerrar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };

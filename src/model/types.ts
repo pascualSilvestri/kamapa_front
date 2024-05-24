@@ -111,7 +111,7 @@ export interface UserFormData {
         create_for: string;
         update_for: string;
         password: string;
-        institucionId: number;
+        institucion: Institucion[];
     };
     rols: any[];
     domicilio: {

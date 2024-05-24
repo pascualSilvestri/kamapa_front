@@ -33,7 +33,7 @@ const VistaEmpleadosPage = () => {
         dni: '',
         cuil: '',
         fechaNacimiento: '',
-        telefono:'',
+        telefono: '',
         email: '',
         domicilioUsuario: {
             localidad: '',
@@ -112,6 +112,7 @@ const VistaEmpleadosPage = () => {
         setSelectedEmpleado(empleado);
         setShowConfirmModal(true);
     };
+    
 
     // Función para manejar el cambio en los checkboxes
     const handleRoleChange = (roleId, isChecked) => {
@@ -124,29 +125,43 @@ const VistaEmpleadosPage = () => {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}api/usuario/${selectedEmpleado}`,
-                {
-                    method: 'DELETE',
-                },
-            );
-
-            if (!response.ok) {
-                throw new Error('Error en la eliminación');
+            if (!selectedEmpleado?.id) {
+                console.error('ID de empleado no válido:', selectedEmpleado);
+                return;
             }
-
-            setEmpleados(empleados.filter((emp) => emp.id !== selectedEmpleado));
+    
+            const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}api/usuario/${selectedEmpleado.id}`;
+            console.log('URL de eliminación:', url);
+    
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.accessToken}`,
+                },
+            });
+    
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                console.error('Error en la eliminación:', errorMessage);
+                throw new Error(errorMessage || 'Error en la eliminación');
+            }
+    
+            setEmpleados(empleados.filter((emp) => emp.id !== selectedEmpleado.id));
             setShowConfirmModal(false);
         } catch (error) {
-            console.log(error);
+            console.error('Error al eliminar el empleado:', error);
         }
     };
+    
+    
 
     const handleModificar = (empleado) => {
-        
-        setSelectedRoles(empleado.Roles.map(role => role.id));
-        setSelectedEmpleado(empleado);
-        // Establecer los valores iniciales del formulario de edición
+        setSelectedRoles(empleado.Roles?.map(role => role.id) || []);
+        setSelectedEmpleado({
+            ...empleado,
+            Roles: empleado.Roles || [],  // Asegúrate de que Roles sea un array vacío si no está definido
+        });
         setEditedEmpleado({
             legajo: empleado.legajo,
             nombre: empleado.nombre,
@@ -157,15 +172,16 @@ const VistaEmpleadosPage = () => {
             telefono: empleado.telefono,
             email: empleado.email,
             domicilioUsuario: {
-                localidad: empleado.domicilioUsuario.localidad,
-                barrio: empleado.domicilioUsuario.barrio,
-                calle: empleado.domicilioUsuario.calle,
-                numero: empleado.domicilioUsuario.numero,
+                localidad: empleado.domicilioUsuario?.localidad || '',
+                barrio: empleado.domicilioUsuario?.barrio || '',
+                calle: empleado.domicilioUsuario?.calle || '',
+                numero: empleado.domicilioUsuario?.numero || '',
             },
-            roles: empleado.Roles.map(role => role.id),
+            roles: empleado.Roles?.map(role => role.id) || [],
         });
         setShowEditModal(true);
     };
+    
 
     const handleSave = () => {
         setShowSaveConfirmModal(true);
@@ -301,6 +317,7 @@ const VistaEmpleadosPage = () => {
                     <tr>
                         <th>Legajo</th>
                         <th>Nombre</th>
+                        <th>D.N.I</th>
                         <th>Telefono</th>
                         <th>Acciones</th>
                     </tr>
@@ -313,6 +330,9 @@ const VistaEmpleadosPage = () => {
                                 <td>{empleado?.legajo}</td>
                                 <td>
                                     {empleado?.nombre} {empleado?.apellido}
+                                </td>
+                                <td>
+                                    {empleado?.dni}
                                 </td>
                                 <td>
                                     {empleado?.telefono}
@@ -334,10 +354,11 @@ const VistaEmpleadosPage = () => {
 
                                     <Button
                                         variant='link'
-                                        onClick={() => handleEliminar(empleado.id)}
+                                        onClick={() => handleEliminar(empleado)}
                                         title='Eliminar Empleado'>
                                         <BsTrash />
                                     </Button>
+
                                 </td>
                             </tr>
                         ))
@@ -358,7 +379,7 @@ const VistaEmpleadosPage = () => {
 
                 <Modal.Body>
                     {selectedEmpleado && (
-                        <>
+                        <p>
                             <p>Legajo: {selectedEmpleado?.legajo}</p>
                             <p>
                                 Fecha de ingreso:{' '}
@@ -385,13 +406,20 @@ const VistaEmpleadosPage = () => {
                                 ).toLocaleDateString()}
                             </p>
                             <p>Teléfono: {selectedEmpleado?.telefono}</p>
+                            <p>Teléfono: {selectedEmpleado?.telefono ?? 'No disponible'}</p>
+                            <p>Provincia: {selectedEmpleado?.domocilioUsuario?.provincia ?? 'No disponible'}</p>
+                            <p>Domicilio: {selectedEmpleado?.domocilioUsuario?.domicilio ?? 'No disponible'}</p>
+                            <p>Localidad: {selectedEmpleado?.domocilioUsuario?.localidad ?? 'No disponible'}</p>
+                            <p>Barrio: {selectedEmpleado?.domocilioUsuario?.barrio ?? 'No disponible'}</p>
+                            <p>Calle: {selectedEmpleado?.domocilioUsuario?.calle ?? 'No disponible'}</p>
+                            <p>Número: {selectedEmpleado?.domocilioUsuario?.numero ?? 'No disponible'}</p>
                             <p>
                                 Estado:{' '}
                                 {selectedEmpleado?.is_active
                                     ? 'Activo'
                                     : 'Inactivo'}
                             </p>
-                        </>
+                        </p>
                     )}
                 </Modal.Body>
 
@@ -463,7 +491,7 @@ const VistaEmpleadosPage = () => {
                             <Form.Group controlId='formFechaNacimiento'>
                                 <Form.Label>Fecha de Nacimiento</Form.Label>
                                 <Form.Control
-                                    type='calendar'
+                                    type='date'
                                     defaultValue={selectedEmpleado?.fechaNacimiento}
                                     onChange={(e)=>{ editedEmpleado.fechaNacimiento = e.target.value}}
                                 />
@@ -491,17 +519,34 @@ const VistaEmpleadosPage = () => {
                                 <Form.Label>Localidad</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.domicilioUsuario.localidad}
-                                    onChange={(e)=>{ editedEmpleado.domicilioUsuario.localidad = e.target.value}}
+                                    defaultValue={selectedEmpleado?.domicilioUsuario?.localidad || ''}
+                                    onChange={(e) => {
+                                        setEditedEmpleado((prevState) => ({
+                                            ...prevState,
+                                            domicilioUsuario: {
+                                                ...prevState.domicilioUsuario,
+                                                localidad: e.target.value,
+                                            },
+                                        }));
+                                    }}
                                 />
                             </Form.Group>
+
 
                             <Form.Group controlId='formBarrio'>
                                 <Form.Label>Barrio</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.domicilioUsuario.barrio}
-                                    onChange={(e)=>{ editedEmpleado.domicilioUsuario.barrio = e.target.value}}
+                                    defaultValue={selectedEmpleado?.domicilioUsuario?.barrio || ''}
+                                    onChange={(e) => {
+                                        setEditedEmpleado((prevState) => ({
+                                            ...prevState,
+                                            domicilioUsuario: {
+                                                ...prevState.domicilioUsuario,
+                                                barrio: e.target.value,
+                                            },
+                                        }));
+                                    }}
                                 />
                             </Form.Group>
 
@@ -509,8 +554,16 @@ const VistaEmpleadosPage = () => {
                                 <Form.Label>Calle</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.domicilioUsuario.calle}
-                                    onChange={(e)=>{ editedEmpleado.domicilioUsuario.calle = e.target.value}}
+                                    defaultValue={selectedEmpleado?.domicilioUsuario?.calle || ''}
+                                    onChange={(e) => {
+                                        setEditedEmpleado((prevState) => ({
+                                            ...prevState,
+                                            domicilioUsuario: {
+                                                ...prevState.domicilioUsuario,
+                                                calle: e.target.value,
+                                            },
+                                        }));
+                                    }}
                                 />
                             </Form.Group>
 
@@ -518,15 +571,23 @@ const VistaEmpleadosPage = () => {
                                 <Form.Label>Numeracion de la calle</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.domicilioUsuario.numero}
-                                    onChange={(e)=>{ editedEmpleado.domicilioUsuario.numero = e.target.value}}
+                                    defaultValue={selectedEmpleado?.domicilioUsuario?.numero || ''}
+                                    onChange={(e) => {
+                                        setEditedEmpleado((prevState) => ({
+                                            ...prevState,
+                                            domicilioUsuario: {
+                                                ...prevState.domicilioUsuario,
+                                                numero: e.target.value,
+                                            },
+                                        }));
+                                    }}
                                 />
                             </Form.Group>
 
                             <Form.Group controlId='formRoles'>
                                 <Form.Label>Roles</Form.Label>
                                 {roles.map((rol) => {
-                                    const isChecked = selectedEmpleado.Roles.some((r) => r.id === rol.id);
+                                    const isChecked = selectedEmpleado?.Roles?.some((r) => r.id === rol.id);
                                     return (
                                         <Form.Check
                                             key={rol.id}
@@ -551,7 +612,7 @@ const VistaEmpleadosPage = () => {
                     </Button>
 
                     <Button
-                        variant='primary'
+                        variant='purple'
                         onClick={handleSave}>
                         Guardar
                     </Button>
@@ -577,7 +638,7 @@ const VistaEmpleadosPage = () => {
                     </Button>
 
                     <Button
-                        variant='primary'
+                        variant='purple'
                         onClick={handleConfirmSave}>
                         Confirmar
                     </Button>
