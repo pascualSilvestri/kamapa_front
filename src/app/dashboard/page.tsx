@@ -17,7 +17,7 @@ const Dashboard = () => {
     const [user, setUser] = useUserContext();
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
     const [rol, setRol] = useRolesContext();
- 
+
 
     useEffect(() => {
         if (!session) {
