@@ -191,23 +191,7 @@ const VistaEmpleadosPage = () => {
         try {
             // Envíar los datos del formulario de edición al servidor
             // e.preventDefault();
-            // console.log({
-            //     legajo:editedEmpleado.legajo,
-            //     nombre:editedEmpleado.nombre,
-            //     apellido:editedEmpleado.apellido,   
-            //     dni: editedEmpleado.dni,
-            //     cuil: editedEmpleado.cuil,
-            //     fechaNacimiento: editedEmpleado.fechaNacimiento,
-            //     email: editedEmpleado.email,
-            //     domicilioUsuario: {
-            //         localidad: editedEmpleado.domicilioUsuario.localidad,
-            //         barrio: editedEmpleado.domicilioUsuario.barrio,
-            //         calle: editedEmpleado.domicilioUsuario.calle,
-            //         numero: editedEmpleado.domicilioUsuario.numero,
-            //     },
-            //     institucionId:institucionSelected.id,
-            //     roles:selectedRoles
-            // });
+            
             const response = await fetch(
                 `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedEmpleado.id}`,
                 {
@@ -231,7 +215,7 @@ const VistaEmpleadosPage = () => {
                             numero: editedEmpleado.domicilioUsuario.numero,
                         },
                         institucionId:institucionSelected.id,
-                        roles:selectedRoles
+                        roles: selectedRoles,
                     }),
                 },
             );

@@ -142,9 +142,10 @@ const RegAdminUsuario = () => {
                 if (response.ok) {
                     setShowSuccessModal(true);
                     setSuccessMessage('El empleado se registró con éxito.');
+                    limpiarCampos(); // Limpia los campos del formulario
                 } else {
                     setShowErrorModal(true);
-                    setErrorMessage('Hubo un problema al registrar al empleado. Por favor, inténtalo nuevamente.');
+                    setErrorMessage('Hubo un problema al registrar al empleado. Por favor, En Consultar Usuario Verifica que no exista.');
                 }
             } catch (error) {
                 setShowErrorModal(true);
