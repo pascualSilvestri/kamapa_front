@@ -77,7 +77,7 @@ export const alumnoAutorizeRouter = [
     'Inicio',
     'Aulas',
     'About',
-    'Calificaciones'
+    'Calificaciones',
 
 ]
 
