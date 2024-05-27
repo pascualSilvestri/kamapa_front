@@ -1,10 +1,10 @@
 'use client'
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Table, Form } from 'react-bootstrap';
 
 interface Curso {
     curso: string;
-    alumnos: string[];
+    alumnos: string[]; // Aquí podrías usar tipos más complejos si es necesario, como objetos de alumno con más detalles
 }
 
 const CursosAlumnos = () => {
