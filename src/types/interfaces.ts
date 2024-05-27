@@ -20,7 +20,7 @@ export interface User {
 	contactoId: number;
 	rolId: number;
     first_session: boolean;
-	roles: Roles[];
+	Roles: Roles[];
 	Instituciones : Institucion[];
 	accessToken: string; // Agrega esta línea
 }

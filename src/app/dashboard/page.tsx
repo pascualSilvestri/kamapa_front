@@ -31,10 +31,10 @@ const Dashboard = () => {
                 apellido: session.user.apellido,
                 legajo: session.user.legajo,
                 telefono: session.user.telefono,
-                Roles: session.user.roles,
+                Roles: session.user.Roles,
                 Instituciones: session.user.Instituciones
             });
-            setRolAdmin(session.user.roles);
+            setRolAdmin(session.user.Roles);
         }
     }, [router, session]);
 

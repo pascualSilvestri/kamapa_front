@@ -349,7 +349,7 @@ const RegUsuario = () => {
                             <Form.Label>Roles *</Form.Label>
                             {Object.keys(roles).filter(rol => {
                                    // Determinar el rol de mayor jerarquía en la sesión del usuario
-                                const highestUserRole = session.user.roles.reduce((highest, current) => {
+                                const highestUserRole = session.user.Roles.reduce((highest, current) => {
                                     return current.name === 'Admin' ? current.name :
                                         current.name === 'Director' && highest !== 'Admin' ? current.name :
                                         current.name === 'Secretario' && highest !== 'Admin' && highest !== 'Director' ? current.name :
