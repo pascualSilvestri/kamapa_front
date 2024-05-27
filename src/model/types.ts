@@ -9,8 +9,8 @@ export interface User {
 }
 
 export interface Roles {
-    name: string;
     id: number;
+    name: string;
 }
 
 export interface Session {
@@ -18,7 +18,7 @@ export interface Session {
     expires: string;
     id: number;
     password: string;
-    roles: Roles;
+    roles: Roles[];
     nombre: string;
     apellido: string;
     dni: string;

@@ -20,7 +20,7 @@ export interface User {
 	contactoId: number;
 	rolId: number;
     first_session: boolean;
-	Roles: Roles[];
+	roles: Roles[];
 	Instituciones : Institucion[];
 	accessToken: string; // Agrega esta línea
 }
@@ -33,8 +33,8 @@ export interface UserSession{
 }
 
 export interface Roles {
-    name: string;
 	id: number;
+    name: string;
 }
 
 
