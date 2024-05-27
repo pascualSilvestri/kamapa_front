@@ -13,7 +13,9 @@ export const router = {
     'About': { label: 'About', href: '/about' },
     'CiclosLectivos': { label: 'Ciclos Lectivos', href: '/ciclolectivo' },
     'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo' },
-    'Curso': { label: 'Gestion Curso y Asigantura', href: '/Curso' },
+    'GestionCurso': { label: 'Gestion Cursos', href: '/gestionCurso' },
+    'AddAsignaturaCurso': { label: 'Agregar Asignatura a  Cursos ', href: '/addAsignaturaCurso' },
+    'GestionAsignatura': { label: 'Gestion Asignatura ', href: '/gestionAsignatura' },
     'CursoAlumno': { label: 'Consultar Alumnos por Curso', href: '/curso_alumno' },
     'AulasRegistro': { label: 'Aulas', href: '/regaulas' },
     'RegistroUsuarios': { label: 'Registro de Usuarios', href: '/consultaUsuario' },
@@ -37,8 +39,9 @@ export const directorAutorizeRouter = [
     // 'Profesores',
     // 'Alumnos',
     'CrearCicloLectivo',
-    'Curso',
+    'GestionCurso',
     'CursoAlumno',
+    'AddAsignaturaCurso',
     'EditarAlumnos',
     // 'CrearAulas',
     // 'Aulas',
@@ -46,7 +49,8 @@ export const directorAutorizeRouter = [
     'RegistroUsuarios',
     // 'Permisos',
     'VistaUsuarios',
-    'resetearPasswordUsuario'
+    'resetearPasswordUsuario',
+    'GestionAsignatura'
 ]
 
 export const secretarioAutorizeRouter = [
@@ -57,9 +61,11 @@ export const secretarioAutorizeRouter = [
     'About',
     'RegistroUsuarios',
     'CrearCicloLectivo',
-    'Curso',
+    'GestionCurso',
+    'AddAsignaturaCurso',
     'CursoAlumno',
-    'VistaUsuarios'
+    'VistaUsuarios',
+    'GestionAsignatura'
 ]
 
 export const preceptorAutorizeRouter = [

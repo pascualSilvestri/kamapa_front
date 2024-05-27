@@ -2,7 +2,7 @@
 import React, { Suspense } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from './components/Loading'; // Importa el componente de carga
-import SessionAuthProvider from '../../contexts/SessionAuthProvider';
+import SessionAuthProvider from '../context/SessionAuthProvider';
 import { UserProvider } from '../context/userContext';
 import { CicloLectivoProvider } from 'context/CicloLectivoContext';
 

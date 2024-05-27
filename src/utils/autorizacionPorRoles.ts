@@ -1,5 +1,5 @@
 import { RoleEmun, AutorizedEmun } from './const';
-import { Roles } from '../types/interfaces';
+import { Roles } from '../model/interfaces';
 
 //////////////////////////////////////////////////////////////////////////////
 ///Recibe un array de Roles y retorna el nivel de aurotizacion en formato int 

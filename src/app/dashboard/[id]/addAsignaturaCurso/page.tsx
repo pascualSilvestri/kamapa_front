@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
 
-const Cursos = () => {
+const AddAsignaturaCurso = () => {
     const [curso, setCurso] = useState<string>('');
     const [asignatura, setAsignatura] = useState<string>('');
     const [cursos, setCursos] = useState<string[]>([]);
@@ -114,4 +114,4 @@ const Cursos = () => {
     );
 };
 
-export default Cursos;
+export default AddAsignaturaCurso;

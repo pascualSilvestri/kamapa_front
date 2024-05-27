@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Environment } from '../../../../utils/apiHelpers';
 import { useInstitucionSelectedContext } from 'context/userContext';
 import Modal from '../../../components/ModalConsultaUser'; // Asegúrate de importar tu componente Modal
-import { Institucion, Roles } from 'types/interfaces';
+import { Institucion, Roles } from 'model/interfaces';
 import { Form } from 'react-bootstrap';
 import { BsChevronDown } from 'react-icons/bs';
 
