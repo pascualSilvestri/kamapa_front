@@ -22,7 +22,7 @@ const VistaEmpleadosPage = () => {
     const { data: session, status } = useSession();
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
     const [selectedRoles, setSelectedRoles] = useState([]);
-
+    const [searchTerm, setSearchTerm] = useState('');
 
 
     // Estado local para el formulario de edición
@@ -43,6 +43,49 @@ const VistaEmpleadosPage = () => {
         },
         roles: [],
     });
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCIONES PARA EL Search
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(
+                    `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${session.accessToken}`,
+                        },
+                    }
+                );
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log(data);
+                setEmpleados(data.usuarios);
+            } catch (error) {
+                console.error('Error al obtener empleados:', error.message);
+            }
+        };
+
+        fetchData();
+    }, [session, institucionSelected.id]);
+
+    const filteredEmpleados = empleados.filter(empleado =>
+        empleado.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        empleado.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        empleado.apellido.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         const fetchRoles = async () => {
@@ -102,7 +145,7 @@ const VistaEmpleadosPage = () => {
     }, [session]);
 
     const handleConsultar = (empleado) => {
-        
+
         setSelectedRoles(empleado.Roles.map(role => role.id));
         setSelectedEmpleado(empleado);
         setShowModal(true);
@@ -112,7 +155,7 @@ const VistaEmpleadosPage = () => {
         setSelectedEmpleado(empleado);
         setShowConfirmModal(true);
     };
-    
+
 
     // Función para manejar el cambio en los checkboxes
     const handleRoleChange = (roleId, isChecked) => {
@@ -129,10 +172,10 @@ const VistaEmpleadosPage = () => {
                 console.error('ID de empleado no válido:', selectedEmpleado);
                 return;
             }
-    
+
             const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}api/usuario/${selectedEmpleado.id}`;
             console.log('URL de eliminación:', url);
-    
+
             const response = await fetch(url, {
                 method: 'DELETE',
                 headers: {
@@ -140,21 +183,21 @@ const VistaEmpleadosPage = () => {
                     'Authorization': `Bearer ${session.accessToken}`,
                 },
             });
-    
+
             if (!response.ok) {
                 const errorMessage = await response.text();
                 console.error('Error en la eliminación:', errorMessage);
                 throw new Error(errorMessage || 'Error en la eliminación');
             }
-    
+
             setEmpleados(empleados.filter((emp) => emp.id !== selectedEmpleado.id));
             setShowConfirmModal(false);
         } catch (error) {
             console.error('Error al eliminar el empleado:', error);
         }
     };
-    
-    
+
+
 
     const handleModificar = (empleado) => {
         setSelectedRoles(empleado.Roles?.map(role => role.id) || []);
@@ -181,7 +224,7 @@ const VistaEmpleadosPage = () => {
         });
         setShowEditModal(true);
     };
-    
+
 
     const handleSave = () => {
         setShowSaveConfirmModal(true);
@@ -191,7 +234,7 @@ const VistaEmpleadosPage = () => {
         try {
             // Envíar los datos del formulario de edición al servidor
             // e.preventDefault();
-            
+
             const response = await fetch(
                 `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedEmpleado.id}`,
                 {
@@ -200,9 +243,9 @@ const VistaEmpleadosPage = () => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        legajo:editedEmpleado.legajo,
-                        nombre:editedEmpleado.nombre,
-                        apellido:editedEmpleado.apellido,   
+                        legajo: editedEmpleado.legajo,
+                        nombre: editedEmpleado.nombre,
+                        apellido: editedEmpleado.apellido,
                         dni: editedEmpleado.dni,
                         cuil: editedEmpleado.cuil,
                         fechaNacimiento: editedEmpleado.fechaNacimiento,
@@ -214,7 +257,7 @@ const VistaEmpleadosPage = () => {
                             calle: editedEmpleado.domicilioUsuario.calle,
                             numero: editedEmpleado.domicilioUsuario.numero,
                         },
-                        institucionId:institucionSelected.id,
+                        institucionId: institucionSelected.id,
                         roles: selectedRoles,
                     }),
                 },
@@ -222,7 +265,8 @@ const VistaEmpleadosPage = () => {
             const data = await response.json();
             console.log(data);
 
-            if (!response.ok) {;
+            if (!response.ok) {
+                ;
                 console.log(data)
                 throw new Error(data);
             }
@@ -293,6 +337,17 @@ const VistaEmpleadosPage = () => {
                 </Col>
             </Row>
 
+            {/* //buscador */}
+            <Form.Group controlId='formBuscar'>
+                <Form.Control
+                    type='text'
+                    placeholder='Buscar por DNI, nombre o apellido...'
+                    value={searchTerm}
+                    onChange={handleSearch}
+                />
+            </Form.Group>
+
+
             <Table
                 striped
                 bordered
@@ -308,8 +363,8 @@ const VistaEmpleadosPage = () => {
                 </thead>
 
                 <tbody>
-                    {Array.isArray(empleados) && empleados.length > 0 ? (
-                        empleados.map((empleado) => (
+                    {Array.isArray(filteredEmpleados) && filteredEmpleados.length > 0 ? (
+                        filteredEmpleados.map((empleado) => (
                             <tr key={empleado.id}>
                                 <td>{empleado?.legajo}</td>
                                 <td>
@@ -425,14 +480,14 @@ const VistaEmpleadosPage = () => {
 
                 <Modal.Body>
                     {selectedEmpleado && (
-                        
+
                         <Form>
                             <Form.Group controlId='formLegajo'>
                                 <Form.Label>Legajo</Form.Label>
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.legajo}
-                                    onChange={(e)=>{ editedEmpleado.legajo = e.target.value}}
+                                    onChange={(e) => { editedEmpleado.legajo = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -441,7 +496,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.nombre}
-                                    onChange={(e)=>{ editedEmpleado.nombre = e.target.value}}
+                                    onChange={(e) => { editedEmpleado.nombre = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -450,7 +505,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.apellido}
-                                    onChange={(e)=>{ editedEmpleado.apellido = e.target.value}}
+                                    onChange={(e) => { editedEmpleado.apellido = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -459,7 +514,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.dni}
-                                    onChange={(e)=>{ editedEmpleado.dni = e.target.value}}
+                                    onChange={(e) => { editedEmpleado.dni = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -468,7 +523,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='text'
                                     defaultValue={selectedEmpleado?.cuil}
-                                    onChange={(e)=>{ editedEmpleado.cuil = e.target.value}}
+                                    onChange={(e) => { editedEmpleado.cuil = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -477,7 +532,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='date'
                                     defaultValue={selectedEmpleado?.fechaNacimiento}
-                                    onChange={(e)=>{ editedEmpleado.fechaNacimiento = e.target.value}}
+                                    onChange={(e) => { editedEmpleado.fechaNacimiento = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -486,7 +541,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='telefono'
                                     defaultValue={selectedEmpleado?.telefono}
-                                    onChange={(e)=>{ editedEmpleado.telefono = e.target.value}}
+                                    onChange={(e) => { editedEmpleado.telefono = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -495,7 +550,7 @@ const VistaEmpleadosPage = () => {
                                 <Form.Control
                                     type='email'
                                     defaultValue={selectedEmpleado?.email}
-                                    onChange={(e)=>{ editedEmpleado.email = e.target.value}}
+                                    onChange={(e) => { editedEmpleado.email = e.target.value }}
                                 />
                             </Form.Group>
 

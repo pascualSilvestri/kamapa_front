@@ -9,11 +9,11 @@ export const router = {
     'Preceptores': { label: 'Preceptores', href: '/preceptor' },
     'Profesores': { label: 'Profesores', href: '/profesores' },
     'Alumnos': { label: 'Alumnos', href: '/alumnos' },
-    'Aulas': { label: 'Aulas', href: '/aulas' },
     'About': { label: 'About', href: '/about' },
     'CiclosLectivos': { label: 'Ciclos Lectivos', href: '/ciclolectivo' },
     'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo' },
     'Curso': { label: 'Gestion Curso y Asigantura', href: '/Curso' },
+    'CursoAlumno': { label: 'Consultar Alumnos por Curso', href: '/curso_alumno' },
     'AulasRegistro': { label: 'Aulas', href: '/regaulas' },
     'RegistroUsuarios': { label: 'Registro de Usuarios', href: '/consultaUsuario' },
     'Permisos': { label: 'Permisos', href: '/permisos' },
@@ -37,6 +37,7 @@ export const directorAutorizeRouter = [
     // 'Alumnos',
     'CrearCicloLectivo',
     'Curso',
+    'CursoAlumno',
     // 'CrearAulas',
     // 'Aulas',
     // 'About',
@@ -55,12 +56,14 @@ export const secretarioAutorizeRouter = [
     'RegistroUsuarios',
     'CrearCicloLectivo',
     'Curso',
+    'CursoAlumno',
     'VistaUsuarios'
 ]
 
 export const preceptorAutorizeRouter = [
     'Inicio',
     'Preceptores',
+    'CursoAlumno',
     'Alumnos',
     'Aulas',
     'About',
