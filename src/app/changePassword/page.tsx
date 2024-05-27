@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import "./ChangePasswordPage.css"; // Importa el archivo CSS
 import { useUserContext } from "context/userContext";
 import { useRouter } from "next/navigation";
-import { Environment } from "utils/apiHelpers";
+import { Environment } from "utils/EnviromenManager";
 import { useSession } from "next-auth/react";
 
 function ChangePasswordPage() {

@@ -7,7 +7,7 @@ import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRol
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
-import { Environment } from 'utils/apiHelpers';
+import { Environment } from 'utils/EnviromenManager';
 
 
 // Define la interfaz Provincia

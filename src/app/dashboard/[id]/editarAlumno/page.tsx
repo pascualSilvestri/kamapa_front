@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Roles, User } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
-import { Environment } from 'utils/apiHelpers';
+import { Environment } from 'utils/EnviromenManager';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 
 const EditarAlumnoPage = () => {

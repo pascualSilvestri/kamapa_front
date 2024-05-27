@@ -5,7 +5,7 @@ import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
 import Link from 'next/link';
 import { useSession, signIn } from 'next-auth/react';
 
-import { Environment } from 'utils/apiHelpers';
+import { Environment } from 'utils/EnviromenManager';
 import { Provincia, Roles, User } from 'model/types';
 import { useRolesContext, useUserContext } from 'context/userContext';
 

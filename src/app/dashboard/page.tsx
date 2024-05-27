@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CicloLectivo, Roles, User } from '../../model/types';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
-import { Environment } from 'utils/apiHelpers';
+import { Environment } from 'utils/EnviromenManager';
 import ButtonAuth from '../components/ButtonAuth';
 
 const Dashboard = () => {

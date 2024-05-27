@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Environment } from '../../../../utils/apiHelpers';
+import { Environment } from '../../../../utils/EnviromenManager';
 import { useInstitucionSelectedContext } from 'context/userContext';
 import Modal from '../../../components/ModalConsultaUser'; // Asegúrate de importar tu componente Modal
 import { Institucion, Roles } from 'model/interfaces';

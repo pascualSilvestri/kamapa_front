@@ -156,6 +156,19 @@ export class Environment {
            api/cicloElectivo/ciclo/idInstitucion
         */
 
+        getCursosByInstitucion: 'api/cursos/institucion/',
+        /**
+         * Trae todos los cursos de la institucion seleccionada
+         * @param {int} idInstitucion
+           api/cursos/institucion/idInstitucion
+        */
+       getAsignaturaByInstitucion: 'api/asignatura/institucion/'
+        /**
+         * Trae todas las asignaturas de la institucion seleccionada
+         * @param {int} idInstitucion
+           api/asignatura/institucion/idInstitucion
+        */
+
     }
 
     public static getEndPoint(endPoint: string): string {

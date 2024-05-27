@@ -1,12 +1,31 @@
 'use client'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
+import { Environment } from 'utils/EnviromenManager';
 
-const AddAsignaturaCurso = () => {
+const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
     const [curso, setCurso] = useState<string>('');
     const [asignatura, setAsignatura] = useState<string>('');
     const [cursos, setCursos] = useState<string[]>([]);
     const [asignaturas, setAsignaturas] = useState<{ [curso: string]: string[] }>({});
+
+
+
+    // useEffect(() => {
+    //     fecthCursos();
+    // }, []);
+
+    // const fecthCursos = async () => {
+    //     const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`, {
+    //         method: 'GET',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     })
+
+    //     const response = await fecth.json();
+    //     setCursos(response);
+    // }
 
     const handleAddCurso = () => {
         setCursos([...cursos, curso]);

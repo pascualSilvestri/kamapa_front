@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useInstitucionSelectedContext, useRolesContext } from 'context/userContext';
 import { useCicloLectivo } from 'context/CicloLectivoContext';
-import { Environment } from 'utils/apiHelpers';
+import { Environment } from 'utils/EnviromenManager';
 import { CicloLectivo } from 'model/types';
 import { useRouter } from 'next/navigation';
 

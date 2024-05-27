@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Environment } from '../../../../utils/apiHelpers';
+import { Environment } from '../../../../utils/EnviromenManager';
 import { useInstitucionSelectedContext } from 'context/userContext';
 
 const ConsultaUsuarioPage = () => {

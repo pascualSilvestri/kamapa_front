@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Roles, User } from '../model/types';
-import { Institucion } from 'model/types';
+
+import { Institucion, Roles, User } from 'model/types';
 
 // Crear el contexto para el usuario
 // Crear el contexto para el usuario

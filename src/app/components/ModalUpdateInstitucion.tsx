@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-import { Environment } from 'utils/apiHelpers';
+import { Environment } from 'utils/EnviromenManager';
 
 interface ModalUpdateInstitucionProps {
     id: number;

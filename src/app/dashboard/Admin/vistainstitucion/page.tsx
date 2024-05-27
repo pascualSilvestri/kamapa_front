@@ -11,7 +11,7 @@ import { ModalType } from 'utils/const';
 import { autorizeNivel, autorizeRol } from 'utils/autorizacionPorRoles';
 import ModalViewInstitucion from 'app/components/ModalViewInstitucion';
 import ModalUpdateInstitucion from 'app/components/ModalUpdateInstitucion';
-import { Environment } from 'utils/apiHelpers';
+import { Environment } from 'utils/EnviromenManager';
 import { useRolesContext, useUserContext } from 'context/userContext';
 
 

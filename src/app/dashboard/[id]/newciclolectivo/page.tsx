@@ -3,7 +3,7 @@ import { useRolesContext, useUserContext } from 'context/userContext';
 import { Roles, User } from 'model/types';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { Environment } from 'utils/apiHelpers';
+import { Environment } from 'utils/EnviromenManager';
 
 const NewCicloLectivoPage = ({ params }: { params: { id: string } }) => {
   const [cicloLectivo, setCicloLectivo] = useState({

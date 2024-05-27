@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import Loading from 'app/components/Loading';
 import ButtonAuth from 'app/components/ButtonAuth';
-import { Environment } from 'utils/apiHelpers';
+import { Environment } from 'utils/EnviromenManager';
 
 const Page = () => {
     const { data: session, status } = useSession();
