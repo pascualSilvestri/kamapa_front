@@ -173,4 +173,5 @@ export interface Curso {
     nombre: string;
     nominacion: string;
     division: string;
+    institucionId?: string;
 }

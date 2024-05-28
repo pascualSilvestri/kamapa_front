@@ -165,11 +165,21 @@ export class Environment {
          * @param {int} idInstitucion
            api/cursos/institucion/idInstitucion
         */
-       getAsignaturaByInstitucion: 'api/asignatura/institucion/'
+       getAsignaturaByInstitucion: 'api/asignatura/institucion/',
         /**
          * Trae todas las asignaturas de la institucion seleccionada
          * @param {int} idInstitucion
            api/asignatura/institucion/idInstitucion
+        */
+       createCurso:'api/cursos',
+        /**
+         * Crear nuevo curso
+         * @body {
+            "nombre": "Curso 1",
+            "nominacion": 1,
+            "division": 1,
+            "institucionId": 1
+            }
         */
 
     }

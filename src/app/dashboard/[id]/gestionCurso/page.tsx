@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
 import { Environment } from 'utils/EnviromenManager';
-import { Curso } from'model/types';
+import { Curso } from 'model/types';
 
 
 
@@ -15,7 +15,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     const [filtroNombre, setFiltroNombre] = useState('');
     const [filtroNominacion, setFiltroNominacion] = useState('');
     const [filtroDivision, setFiltroDivision] = useState('');
-    
+
 
     useEffect(() => {
         fecthCursos();
@@ -34,15 +34,39 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     }
 
 
-    const handleCrearCurso = () => {
+    const handleCrearCurso = async () => {
         const nuevoCurso: Curso = {
             id: cursos.length + 1,
             nombre,
             nominacion,
             division,
+            institucionId: params.id,
         };
-        setCursos([...cursos, nuevoCurso]);
-        console.log('Curso creado:', nuevoCurso);
+        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.createCurso)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nombre: nuevoCurso.nombre,
+                nominacion: nuevoCurso.nominacion,
+                division: nuevoCurso.division,
+                institucionId: nuevoCurso.institucionId
+            })
+        })
+
+        if (fecth.status !== 200) {
+            alert('Error al crear curso');
+            return;
+        } else {
+
+            const response = await fecth.json();
+            fecthCursos();
+        }
+
+
+
+
         setNombre('');
         setNominacion('');
         setDivision('');
