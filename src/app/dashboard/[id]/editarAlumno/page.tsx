@@ -10,8 +10,8 @@ import { Environment } from 'utils/EnviromenManager';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 
 const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
-    const [empleados, setEmpleados] = useState([]);
-    const [selectedEmpleado, setSelectedEmpleado] = useState(null);
+    const [alumnos, setAlumnos] = useState([]);
+    const [selectedAlumno, setSelectedAlumno] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -26,7 +26,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 
 
     // Estado local para el formulario de edición
-    const [editedEmpleado, setEditedEmpleado] = useState({
+    const [editedAlumno, setEditedAlumno] = useState({
         legajo: '',
         nombre: '',
         apellido: '',
@@ -102,17 +102,17 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 
             const data = await response.json();
             console.log(data);
-            setEmpleados(data.usuarios);
+            setAlumnos(data.usuarios);
         } catch (error) {
             console.error('Error al obtener empleados:', error.message);
         }
     };
 
 
-    const filteredEmpleados = empleados.filter(empleado =>
-        empleado.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        empleado.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        empleado.apellido.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredAlumnos = alumnos.filter(alumnos =>
+        alumnos.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        alumnos.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        alumnos.apellido.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleSearch = (e) => {
@@ -121,15 +121,15 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 
 
 
-    const handleConsultar = (empleado) => {
+    const handleConsultar = (alumnos) => {
 
-        setSelectedRoles(empleado.Roles.map(role => role.id));
-        setSelectedEmpleado(empleado);
+        setSelectedRoles(alumnos.Roles.map(role => role.id));
+        setSelectedAlumno(alumnos);
         setShowModal(true);
     };
 
-    const handleEliminar = (empleado) => {
-        setSelectedEmpleado(empleado);
+    const handleEliminar = (alumnos) => {
+        setSelectedAlumno(alumnos);
         setShowConfirmModal(true);
     };
 
@@ -145,12 +145,12 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 
     const handleConfirmDelete = async () => {
         try {
-            if (!selectedEmpleado?.id) {
-                console.error('ID de empleado no válido:', selectedEmpleado);
+            if (!selectedAlumno?.id) {
+                console.error('ID de empleado no válido:', selectedAlumno);
                 return;
             }
 
-            const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}api/usuario/${selectedEmpleado.id}`;
+            const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}api/usuario/${selectedAlumno.id}`;
             console.log('URL de eliminación:', url);
 
             const response = await fetch(url, {
@@ -167,7 +167,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                 throw new Error(errorMessage || 'Error en la eliminación');
             }
 
-            setEmpleados(empleados.filter((emp) => emp.id !== selectedEmpleado.id));
+            setAlumnos(alumnos.filter((emp) => emp.id !== selectedAlumno.id));
             setShowConfirmModal(false);
         } catch (error) {
             console.error('Error al eliminar el empleado:', error);
@@ -176,28 +176,28 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 
 
 
-    const handleModificar = (empleado) => {
-        setSelectedRoles(empleado.Roles?.map(role => role.id) || []);
-        setSelectedEmpleado({
-            ...empleado,
-            Roles: empleado.Roles || [],  // Asegúrate de que Roles sea un array vacío si no está definido
+    const handleModificar = (alumno) => {
+        setSelectedRoles(alumno.Roles?.map(role => role.id) || []);
+        setSelectedAlumno({
+            ...alumno,
+            Roles: alumno.Roles || [],  // Asegúrate de que Roles sea un array vacío si no está definido
         });
-        setEditedEmpleado({
-            legajo: empleado.legajo,
-            nombre: empleado.nombre,
-            apellido: empleado.apellido,
-            dni: empleado.dni,
-            cuil: empleado.cuil,
-            fechaNacimiento: empleado.fechaNacimiento,
-            telefono: empleado.telefono,
-            email: empleado.email,
+        setEditedAlumno({
+            legajo: alumno.legajo,
+            nombre: alumno.nombre,
+            apellido: alumno.apellido,
+            dni: alumno.dni,
+            cuil: alumno.cuil,
+            fechaNacimiento: alumno.fechaNacimiento,
+            telefono: alumno.telefono,
+            email: alumno.email,
             domicilioUsuario: {
-                localidad: empleado.domicilioUsuario?.localidad || '',
-                barrio: empleado.domicilioUsuario?.barrio || '',
-                calle: empleado.domicilioUsuario?.calle || '',
-                numero: empleado.domicilioUsuario?.numero || '',
+                localidad: alumno.domicilioUsuario?.localidad || '',
+                barrio: alumno.domicilioUsuario?.barrio || '',
+                calle: alumno.domicilioUsuario?.calle || '',
+                numero: alumno.domicilioUsuario?.numero || '',
             },
-            roles: empleado.Roles?.map(role => role.id) || [],
+            roles: alumno.Roles?.map(role => role.id) || [],
         });
         setShowEditModal(true);
     };
@@ -213,26 +213,26 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             // e.preventDefault();
 
             const response = await fetch(
-                `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedEmpleado.id}`,
+                `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedAlumno.id}`,
                 {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        legajo: editedEmpleado.legajo,
-                        nombre: editedEmpleado.nombre,
-                        apellido: editedEmpleado.apellido,
-                        dni: editedEmpleado.dni,
-                        cuil: editedEmpleado.cuil,
-                        fechaNacimiento: editedEmpleado.fechaNacimiento,
-                        telefono: editedEmpleado.telefono,
-                        email: editedEmpleado.email,
+                        legajo: editedAlumno.legajo,
+                        nombre: editedAlumno.nombre,
+                        apellido: editedAlumno.apellido,
+                        dni: editedAlumno.dni,
+                        cuil: editedAlumno.cuil,
+                        fechaNacimiento: editedAlumno.fechaNacimiento,
+                        telefono: editedAlumno.telefono,
+                        email: editedAlumno.email,
                         domicilio: {
-                            localidad: editedEmpleado.domicilioUsuario.localidad,
-                            barrio: editedEmpleado.domicilioUsuario.barrio,
-                            calle: editedEmpleado.domicilioUsuario.calle,
-                            numero: editedEmpleado.domicilioUsuario.numero,
+                            localidad: editedAlumno.domicilioUsuario.localidad,
+                            barrio: editedAlumno.domicilioUsuario.barrio,
+                            calle: editedAlumno.domicilioUsuario.calle,
+                            numero: editedAlumno.domicilioUsuario.numero,
                         },
                         institucionId: institucionSelected.id,
                         roles: selectedRoles,
@@ -253,7 +253,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             );
             const updatedData = await updatedResponse.json();
 
-            setEmpleados(updatedData.usuarios);
+            setAlumnos(updatedData.usuarios);
 
             setShowEditModal(false);
             setShowSaveConfirmModal(false);
@@ -261,8 +261,8 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             console.error('Error al actualizar empleado:', error);
         }
     };
-    console.log(empleados)
-
+    console.log(alumnos)
+    console.log(selectedAlumno)
     return (
         <div className='p-3'>
             <Row className='mb-3  justify-content-center'>
@@ -340,37 +340,37 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                 </thead>
 
                 <tbody>
-                    {Array.isArray(filteredEmpleados) && filteredEmpleados.length > 0 ? (
-                        filteredEmpleados.map((empleado) => (
-                            <tr key={empleado.id}>
-                                <td>{empleado?.legajo}</td>
+                    {Array.isArray(filteredAlumnos) && filteredAlumnos.length > 0 ? (
+                        filteredAlumnos.map((alumno) => (
+                            <tr key={alumno.id}>
+                                <td>{alumno?.legajo}</td>
                                 <td>
-                                    {empleado?.nombre} {empleado?.apellido}
+                                    {alumno?.nombre} {alumno?.apellido}
                                 </td>
                                 <td>
-                                    {empleado?.dni}
+                                    {alumno?.dni}
                                 </td>
                                 <td>
-                                    {empleado?.telefono}
+                                    {alumno?.telefono}
                                 </td>
                                 <td>
                                     <Button
                                         variant='link'
-                                        onClick={() => handleConsultar(empleado)}
+                                        onClick={() => handleConsultar(alumno)}
                                         title='Consultar Empleado'>
                                         <BsEye />
                                     </Button>
 
                                     <Button
                                         variant='link'
-                                        onClick={() => handleModificar(empleado)}
+                                        onClick={() => handleModificar(alumno)}
                                         title='Modificar Empleado'>
                                         <BsPencil />
                                     </Button>
 
                                     <Button
                                         variant='link'
-                                        onClick={() => handleEliminar(empleado)}
+                                        onClick={() => handleEliminar(alumno)}
                                         title='Eliminar Empleado'>
                                         <BsTrash />
                                     </Button>
@@ -394,47 +394,45 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                 </Modal.Header>
 
                 <Modal.Body>
-                    {selectedEmpleado && (
+                    {selectedAlumno && (
                         <p>
-                            <p>Legajo: {selectedEmpleado?.legajo}</p>
+                            <p>Legajo: {selectedAlumno?.legajo}</p>
                             <p>
                                 Fecha de ingreso:{' '}
                                 {new Date(
-                                    selectedEmpleado?.fecha_ingreso,
+                                    selectedAlumno?.fecha_ingreso,
                                 ).toLocaleDateString()}
                             </p>
                             <p>
                                 Fecha de egreso:{' '}
-                                {selectedEmpleado?.fecha_egreso
+                                {selectedAlumno?.fecha_egreso
                                     ? new Date(
-                                        selectedEmpleado?.fecha_egreso,
+                                        selectedAlumno?.fecha_egreso,
                                     ).toLocaleDateString()
                                     : 'N/A'}
                             </p>
-                            <p>Nombre: {selectedEmpleado?.nombre}</p>
-                            <p>Apellido: {selectedEmpleado?.apellido}</p>
-                            <p>DNI: {selectedEmpleado?.dni}</p>
-                            <p>CUIL: {selectedEmpleado?.cuil}</p>
+                            <p>Nombre: {selectedAlumno?.nombre}</p>
+                            <p>Apellido: {selectedAlumno?.apellido}</p>
+                            <p>DNI: {selectedAlumno?.dni}</p>
+                            <p>CUIL: {selectedAlumno?.cuil}</p>
                             <p>
                                 Fecha de nacimiento:{' '}
                                 {new Date(
-                                    selectedEmpleado?.fechaNacimiento,
+                                    selectedAlumno?.fechaNacimiento,
                                 ).toLocaleDateString()}
                             </p>
-                            <p>Teléfono: {selectedEmpleado?.telefono}</p>
-                            <p>Teléfono: {selectedEmpleado?.telefono ?? 'No disponible'}</p>
-                            <p>Provincia: {selectedEmpleado?.domocilioUsuario?.provincia ?? 'No disponible'}</p>
-                            <p>Domicilio: {selectedEmpleado?.domocilioUsuario?.domicilio ?? 'No disponible'}</p>
-                            <p>Localidad: {selectedEmpleado?.domocilioUsuario?.localidad ?? 'No disponible'}</p>
-                            <p>Barrio: {selectedEmpleado?.domocilioUsuario?.barrio ?? 'No disponible'}</p>
-                            <p>Calle: {selectedEmpleado?.domocilioUsuario?.calle ?? 'No disponible'}</p>
-                            <p>Número: {selectedEmpleado?.domocilioUsuario?.numero ?? 'No disponible'}</p>
-                            <p>
+                            <p>Teléfono: {selectedAlumno.telefono || 'No disponible'}</p>
+                            {/* <p>Provincia: {selectedEmpleado.domicilioUsuario?.provincia || 'No disponible'}</p> */}
+                            <p>Localidad: {selectedAlumno?.domicilioUsuario?.localidad || 'No disponible'}</p>
+                            <p>Barrio: {selectedAlumno.domicilioUsuario?.barrio || 'No disponible'}</p>
+                            <p>Calle: {selectedAlumno.domicilioUsuario?.calle || 'No disponible'}</p>
+                            <p>Número: {selectedAlumno.domicilioUsuario?.numero || 'No disponible'}</p>
+                            {/* <p>
                                 Estado:{' '}
-                                {selectedEmpleado?.is_active
+                                {selectedAlumno?.is_active
                                     ? 'Activo'
                                     : 'Inactivo'}
-                            </p>
+                            </p> */}
                         </p>
                     )}
                 </Modal.Body>
@@ -456,15 +454,15 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                 </Modal.Header>
 
                 <Modal.Body>
-                    {selectedEmpleado && (
+                    {selectedAlumno && (
 
                         <Form>
                             <Form.Group controlId='formLegajo'>
                                 <Form.Label>Legajo</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.legajo}
-                                    onChange={(e) => { editedEmpleado.legajo = e.target.value }}
+                                    defaultValue={selectedAlumno?.legajo}
+                                    onChange={(e) => { editedAlumno.legajo = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -472,8 +470,8 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Nombre</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.nombre}
-                                    onChange={(e) => { editedEmpleado.nombre = e.target.value }}
+                                    defaultValue={selectedAlumno?.nombre}
+                                    onChange={(e) => { editedAlumno.nombre = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -481,8 +479,8 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Apellido</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.apellido}
-                                    onChange={(e) => { editedEmpleado.apellido = e.target.value }}
+                                    defaultValue={selectedAlumno?.apellido}
+                                    onChange={(e) => { editedAlumno.apellido = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -490,8 +488,8 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>D.N.I:</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.dni}
-                                    onChange={(e) => { editedEmpleado.dni = e.target.value }}
+                                    defaultValue={selectedAlumno?.dni}
+                                    onChange={(e) => { editedAlumno.dni = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -499,8 +497,8 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>C.U.I.L:</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.cuil}
-                                    onChange={(e) => { editedEmpleado.cuil = e.target.value }}
+                                    defaultValue={selectedAlumno?.cuil}
+                                    onChange={(e) => { editedAlumno.cuil = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -508,8 +506,8 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Fecha de Nacimiento</Form.Label>
                                 <Form.Control
                                     type='date'
-                                    defaultValue={selectedEmpleado?.fechaNacimiento}
-                                    onChange={(e) => { editedEmpleado.fechaNacimiento = e.target.value }}
+                                    defaultValue={selectedAlumno?.fechaNacimiento}
+                                    onChange={(e) => { editedAlumno.fechaNacimiento = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -517,8 +515,8 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Telefono</Form.Label>
                                 <Form.Control
                                     type='telefono'
-                                    defaultValue={selectedEmpleado?.telefono}
-                                    onChange={(e) => { editedEmpleado.telefono = e.target.value }}
+                                    defaultValue={selectedAlumno?.telefono}
+                                    onChange={(e) => { editedAlumno.telefono = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -526,8 +524,8 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Email</Form.Label>
                                 <Form.Control
                                     type='email'
-                                    defaultValue={selectedEmpleado?.email}
-                                    onChange={(e) => { editedEmpleado.email = e.target.value }}
+                                    defaultValue={selectedAlumno?.email}
+                                    onChange={(e) => { editedAlumno.email = e.target.value }}
                                 />
                             </Form.Group>
 
@@ -535,9 +533,9 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Localidad</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.domicilioUsuario?.localidad || ''}
+                                    defaultValue={selectedAlumno?.domicilioUsuario?.localidad || ''}
                                     onChange={(e) => {
-                                        setEditedEmpleado((prevState) => ({
+                                        setEditedAlumno((prevState) => ({
                                             ...prevState,
                                             domicilioUsuario: {
                                                 ...prevState.domicilioUsuario,
@@ -553,9 +551,9 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Barrio</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.domicilioUsuario?.barrio || ''}
+                                    defaultValue={selectedAlumno?.domicilioUsuario?.barrio || ''}
                                     onChange={(e) => {
-                                        setEditedEmpleado((prevState) => ({
+                                        setEditedAlumno((prevState) => ({
                                             ...prevState,
                                             domicilioUsuario: {
                                                 ...prevState.domicilioUsuario,
@@ -570,9 +568,9 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Calle</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.domicilioUsuario?.calle || ''}
+                                    defaultValue={selectedAlumno?.domicilioUsuario?.calle || ''}
                                     onChange={(e) => {
-                                        setEditedEmpleado((prevState) => ({
+                                        setEditedAlumno((prevState) => ({
                                             ...prevState,
                                             domicilioUsuario: {
                                                 ...prevState.domicilioUsuario,
@@ -587,9 +585,9 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Numeracion de la calle</Form.Label>
                                 <Form.Control
                                     type='text'
-                                    defaultValue={selectedEmpleado?.domicilioUsuario?.numero || ''}
+                                    defaultValue={selectedAlumno?.domicilioUsuario?.numero || ''}
                                     onChange={(e) => {
-                                        setEditedEmpleado((prevState) => ({
+                                        setEditedAlumno((prevState) => ({
                                             ...prevState,
                                             domicilioUsuario: {
                                                 ...prevState.domicilioUsuario,
@@ -600,7 +598,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 />
                             </Form.Group>
 
-                            <Form.Group controlId='formRoles'>
+                            {/* <Form.Group controlId='formRoles'>
                                 <Form.Label>Roles</Form.Label>
                                 {roles.map((rol) => {
                                     const isChecked = selectedEmpleado?.Roles?.some((r) => r.id === rol.id);
@@ -615,7 +613,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                         />
                                     )
                                 })}
-                            </Form.Group>
+                            </Form.Group> */}
                         </Form>
                     )}
                 </Modal.Body>
