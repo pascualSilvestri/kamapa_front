@@ -1,41 +1,36 @@
 'use client';
 
-import { Curso } from 'model/types';
+import { Asignatura, Curso } from 'model/types';
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
 import { Environment } from 'utils/EnviromenManager';
 
-interface Asignatura {
-    id: number;
-    nombre: string;
-    curso?: Curso;
-}
 
 const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
     const [nombre, setNombre] = useState('');
     const [cursoAsociado, setCursoAsociado] = useState<Curso | undefined>();
     const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
-    const [cursos, setCursos] = useState<Curso[]>([]);
+    // const [cursos, setCursos] = useState<Curso[]>([]);
     const [filtroNombre, setFiltroNombre] = useState('');
     const [filtroCurso, setFiltroCurso] = useState('');
 
     useEffect(() => {
-        fetchCursos();
+        // fetchCursos();
         fetchAsignaturas();
     }, []);
     console.log(asignaturas)
 
-    const fetchCursos = async () => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+    // const fetchCursos = async () => {
+    //     const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`, {
+    //         method: 'GET',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     });
 
-        const cursos = await response.json();
-        setCursos(cursos);
-    };
+    //     const cursos = await response.json();
+    //     setCursos(cursos);
+    // };
 
     const fetchAsignaturas = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaByInstitucion)}${params.id}`, {
@@ -49,14 +44,31 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
         setAsignaturas(asignaturas);
     };
 
-    const handleCrearAsignatura = () => {
+    const handleCrearAsignatura = async () => {
         const nuevaAsignatura: Asignatura = {
             id: asignaturas.length + 1,
             nombre,
-            curso: cursoAsociado || undefined,
         };
-        setAsignaturas([...asignaturas, nuevaAsignatura]);
-        console.log('Asignatura creada:', nuevaAsignatura);
+
+        const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.crearAsignatura)}`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nombre: nuevaAsignatura.nombre,
+                institucionId: params.id
+            })
+        })
+
+        if(res.status !== 200){
+            throw new Error('No se pudo crear la asignatura');
+        }else{
+            const response = await res.json();
+            fetchAsignaturas();
+        }
+
+    
         setNombre('');
         setCursoAsociado(undefined);
     };
@@ -91,24 +103,6 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
                             />
-                        </Form.Group>
-                        <Form.Group className="mb-3" controlId="formCursoAsociado">
-                            <Form.Label>Curso Asociado (opcional)</Form.Label>
-                            <Form.Control
-                                as="select"
-                                value={cursoAsociado ? cursoAsociado.id : ''}
-                                onChange={(e) => {
-                                    const selectedCurso = cursos.find(curso => curso.id === parseInt(e.target.value));
-                                    setCursoAsociado(selectedCurso);
-                                }}
-                            >
-                                <option value="">Seleccionar curso</option>
-                                {cursos.map((curso) => (
-                                    <option key={curso.id} value={curso.id}>
-                                        {curso.nombre}
-                                    </option>
-                                ))}
-                            </Form.Control>
                         </Form.Group>
                         <Button
                             variant="primary"
@@ -148,17 +142,6 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                         />
                     </Form.Group>
                 </Col>
-                <Col md={6}>
-                    <Form.Group className="mb-3" controlId="formFiltroCurso">
-                        <Form.Label>Filtrar por Curso Asociado</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Nombre del curso"
-                            value={filtroCurso}
-                            onChange={(e) => setFiltroCurso(e.target.value)}
-                        />
-                    </Form.Group>
-                </Col>
             </Row>
             <Row>
                 <Col>
@@ -167,7 +150,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                         <thead>
                             <tr>
                                 <th>Nombre</th>
-                                <th>Curso Asociado</th>
+                                
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -175,7 +158,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                             {filteredAsignaturas.map((asignatura) => (
                                 <tr key={asignatura.id}>
                                     <td>{asignatura.nombre}</td>
-                                    <td>{asignatura.curso ? asignatura.curso.nombre : 'No asociado'}</td>
+                                    
                                     <td>
                                         <Button
                                             variant="warning"
