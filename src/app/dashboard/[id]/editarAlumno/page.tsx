@@ -83,34 +83,6 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
     }, [session]);
 
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await fetch(
-    //                 `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion)}${institucionSelected.id}`, {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                     'Authorization': `Bearer ${session.accessToken}`,
-    //                 },
-    //             }
-    //             );
-    //             if (!response.ok) {
-    //                 throw new Error(`Error ${response.status}: ${response.statusText}`);
-    //             }
-
-
-    //             const data = await response.json();
-    //             console.log(data);
-    //             setEmpleados(data.usuarios);
-    //         } catch (error) {
-    //             console.error('Error al obtener empleados:', error.message);
-    //         }
-    //     };
-
-    //     fetchData();
-    // }, [session]);
-
 
     const fetchData = async () => {
         try {
