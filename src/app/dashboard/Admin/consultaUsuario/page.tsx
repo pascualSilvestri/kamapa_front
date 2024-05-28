@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation';
 import { Environment } from '../../../../utils/EnviromenManager';
 import { useInstitucionSelectedContext } from 'context/userContext';
 import Modal from '../../../components/ModalConsultaUser'; // Asegúrate de importar tu componente Modal
-import { Institucion, Roles } from 'model/interfaces';
 import { Form } from 'react-bootstrap';
 import { BsChevronDown } from 'react-icons/bs';
+import { Institucion, Roles } from 'model/types';
 
 const ConsultaUsuarioPage = () => {
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
