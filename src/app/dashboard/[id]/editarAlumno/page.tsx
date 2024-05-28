@@ -9,7 +9,7 @@ import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRol
 import { Environment } from 'utils/EnviromenManager';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 
-const EditarAlumnoPage = () => {
+const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
     const [empleados, setEmpleados] = useState([]);
     const [selectedEmpleado, setSelectedEmpleado] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -48,32 +48,94 @@ const EditarAlumnoPage = () => {
     // FUNCIONES PARA EL Search
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     useEffect(() => {
-        const fetchData = async () => {
+        
+        fetchData();
+    }, [session]);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    useEffect(() => {
+        const fetchRoles = async () => {
             try {
                 const response = await fetch(
-                    `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${session.accessToken}`,
-                        },
-                    }
+                    `${Environment.getEndPoint(Environment.endPoint.roles)}${roles}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.accessToken}`,
+                    },
+                }
                 );
                 if (!response.ok) {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
 
+
                 const data = await response.json();
-                console.log(data);
-                setEmpleados(data.usuarios);
+
+                setRoles(data);
             } catch (error) {
                 console.error('Error al obtener empleados:', error.message);
             }
         };
 
-        fetchData();
-    }, [session, institucionSelected.id]);
+        fetchRoles();
+    }, [session]);
+
+
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetch(
+    //                 `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion)}${institucionSelected.id}`, {
+    //                 method: 'GET',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'Authorization': `Bearer ${session.accessToken}`,
+    //                 },
+    //             }
+    //             );
+    //             if (!response.ok) {
+    //                 throw new Error(`Error ${response.status}: ${response.statusText}`);
+    //             }
+
+
+    //             const data = await response.json();
+    //             console.log(data);
+    //             setEmpleados(data.usuarios);
+    //         } catch (error) {
+    //             console.error('Error al obtener empleados:', error.message);
+    //         }
+    //     };
+
+    //     fetchData();
+    // }, [session]);
+
+
+    const fetchData = async () => {
+        try {
+            const response = await fetch(
+                `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion)}${params.id}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.accessToken}`,
+                    },
+                }
+            );
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            setEmpleados(data.usuarios);
+        } catch (error) {
+            console.error('Error al obtener empleados:', error.message);
+        }
+    };
+
 
     const filteredEmpleados = empleados.filter(empleado =>
         empleado.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -85,64 +147,7 @@ const EditarAlumnoPage = () => {
         setSearchTerm(e.target.value);
     };
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    useEffect(() => {
-        const fetchRoles = async () => {
-            try {
-                const response = await fetch(
-                    `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumno)}${roles}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.accessToken}`,
-                    },
-                }
-                );
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-
-
-                const data = await response.json();
-                console.log(data);
-                setRoles(data);
-            } catch (error) {
-                console.error('Error al obtener empleados:', error.message);
-            }
-        };
-
-        fetchRoles();
-    }, [session]);
-
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(
-                    `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.accessToken}`,
-                    },
-                }
-                );
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-
-
-                const data = await response.json();
-                console.log(data);
-                setEmpleados(data.usuarios);
-            } catch (error) {
-                console.error('Error al obtener empleados:', error.message);
-            }
-        };
-
-        fetchData();
-    }, [session]);
 
     const handleConsultar = (empleado) => {
 

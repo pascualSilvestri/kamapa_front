@@ -52,7 +52,10 @@ export class Environment {
         //url/api/usuario/alumnos
         getUsuarioWhereRolIsNotAlumno: 'api/usuario/empleados/',
         //url/api/usuario/empleados
-        getUsuarioWhereRolIsAlumnoByInstitucion: 'api/usuario/alumnos/',
+        getUsuarioWhereRolIsAlumnoByInstitucion: 'api/usuario/alumno/',
+        /**
+         * @param {string} idInstitucion
+         */
         //url/api/usuario/alumnos/idInstitucion
         getUsuarioWhereRolIsNotAlumnoByIntitucion: 'api/usuario/empleados/',
         //url/api/usuario/empleados/idInstitucion
