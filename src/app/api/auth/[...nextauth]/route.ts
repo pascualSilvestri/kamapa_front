@@ -1,8 +1,8 @@
 import NextAuth  from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { User,Roles, UserSession  } from '../../../../model/interfaces'; // Assuming User, Rol and Session are defined in your interfaces
 import { JWT } from 'next-auth/jwt';
 import { Environment } from 'utils/EnviromenManager';
+import { User } from 'model/types';
 
 
 
