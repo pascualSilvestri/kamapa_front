@@ -175,3 +175,10 @@ export interface Curso {
     division: string;
     institucionId?: string;
 }
+
+
+export interface Asignatura {
+    id: number;
+    nombre: string;
+    curso?: Curso;
+}

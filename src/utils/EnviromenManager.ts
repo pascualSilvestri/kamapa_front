@@ -181,6 +181,14 @@ export class Environment {
             "institucionId": 1
             }
         */
+       crearAsignatura: 'api/asignatura',
+        /**
+         * Crear nueva asignatura
+         * @body {
+            "nombre": "Asignatura 1",
+            "institucionId": 1
+         }
+         */
 
     }
 
