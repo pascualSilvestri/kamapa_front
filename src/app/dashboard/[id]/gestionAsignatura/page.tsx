@@ -2,35 +2,22 @@
 
 import { Asignatura, Curso } from 'model/types';
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Table, Modal } from 'react-bootstrap';
 import { Environment } from 'utils/EnviromenManager';
-
 
 const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
     const [nombre, setNombre] = useState('');
     const [cursoAsociado, setCursoAsociado] = useState<Curso | undefined>();
     const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
-    // const [cursos, setCursos] = useState<Curso[]>([]);
     const [filtroNombre, setFiltroNombre] = useState('');
     const [filtroCurso, setFiltroCurso] = useState('');
+    const [showModalModify, setShowModalModify] = useState(false);
+    const [currentAsignaturaId, setCurrentAsignaturaId] = useState<number | null>(null);
 
     useEffect(() => {
-        // fetchCursos();
         fetchAsignaturas();
     }, []);
-    console.log(asignaturas)
-
-    // const fetchCursos = async () => {
-    //     const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`, {
-    //         method: 'GET',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     });
-
-    //     const cursos = await response.json();
-    //     setCursos(cursos);
-    // };
+    console.log(asignaturas);
 
     const fetchAsignaturas = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaByInstitucion)}${params.id}`, {
@@ -68,18 +55,61 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
             fetchAsignaturas();
         }
 
-    
         setNombre('');
         setCursoAsociado(undefined);
     };
 
     const handleModificarAsignatura = (id: number) => {
-        console.log('Modificar asignatura con ID:', id);
+        const asignatura = asignaturas.find(asig => asig.id === id);
+        if (asignatura) {
+            setNombre(asignatura.nombre);
+            // Asignar otros campos si los hay
+            setCurrentAsignaturaId(id);
+            setShowModalModify(true);
+        }
     };
 
-    const handleEliminarAsignatura = (id: number) => {
-        setAsignaturas(asignaturas.filter(asignatura => asignatura.id !== id));
-        console.log('Eliminar asignatura con ID:', id);
+    const handleSubmitModificarAsignatura = async () => {
+        if (currentAsignaturaId !== null) {
+            const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateAsignatura)}${currentAsignaturaId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombre,
+                    institucionId: params.id
+                })
+            });
+
+            if (res.status !== 200) {
+                throw new Error('No se pudo modificar la asignatura');
+            } else {
+                fetchAsignaturas();
+                setShowModalModify(false);
+                setNombre('');
+                setCurrentAsignaturaId(null);
+            }
+        }
+    };
+
+    const handleEliminarAsignatura = async (id: number) => {
+        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAsignatura)}${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+
+        if (fecth.status !== 200) {
+            alert('Error al crear curso');
+            return;
+        } else {
+            const response = await fecth.json();
+            console.log(response);
+            fetchAsignaturas();
+        }
+        console.log('Eliminar curso con ID:', id);
     };
 
     const filteredAsignaturas = asignaturas.filter(asignatura => {
@@ -150,7 +180,6 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                         <thead>
                             <tr>
                                 <th>Nombre</th>
-                                
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -158,7 +187,6 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                             {filteredAsignaturas.map((asignatura) => (
                                 <tr key={asignatura.id}>
                                     <td>{asignatura.nombre}</td>
-                                    
                                     <td>
                                         <Button
                                             variant="warning"
@@ -180,6 +208,33 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                     </Table>
                 </Col>
             </Row>
+
+            <Modal show={showModalModify} onHide={() => setShowModalModify(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Modificar Asignatura</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group className="mb-3" controlId="formNombreModal">
+                            <Form.Label>Nombre</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Nombre de la asignatura"
+                                value={nombre}
+                                onChange={(e) => setNombre(e.target.value)}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModalModify(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={handleSubmitModificarAsignatura}>
+                        Modificar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };

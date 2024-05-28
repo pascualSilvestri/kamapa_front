@@ -10,7 +10,7 @@ enum environment {
 export class Environment {
 
 
-    private static environment: environment = environment.prov;
+    private static environment: environment = environment.dev;
 
     private static getEnvironment(env: environment): string {
         if (env == environment.prov) {
@@ -171,7 +171,7 @@ export class Environment {
          * @param {int} idInstitucion
            api/asignatura/institucion/idInstitucion
         */
-       createCurso:'api/cursos',
+       createCurso:'api/cursos/',
         /**
          * Crear nuevo curso
          * @body {
@@ -181,7 +181,7 @@ export class Environment {
             "institucionId": 1
             }
         */
-       crearAsignatura: 'api/asignatura',
+       crearAsignatura: 'api/asignatura/',
         /**
          * Crear nueva asignatura
          * @body {
@@ -189,7 +189,35 @@ export class Environment {
             "institucionId": 1
          }
          */
-
+        deleteCurso:'api/cursos/delete/',
+        /**
+         * Eliminar curso
+         * @param {int} cursoId
+         */
+        deleteAsignatura: 'api/asignatura/delete/',
+        /**
+         * Eliminar asignatura
+         * @param {int} asignaturaId
+         */
+        updateAsignatura: 'api/asignatura/update/',
+        /**
+         * Actualizar asignatura
+         * @param {int} asignaturaId
+         * @body {
+            "nombre": "Asignatura 1",
+            "institucionId": 1
+        */
+       updateCursor: 'api/cursos/update/',
+        /**
+         * Actualizar curso
+         * @param {int} cursoId
+         * @body {
+            "nombre": "Curso 1",
+            "nominacion": 1,
+            "division": 1,
+            "institucionId": 1
+        */
+       
     }
 
     public static getEndPoint(endPoint: string): string {

@@ -1,11 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Table, Modal } from 'react-bootstrap';
 import { Environment } from 'utils/EnviromenManager';
 import { Curso } from 'model/types';
-
-
 
 const GestionCursos = ({ params }: { params: { id: string } }) => {
     const [nombre, setNombre] = useState('');
@@ -15,7 +13,8 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     const [filtroNombre, setFiltroNombre] = useState('');
     const [filtroNominacion, setFiltroNominacion] = useState('');
     const [filtroDivision, setFiltroDivision] = useState('');
-
+    const [showModalModify, setShowModalModify] = useState(false);
+    const [currentCursoId, setCurrentCursoId] = useState<number | null>(null);
 
     useEffect(() => {
         fecthCursos();
@@ -27,12 +26,11 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             headers: {
                 'Content-Type': 'application/json'
             }
-        })
+        });
 
         const response = await fecth.json();
         setCursos(response);
-    }
-
+    };
 
     const handleCrearCurso = async () => {
         const nuevoCurso: Curso = {
@@ -53,19 +51,15 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                 division: nuevoCurso.division,
                 institucionId: nuevoCurso.institucionId
             })
-        })
+        });
 
         if (fecth.status !== 200) {
             alert('Error al crear curso');
             return;
         } else {
-
             const response = await fecth.json();
             fecthCursos();
         }
-
-
-
 
         setNombre('');
         setNominacion('');
@@ -73,12 +67,60 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     };
 
     const handleModificarCurso = (id: number) => {
-        console.log('Modificar curso con ID:', id);
+        const curso = cursos.find(curso => curso.id === id);
+        if (curso) {
+            setNombre(curso.nombre);
+            setNominacion(curso.nominacion);
+            setDivision(curso.division);
+            setCurrentCursoId(id);
+            setShowModalModify(true);
+        }
     };
 
-    const handleEliminarCurso = (id: number) => {
-        setCursos(cursos.filter(curso => curso.id !== id));
-        console.log('Eliminar curso con ID:', id);
+    const handleSubmitModificarCurso = async () => {
+        if (currentCursoId !== null) {
+            const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateCursor)}${currentCursoId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombre,
+                    nominacion,
+                    division,
+                    institucionId: params.id
+                })
+            });
+
+            if (res.status !== 200) {
+                throw new Error('No se pudo modificar el curso');
+            } else {
+                fecthCursos();
+                setShowModalModify(false);
+                setNombre('');
+                setNominacion('');
+                setDivision('');
+                setCurrentCursoId(null);
+            }
+        }
+    };
+
+    const handleEliminarCurso = async (id: number) => {
+        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteCurso)}${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (fecth.status !== 200) {
+            alert('Error al eliminar curso');
+            return;
+        } else {
+            const response = await fecth.json();
+            console.log(response);
+            fecthCursos();
+        }
     };
 
     const filteredCursos = cursos.filter(curso => {
@@ -222,6 +264,51 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                     </Table>
                 </Col>
             </Row>
+
+            <Modal show={showModalModify} onHide={() => setShowModalModify(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Modificar Curso</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group className="mb-3" controlId="formNombreModificar">
+                            <Form.Label>Nombre</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Nombre del curso"
+                                value={nombre}
+                                onChange={(e) => setNombre(e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="formNominacionModificar">
+                            <Form.Label>Nominación</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Nominación del curso"
+                                value={nominacion}
+                                onChange={(e) => setNominacion(e.target.value)}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="formDivisionModificar">
+                            <Form.Label>División</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="División del curso"
+                                value={division}
+                                onChange={(e) => setDivision(e.target.value)}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModalModify(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={handleSubmitModificarCurso}>
+                        Guardar Cambios
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };
