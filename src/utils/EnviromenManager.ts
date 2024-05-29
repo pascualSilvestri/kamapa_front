@@ -28,25 +28,25 @@ export class Environment {
         institucion: 'api/institucion/',
         getInstitucionById: 'api/institucion/',
         /*
-       traer institucion por el id
-       url/api/institucion/id
+        traer institucion por el id
+        url/api/institucion/id
        */
         getInstitucionForRolsForUser: 'api/institucion/userRolsInstitucion/',
         /*
         url/api/institucion/userRolsInstitucion/idInstitucion
         {
-          "usuarioId":1
-         }
+            "usuarioId":1
+        }
          */
         usuario: 'api/usuario/',
         /*
         Traer a todos los usuarios
-          url/api/usuario
+            url/api/usuario
         */
         getUsuariosAllByIntitucion: 'api/usuario/institucion/',
         /*
         Traer a todos los usuarios
-          url/api/usuario/institucion/idInstitucion
+            url/api/usuario/institucion/idInstitucion
         */
         getUsuarioWhereRolIsAlumno: 'api/usuario/alumnos/',
         //url/api/usuario/alumnos
@@ -73,7 +73,7 @@ export class Environment {
 
         /** 
          * 
-         {
+            {
         "usuario": {
         "legajo": "123ABC",
         "nombre": "Pascual",
@@ -92,17 +92,17 @@ export class Environment {
         //url/api/usuario/alumno
         /*
         {
-           "idInstitucion":1,
+            "idInstitucion":1,
             "idUsuario":1
         }
         */
         addInstitucion: 'api/usuario/addInstitucion/',
         /*
-         {
-             "usuarioId":4,
-             "institucionId":3,
-             "roles":[1,3,4]
-         }
+            {
+                "usuarioId":4,
+                "institucionId":3,
+                "roles":[1,3,4]
+            }
         */
         changePasswordFirst: 'api/password/changePassword/',
         /** 
@@ -156,22 +156,22 @@ export class Environment {
         /**
          * Trae todos los ciclos lectivos de la institucion seleccionada
          * @param {int} idInstitucion
-           api/cicloElectivo/ciclo/idInstitucion
+            api/cicloElectivo/ciclo/idInstitucion
         */
 
         getCursosByInstitucion: 'api/cursos/institucion/',
         /**
          * Trae todos los cursos de la institucion seleccionada
          * @param {int} idInstitucion
-           api/cursos/institucion/idInstitucion
+            api/cursos/institucion/idInstitucion
         */
-       getAsignaturaByInstitucion: 'api/asignatura/institucion/',
+        getAsignaturaByInstitucion: 'api/asignatura/institucion/',
         /**
          * Trae todas las asignaturas de la institucion seleccionada
          * @param {int} idInstitucion
-           api/asignatura/institucion/idInstitucion
+            api/asignatura/institucion/idInstitucion
         */
-       createCurso:'api/cursos/',
+        createCurso: 'api/cursos/',
         /**
          * Crear nuevo curso
          * @body {
@@ -181,15 +181,15 @@ export class Environment {
             "institucionId": 1
             }
         */
-       crearAsignatura: 'api/asignatura/',
+        crearAsignatura: 'api/asignatura/',
         /**
          * Crear nueva asignatura
          * @body {
             "nombre": "Asignatura 1",
             "institucionId": 1
-         }
+            }
          */
-        deleteCurso:'api/cursos/delete/',
+        deleteCurso: 'api/cursos/delete/',
         /**
          * Eliminar curso
          * @param {int} cursoId
@@ -207,7 +207,7 @@ export class Environment {
             "nombre": "Asignatura 1",
             "institucionId": 1
         */
-       updateCursor: 'api/cursos/update/',
+        updateCursor: 'api/cursos/update/',
         /**
          * Actualizar curso
          * @param {int} cursoId
@@ -217,7 +217,7 @@ export class Environment {
             "division": 1,
             "institucionId": 1
         */
-       
+
     }
 
     public static getEndPoint(endPoint: string): string {
