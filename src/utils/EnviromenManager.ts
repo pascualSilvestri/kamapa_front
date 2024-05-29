@@ -54,7 +54,7 @@ export class Environment {
         //url/api/usuario/empleados
         getUsuarioWhereRolIsAlumnoByInstitucion: 'api/usuario/alumno/',
         /**
-         * @param {string} idInstitucion
+         * @param {int} idInstitucion
          */
         //url/api/usuario/alumnos/idInstitucion
         getUsuarioWhereRolIsNotAlumnoByIntitucion: 'api/usuario/empleados/',
@@ -217,7 +217,21 @@ export class Environment {
             "division": 1,
             "institucionId": 1
         */
-       
+       asociarAsignaturaCurso:'api/asignatura/addAsignaturasToCurso/',
+        /**
+         * Asociar asignaturas a un curso
+         * @body {
+            "asignaturaID": 1
+            "cursoId": 1
+            "usuarioId": 1
+        */
+       getCursosAndAsignaturasByInstitucion:'api/cursos/cursoAndAsignaturaByInstitucion/',
+        /**
+         * Trae todos los cursos y asignaturas de la institucion seleccionada
+         * @param {int} idInstitucion
+           api/cursos/cursoAndAsignaturaByInstitucion/idInstitucion
+        */
+        getProfesoresByInstitucion:'api/usuario/getProfesoresByInstitucion/'
     }
 
     public static getEndPoint(endPoint: string): string {

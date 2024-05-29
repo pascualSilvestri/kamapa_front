@@ -32,10 +32,6 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
     };
 
     const handleCrearAsignatura = async () => {
-        const nuevaAsignatura: Asignatura = {
-            id: asignaturas.length + 1,
-            nombre,
-        };
 
         const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.crearAsignatura)}`,{
             method: 'POST',
@@ -43,7 +39,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                nombre: nuevaAsignatura.nombre,
+                nombre: nombre,
                 institucionId: params.id
             })
         })

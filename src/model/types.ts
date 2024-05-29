@@ -174,11 +174,13 @@ export interface Curso {
     nominacion: string;
     division: string;
     institucionId?: string;
+    asignaturas?: Asignatura[];
 }
 
 
 export interface Asignatura {
-    id: number;
-    nombre: string;
+    id?: number;
+    nombre?: string;
     curso?: Curso;
+    usuarioAsignatura:User[];
 }
