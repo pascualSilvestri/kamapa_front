@@ -15,6 +15,8 @@ export function NavigationAdmin() {
   const router = useRouter();
 	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
+  console.log(session)
+
   useEffect(() => {
     // Si no hay sesión, redirige a la página de inicio de sesión
     if (!session) {
@@ -35,7 +37,7 @@ export function NavigationAdmin() {
             <Navbar.Brand href='#'>
               {/* Logo de KAMAPA */}
               <Image
-                src={institucionSelected.logo || '/Logo.png'}
+                src='/Logo.png'
                 alt='logo'
                 width={50}
                 height={50}
@@ -44,7 +46,7 @@ export function NavigationAdmin() {
                   borderRadius: '50%'
                 }}
               />
-              <h2 className='float-end m-lg-2'>{institucionSelected.nombre}</h2>
+              <h2 className='float-end m-lg-2'>Panel Admin</h2>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
             <Navbar.Offcanvas
@@ -55,14 +57,14 @@ export function NavigationAdmin() {
             >
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title id={`offcanvasNavbarLabel-expand-${expand}`}>
-                  Esc. Sec. José Rudecindo Rojo
+                  Bienvenido { session.user.nombre} {session.user.apellido}
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <hr />
               <Offcanvas.Header className='justify-content-center'>
                 {/* Logo de la Escuela, traer Link de la BD luego */}
                 <Image
-                  src='/LogoJRR.png'
+                  src='/Logo.png'
                   alt='logo'
                   width={100}
                   height={100}
