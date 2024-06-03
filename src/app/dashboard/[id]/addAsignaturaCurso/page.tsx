@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table, Pagination, Modal } from 'react-bootstrap';
 import { Asignatura, Curso, User } from 'model/types';  // Asegúrate de que 'User' esté definido en 'model/types'
@@ -10,17 +11,14 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
     const [cursos, setCursos] = useState<Curso[]>([]);
     const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
     const [cursoAsignado, setCursoAsignado] = useState<Curso | null>(null);
-    // const [asignaturaAsignada, setAsignaturaAsignada] = useState<Asignatura[]>([]);
     const [asignaturaAsignada, setAsignaturaAsignada] = useState<Asignatura>();
     const [profesorAsignado, setProfesorAsignado] = useState<User>();
     const [cursosConAsignaturas, setCursosConAsignaturas] = useState<Curso[]>([]);
     const [profesores, setProfesores] = useState<User[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(3);
+    const [filtroProfesor, setFiltroProfesor] = useState('');
     const [showModalModify, setShowModalModify] = useState(false);
-    
-
-    
 
     useEffect(() => {
         fetchCursos();
@@ -38,14 +36,12 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
     const fetchAsignaturas = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaByInstitucion)}${params.id}`);
         const data = await response.json();
-
         setAsignaturas(Array.isArray(data) ? data : []);
     };
 
     const fetchProfesores = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getProfesoresByInstitucion)}${params.id}`);
         const data = await response.json();
-
         setProfesores(data.usuarios);
     };
 
@@ -57,7 +53,6 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
         }
     };
 
-
     const handleAddAsignatura = () => {
         if (asignatura) {
             const asignaturaSelecte = asignaturas.find(a => a.id.toString() === asignatura);
@@ -68,32 +63,16 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
         }
     };
 
-    // const handleAddAsignatura = () => {
-    //     if (asignatura) {
-    //         const asignaturaSelecte = asignaturas.find(a => a.id.toString() === asignatura);
-    //         if (asignaturaSelecte) {
-    //             setAsignaturaAsignada([...asignaturaAsignada, asignaturaSelecte]);
-    //         }
-    //         setAsignatura('');
-    //     }
-    // };
-
     const handleAddProfesor = (profesorId: number | string) => {
         const profesorSelecte = profesores.find(p => p.id.toString() === profesorId.toString());
         setProfesorAsignado(profesorSelecte);
     };
 
     const handleAsociar = async () => {
-        if (cursoAsignado && asignaturaAsignada) {
+        if (cursoAsignado && asignaturaAsignada && profesorAsignado) {
             const cursoId = cursoAsignado.id;
             const asignaturaId = asignaturaAsignada.id;
             const profesorId = profesorAsignado.id;
-
-            console.log(profesorId);
-            console.log(cursoId);
-            console.log(asignaturaId);
-
-
 
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.asociarAsignaturaCurso)}`, {
                 method: 'POST',
@@ -110,12 +89,8 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
             if (response.status !== 200) {
                 throw new Error('Error al asociar asignaturas, curso y profesor');
             } else {
-                const data = await response.json();
-                console.log(data);
-
+                await response.json();
                 cleandata();
-
-
                 fetchCursosConAsignaturas();
             }
         }
@@ -130,7 +105,6 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
     const fetchCursosConAsignaturas = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosAndAsignaturasByInstitucion)}${params.id}`);
         const data = await response.json();
-        console.log(data);
         setCursosConAsignaturas(Array.isArray(data) ? data : []);
     };
 
@@ -138,15 +112,20 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
         setCurrentPage(pageNumber);
     };
 
-    const handleModificarAsignaturas = () => {
-        setShowModalModify(false);
-    }
+    // Filtrado de profesores según el valor del filtro
+    const filteredProfesores = profesores.filter(profesor => {
+        const fullName = `${profesor.nombre} ${profesor.apellido}`.toLowerCase();
+        return (
+            fullName.includes(filtroProfesor.toLowerCase()) ||
+            profesor.dni.toString().includes(filtroProfesor)
+        );
+    });
 
     // Logic for displaying current professors
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentProfessors = profesores.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(profesores.length / itemsPerPage);
+    const currentProfessors = filteredProfesores.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredProfesores.length / itemsPerPage);
 
     return (
         <Container>
@@ -226,6 +205,15 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
                     <Row>
                         <Col>
                             <h2>Profesores Disponibles</h2>
+                            <Form.Group controlId="filtroProfesor">
+                                <Form.Label>Filtrar Profesores</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Filtrar por nombre, apellido o DNI"
+                                    value={filtroProfesor}
+                                    onChange={(e) => setFiltroProfesor(e.target.value)}
+                                />
+                            </Form.Group>
                             <Table striped bordered hover>
                                 <thead>
                                     <tr>
