@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Table, Modal, Pagination } from 'react-bootstrap';
 import { Environment } from 'utils/EnviromenManager';
 import { Curso } from 'model/types';
 
@@ -15,21 +15,23 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     const [filtroDivision, setFiltroDivision] = useState('');
     const [showModalModify, setShowModalModify] = useState(false);
     const [currentCursoId, setCurrentCursoId] = useState<number | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(3);// Modificar el numero dependiendo cuantos elementos se quiere mostrar en la paginacion
 
     useEffect(() => {
-        fecthCursos();
+        fetchCursos();
     }, []);
 
-    const fecthCursos = async () => {
-        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`, {
+    const fetchCursos = async () => {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
         });
 
-        const response = await fecth.json();
-        setCursos(response);
+        const data = await response.json();
+        setCursos(data);
     };
 
     const handleCrearCurso = async () => {
@@ -40,7 +42,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             division,
             institucionId: params.id,
         };
-        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.createCurso)}`, {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createCurso)}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -53,12 +55,12 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             })
         });
 
-        if (fecth.status !== 200) {
+        if (response.status !== 200) {
             alert('Error al crear curso');
             return;
         } else {
-            const response = await fecth.json();
-            fecthCursos();
+            await response.json();
+            fetchCursos();
         }
 
         setNombre('');
@@ -79,7 +81,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
 
     const handleSubmitModificarCurso = async () => {
         if (currentCursoId !== null) {
-            const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateCursor)}${currentCursoId}`, {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateCursor)}${currentCursoId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -92,10 +94,10 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                 })
             });
 
-            if (res.status !== 200) {
+            if (response.status !== 200) {
                 throw new Error('No se pudo modificar el curso');
             } else {
-                fecthCursos();
+                fetchCursos();
                 setShowModalModify(false);
                 setNombre('');
                 setNominacion('');
@@ -106,23 +108,27 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     };
 
     const handleEliminarCurso = async (id: number) => {
-        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteCurso)}${id}`, {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteCurso)}${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             }
         });
 
-        if (fecth.status !== 200) {
+        if (response.status !== 200) {
             alert('Error al eliminar curso');
             return;
         } else {
-            const response = await fecth.json();
-            console.log(response);
-            fecthCursos();
+            await response.json();
+            fetchCursos();
         }
     };
 
+    const handlePageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
+    };
+
+    // Filtrar cursos según los criterios de filtro
     const filteredCursos = cursos.filter(curso => {
         return (
             (filtroNombre === '' || curso.nombre.toLowerCase().includes(filtroNombre.toLowerCase())) &&
@@ -130,6 +136,12 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             (filtroDivision === '' || curso.division.toLowerCase().includes(filtroDivision.toLowerCase()))
         );
     });
+
+    // Obtener los cursos a mostrar en la página actual
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentCursos = filteredCursos.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredCursos.length / itemsPerPage);
 
     return (
         <Container>
@@ -238,7 +250,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredCursos.map((curso) => (
+                            {currentCursos.map((curso) => (
                                 <tr key={curso.id}>
                                     <td>{curso.nombre}</td>
                                     <td>{curso.nominacion}</td>
@@ -262,6 +274,13 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                             ))}
                         </tbody>
                     </Table>
+                    <Pagination>
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                                {i + 1}
+                            </Pagination.Item>
+                        ))}
+                    </Pagination>
                 </Col>
             </Row>
 

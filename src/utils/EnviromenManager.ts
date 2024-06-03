@@ -21,6 +21,13 @@ export class Environment {
     }
 
 
+    public static getEndPoint(endPoint: string): string {
+        return `${this.getEnvironment(this.environment)}${endPoint}`;
+    }
+
+
+
+
     public static endPoint = {
         login: 'api/auth/login/',
         provincias: 'api/provincia/',
@@ -233,11 +240,6 @@ export class Environment {
         */
         getProfesoresByInstitucion:'api/usuario/getProfesoresByInstitucion/'
     }
-
-    public static getEndPoint(endPoint: string): string {
-        return `${this.getEnvironment(this.environment)}${endPoint}`;
-    }
-
 
 
 

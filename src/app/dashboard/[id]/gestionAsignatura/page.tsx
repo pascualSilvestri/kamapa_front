@@ -2,7 +2,7 @@
 
 import { Asignatura, Curso } from 'model/types';
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Table, Modal, Pagination } from 'react-bootstrap';
 import { Environment } from 'utils/EnviromenManager';
 
 const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
@@ -13,11 +13,12 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
     const [filtroCurso, setFiltroCurso] = useState('');
     const [showModalModify, setShowModalModify] = useState(false);
     const [currentAsignaturaId, setCurrentAsignaturaId] = useState<number | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(3);// Modificar el numero dependiendo cuantos elementos se quiere mostrar en la paginacion
 
     useEffect(() => {
         fetchAsignaturas();
     }, []);
-    console.log(asignaturas);
 
     const fetchAsignaturas = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaByInstitucion)}${params.id}`, {
@@ -32,8 +33,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
     };
 
     const handleCrearAsignatura = async () => {
-
-        const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.crearAsignatura)}`,{
+        const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.crearAsignatura)}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -42,12 +42,12 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                 nombre: nombre,
                 institucionId: params.id
             })
-        })
+        });
 
-        if(res.status !== 200){
+        if (res.status !== 200) {
             throw new Error('No se pudo crear la asignatura');
-        }else{
-            const response = await res.json();
+        } else {
+            await res.json();
             fetchAsignaturas();
         }
 
@@ -90,22 +90,24 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
     };
 
     const handleEliminarAsignatura = async (id: number) => {
-        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAsignatura)}${id}`, {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAsignatura)}${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             }
-        })
+        });
 
-        if (fecth.status !== 200) {
-            alert('Error al crear curso');
+        if (response.status !== 200) {
+            alert('Error al eliminar la asignatura');
             return;
         } else {
-            const response = await fecth.json();
-            console.log(response);
+            await response.json();
             fetchAsignaturas();
         }
-        console.log('Eliminar curso con ID:', id);
+    };
+
+    const handlePageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
     };
 
     const filteredAsignaturas = asignaturas.filter(asignatura => {
@@ -114,6 +116,12 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
             (filtroCurso === '' || (asignatura.curso && asignatura.curso.nombre.toLowerCase().includes(filtroCurso.toLowerCase())))
         );
     });
+
+    // Obtener las asignaturas a mostrar en la página actual
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentAsignaturas = filteredAsignaturas.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredAsignaturas.length / itemsPerPage);
 
     return (
         <Container>
@@ -180,7 +188,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredAsignaturas.map((asignatura) => (
+                            {currentAsignaturas.map((asignatura) => (
                                 <tr key={asignatura.id}>
                                     <td>{asignatura.nombre}</td>
                                     <td>
@@ -202,6 +210,13 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                             ))}
                         </tbody>
                     </Table>
+                    <Pagination>
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                                {i + 1}
+                            </Pagination.Item>
+                        ))}
+                    </Pagination>
                 </Col>
             </Row>
 
