@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { autorizeNivel, autorizeRol } from 'utils/autorizacionPorRoles';
 import { Roles, User } from 'model/types';
 import { useRolesContext, useUserContext } from 'context/userContext';
+import Loading from 'app/components/Loading';
 
 
 
@@ -25,15 +26,31 @@ export default function Page() {
 	const [rol, setRol] = useRolesContext();
 	const [user, setUser] = useUserContext();
 	const router = useRouter();
+	const [rolAdmin, setRolAdmin] = useState<Roles[]>([]);
 
 
 	useEffect(() => {
-		// Si no hay sesión, redirige a la página de inicio de sesión
-		if (!session) {
-			router.push('/login');
-		}
-	}, [router, session]);
+        if (!session) {
+            router.push('/login');
+        } else if (session?.user?.first_session === false) {
+            router.push('/changePassword');
+        } else if (session?.user) {
+            setUser({
+                id: session.user.id,
+                nombre: session.user.nombre,
+                apellido: session.user.apellido,
+                legajo: session.user.legajo,
+                telefono: session.user.telefono,
+                Roles: session.user.Roles,
+                Instituciones: session.user.Instituciones
+            });
+            setRolAdmin(session.user.Roles);
+        }
+    }, [router, session]);
 
+    if (status === 'loading') {
+        return <Loading />;
+    }
 
 
 	console.log(session)
