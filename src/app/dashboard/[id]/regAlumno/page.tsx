@@ -16,7 +16,7 @@ interface Provincia {
     provincia: string;
 }
 
-const RegUsuario = () => {
+const RegAlumno = () => {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [dni, setDni] = useState('');
@@ -95,8 +95,8 @@ const RegUsuario = () => {
                     telefono: telefono,
                     email: email,
                     is_active: true, // O ajusta esto según tus necesidades
-                    create_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
-                    update_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
+                    create_for: session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
+                    update_for:  session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
                     password: dni, // Puedes ajustar esto según tus necesidades
                     institucionId: institucionSelected.id, // Poked
                     // Puedes ajustar esto según tus necesidades
@@ -181,7 +181,7 @@ const RegUsuario = () => {
         setSelectedRoleIds([]);
     };
 
-    const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
 
     return (
@@ -345,15 +345,25 @@ const RegUsuario = () => {
                         <Form.Group >
                             <h1>Nivel de acceso segun el Rol *</h1>
                         </Form.Group>
-
                         <Form.Group controlId='roles'>
                             <Form.Label>Roles *</Form.Label>
                             {Object.keys(roles).filter(rol => {
-                                // Verificar si el usuario de la sesión es Admin
-                                const isAdmin = session.user.Roles.some(role => role.name === 'Admin');
+                                   // Determinar el rol de mayor jerarquía en la sesión del usuario
+                                const highestUserRole = session.user.Roles.reduce((highest, current) => {
+                                    return current.name === 'Admin' ? current.name :
+                                        current.name === 'Director' && highest !== 'Admin' ? current.name :
+                                        current.name === 'Secretario' && highest !== 'Admin' && highest !== 'Director' ? current.name :
+                                        current.name === 'Preceptor' && highest === 'Alumno' ? current.name :
+                                        current.name === 'Docente' && highest === 'Alumno' ? current.name :
+                                        highest;
+                                }, 'Alumno');
 
                                 // Filtrar los roles que se muestran en el formulario
-                                return isAdmin || rol !== 'Admin';
+                                return (highestUserRole === 'Admin' || 
+                                        (highestUserRole === 'Director' && rol !== 'Admin') ||
+                                        (highestUserRole === 'Secretario' && rol !== 'Admin' && rol !== 'Director') ||
+                                        (highestUserRole === 'Preceptor' && rol === 'Alumno') ||
+                                        (highestUserRole === 'Docente' && rol === 'Alumno'));
                             }).map((rol, index) => (
                                 <Form.Check
                                     key={index}
@@ -378,7 +388,7 @@ const RegUsuario = () => {
                         <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
-                                <Link href={`/dashboard/${institucionSelected.id}/consultaUsuario`}>
+                                <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/consultaUsuario`}>
                                     <Button variant='secondary' style={{
                                         padding: '0.4rem 1rem',
                                         fontSize: '1rem',
@@ -493,4 +503,4 @@ const RegUsuario = () => {
     );
 };
 
-export default RegUsuario;
+export default RegAlumno;

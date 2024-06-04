@@ -8,7 +8,7 @@ export const router = {
     'Dirección': { label: 'Dirección', href: '/director' },
     'Preceptores': { label: 'Preceptores', href: '/preceptor' },
     'Profesores': { label: 'Profesores', href: '/profesores' },
-    'Alumnos': { label: 'Alumnos', href: '/alumnos' },
+    'Alumnos': { label: 'Alumnos', href: '/alumno' },
     'EditarAlumnos': { label: 'Editar Alumnos', href: '/editarAlumno' },
     'About': { label: 'About', href: '/about' },
     'CiclosLectivos': { label: 'Ciclos Lectivos', href: '/ciclolectivo' },
