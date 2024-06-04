@@ -69,7 +69,11 @@ const ConsultaUsuarioPage = () => {
             }
             const user = await response.json();
             console.log(user);
-            setUserData(user.usuarios[0]);
+            if (!user.usuarios || user.usuarios.length === 0) {
+                setUserData(null);
+            } else {
+                setUserData(user.usuarios[0]);
+            }
         } catch (error) {
             console.error('Error al buscar usuario:', error);
             setUserData(null);

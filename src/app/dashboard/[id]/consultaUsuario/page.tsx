@@ -19,7 +19,7 @@ const ConsultaUsuarioPage = () => {
     const [rol, setRol] = useRolesContext();
     const [userIsPreseptor, setUserIsPreseptor] = useState(false);
 
-    
+
     useEffect(() => {
         if (rol.some(e => e.name === 'Director' || e.name === 'Secretario')) {
             setUserIsPreseptor(true);
@@ -37,10 +37,16 @@ const ConsultaUsuarioPage = () => {
             }
             const data = await response.json();
             console.log(data);
-            setUserData(data.usuarios[0]);
+            if (!data.usuarios || data.usuarios.length === 0) {
+                setUserData(null);
+            } else {
+                setUserData(data.usuarios[0]);
+            }
             if (data.usuarios.length === 0) {
                 setUserIsNotExists(true);
             }
+
+            
 
         } catch (error) {
             console.error('Error al buscar usuario:', error);
