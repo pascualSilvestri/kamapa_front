@@ -175,6 +175,7 @@ export interface Curso {
     division: string;
     institucionId?: string;
     asignaturas?: Asignatura[];
+    cursosUsuario?: User[];
 }
 
 

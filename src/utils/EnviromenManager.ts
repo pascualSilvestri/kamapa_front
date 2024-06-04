@@ -10,7 +10,7 @@ enum environment {
 export class Environment {
 
 
-    private static environment: environment = environment.prov;
+    private static environment: environment = environment.dev;
 
     private static getEnvironment(env: environment): string {
         if (env == environment.prov) {
@@ -238,7 +238,18 @@ export class Environment {
          * @param {int} idInstitucion
            api/cursos/cursoAndAsignaturaByInstitucion/idInstitucion
         */
-        getProfesoresByInstitucion:'api/usuario/getProfesoresByInstitucion/'
+        getProfesoresByInstitucion:'api/usuario/getProfesoresByInstitucion/',
+
+        addAlumnoToCurso:'api/cursos/addAlumnoToCurso/',
+        /**
+         * Asociar alumno a un curso
+         * @body {
+            "alumnosId": [1,2,3]
+            "cursoId": 1
+            "institucionId": 1
+        */
+        getCursosAllAlumnosByCicloLectivoActivo:'api/cursos/getCursosAllAlumnosByCicloLectivoActivo/',
+            
     }
 
 

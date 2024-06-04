@@ -1,27 +1,35 @@
 'use client'
-import React, { useState } from 'react';
+import { Curso, User } from 'model/types';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Table, Form } from 'react-bootstrap';
+import { Environment } from 'utils/EnviromenManager';
 
-interface Curso {
-    curso: string;
-    alumnos: string[]; // Aquí podrías usar tipos más complejos si es necesario, como objetos de alumno con más detalles
-}
-
-const CursosAlumnos = () => {
-    const cursos: Curso[] = [
-        { curso: 'Curso 1', alumnos: ['Alumno 1', 'Alumno 2'] },
-        { curso: 'Curso 2', alumnos: ['Alumno 3', 'Alumno 4'] },
-    ];
-
+const CursosAlumnos = ({ params }: { params: { id: string } }) => {
+    const [cursos, setCursos] = useState<Curso[]>([]);
     const [filtroAlumno, setFiltroAlumno] = useState<string>('');
+
+    useEffect(() => {
+        fecthCursosAndAlumnos();
+    }, []);
+
+    async function fecthCursosAndAlumnos() {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosAllAlumnosByCicloLectivoActivo)}${params.id}`,{
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'GET',
+        });
+        const data = await response.json();
+        setCursos(data);
+    }
 
     const handleFiltroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFiltroAlumno(e.target.value);
     };
 
-    const filtrarAlumnos = (alumnos: string[], filtro: string): string[] => {
+    const filtrarAlumnos = (alumnos: User[], filtro: string): User[] => {
         return alumnos.filter(alumno =>
-            alumno.toLowerCase().includes(filtro.toLowerCase())
+            alumno.nombre.toLowerCase().includes(filtro.toLowerCase())
         );
     };
 
@@ -48,12 +56,12 @@ const CursosAlumnos = () => {
                         <tbody>
                             {cursos.map((curso, index) => (
                                 <tr key={index}>
-                                    <td>{curso.curso}</td>
+                                    <td>{curso.nombre}</td>
                                     <td>
                                         <ul>
-                                            {filtrarAlumnos(curso.alumnos, filtroAlumno).map(
+                                            {filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(
                                                 (alumno, idx) => (
-                                                    <li key={idx}>{alumno}</li>
+                                                    <li key={idx}>{alumno.nombre}</li>
                                                 )
                                             )}
                                         </ul>

@@ -11,8 +11,8 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
     const [cursos, setCursos] = useState<Curso[]>([]);
     const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
     const [cursoAsignado, setCursoAsignado] = useState<Curso | null>(null);
-    const [asignaturaAsignada, setAsignaturaAsignada] = useState<Asignatura>();
-    const [profesorAsignado, setProfesorAsignado] = useState<User>();
+    const [asignaturaAsignada, setAsignaturaAsignada] = useState<Asignatura>(null);
+    const [profesorAsignado, setProfesorAsignado] = useState<User>(null);
     const [cursosConAsignaturas, setCursosConAsignaturas] = useState<Curso[]>([]);
     const [profesores, setProfesores] = useState<User[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -129,6 +129,75 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
 
     return (
         <Container>
+
+            <Row>
+                <Col>
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>Curso</th>
+                                <th>Asignaturas</th>
+                                <th>Profesor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {cursoAsignado && (
+                                <tr>
+                                    <td>{cursoAsignado.nombre}</td>
+                                    <td>
+                                        {asignaturaAsignada
+                                            ? asignaturaAsignada.nombre
+                                            : 'No asignada'}
+                                    </td>
+                                    <td>
+                                        {profesorAsignado && profesorAsignado.nombre + ' ' + profesorAsignado.apellido}
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </Table>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <Button onClick={handleAsociar} style={{
+                        backgroundColor: 'purple',
+                        color: 'white',
+                        padding: '0.4rem 1rem',
+                        fontSize: '1rem',
+                        transition: 'all 0.3s ease',
+                        marginBottom: '10px',
+                        border: '2px solid purple',
+                        cursor: 'pointer',
+                    }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.color = 'black';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'purple';
+                            e.currentTarget.style.color = 'white';
+                        }}>Asociar</Button>
+                    <Button onClick={cleandata} style={{
+                        backgroundColor: 'purple',
+                        color: 'white',
+                        padding: '0.4rem 1rem',
+                        fontSize: '1rem',
+                        transition: 'all 0.3s ease',
+                        marginBottom: '10px',
+                        border: '2px solid purple',
+                        cursor: 'pointer',
+                    }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.color = 'black';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'purple';
+                            e.currentTarget.style.color = 'white';
+                        }}>Borrar</Button>
+                </Col>
+            </Row>
             <Row>
                 <Col md={6}>
                     <h1>Agregar Asignaturas a Cursos</h1>
@@ -260,74 +329,7 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
                             </Pagination>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col>
-                            <Button onClick={handleAsociar} style={{
-                                backgroundColor: 'purple',
-                                color: 'white',
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease',
-                                marginBottom: '10px',
-                                border: '2px solid purple',
-                                cursor: 'pointer',
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'white';
-                                    e.currentTarget.style.color = 'black';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'purple';
-                                    e.currentTarget.style.color = 'white';
-                                }}>Asociar</Button>
-                            <Button onClick={cleandata} style={{
-                                backgroundColor: 'purple',
-                                color: 'white',
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease',
-                                marginBottom: '10px',
-                                border: '2px solid purple',
-                                cursor: 'pointer',
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'white';
-                                    e.currentTarget.style.color = 'black';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'purple';
-                                    e.currentTarget.style.color = 'white';
-                                }}>Borrar</Button>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <Table striped bordered hover>
-                                <thead>
-                                    <tr>
-                                        <th>Curso</th>
-                                        <th>Asignaturas</th>
-                                        <th>Profesor</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {cursoAsignado && (
-                                        <tr>
-                                            <td>{cursoAsignado.nombre}</td>
-                                            <td>
-                                                {asignaturaAsignada
-                                                    ? asignaturaAsignada.nombre
-                                                    : 'No asignada'}
-                                            </td>
-                                            <td>
-                                                {profesorAsignado && profesorAsignado.nombre + ' ' + profesorAsignado.apellido}
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </Table>
-                        </Col>
-                    </Row>
+
                 </Col>
                 <Col md={6}>
                     <h2>Cursos con Asignaturas y Profesores Asociados</h2>
