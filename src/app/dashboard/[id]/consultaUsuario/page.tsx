@@ -3,14 +3,26 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Environment } from '../../../../utils/EnviromenManager';
 import { useInstitucionSelectedContext } from 'context/userContext';
+import { User } from 'model/types';
+import {useRolesContext} from 'context/userContext';
+import Link from 'next/link';
+
 
 const ConsultaUsuarioPage = () => {
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
     const router = useRouter();
     const [dni, setDNI] = useState('');
-    const [userData, setUserData] = useState(null);
+    const [userData, setUserData] = useState<User>(null);
     const [loading, setLoading] = useState(false);
+    const [userIsNotExists, setUserIsNotExists] = useState(false);
+    const [rol, setRol] = useRolesContext();
+    const [userIsPreseptor, setUserIsPreseptor] = useState(false);
+
+    if (rol.some(e => e.name === 'Preceptor')) {
+        setUserIsPreseptor(true);
+    }
+    
 
     const searchUserByDNI = async (dni) => {
         try {
@@ -21,9 +33,13 @@ const ConsultaUsuarioPage = () => {
             if (!response.ok) {
                 throw new Error('Usuario no encontrado');
             }
-            const userData = await response.json();
-            console.log(userData);
-            setUserData(userData.usuarios[0]);
+            const data = await response.json();
+            console.log(data);
+            setUserData(data.usuarios[0]);
+            if (data.usuarios.length === 0) {
+                setUserIsNotExists(true);
+            }
+            
         } catch (error) {
             console.error('Error al buscar usuario:', error);
             setUserData(null);
@@ -41,12 +57,20 @@ const ConsultaUsuarioPage = () => {
     };
 
     const handleRegisterNewUser = () => {
+
         if (!userData) {
-            router.push(`/dashboard/${institucionSelected.id}/regUsuario`); // Redirecciona a la página de registro de usuario
-        } else {
-            // Lógica para registrar el usuario en la institución
-            console.log('Registrando usuario en esta institución:', userData);
+            // No se encontró usuario, redirigir a registro de nuevo usuario
+            router.push(`/dashboard/${institucionSelected.id}/regUsuario`);
+            return;
         }
+
+        // const isAlumno = userData.Roles.some((role) => role.name === 'Alumno');
+
+        // if (isAlumno) {
+        //     router.push(`/dashboard/${institucionSelected.id}/regAlumno`);
+        // } else {
+        //     router.push(`/dashboard/${institucionSelected.id}/regUsuario`);
+        // }
     };
 
     return (
@@ -66,7 +90,7 @@ const ConsultaUsuarioPage = () => {
                 <p>Buscando usuario...</p>
             ) : (
                 <>
-                    {userData ? (
+                    {userData && (
                         <div>
                             <h2>Datos del Usuario</h2>
                             <p>Nombre: {userData.nombre}</p>
@@ -78,15 +102,22 @@ const ConsultaUsuarioPage = () => {
                                 Registrar en esta Institución
                             </button>
                         </div>
-                    ) : (
+                    )}  {userIsNotExists && (
                         <div>
                             <p>Usuario no encontrado.</p>
                             {/* Este botón se mostrará solo si no se encontró un usuario */}
-                            <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
+                            { !userIsPreseptor && <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
                                 Registrar un nuevo usuario
-                            </button>
+                            </button>}
+                            <br />
+                            <Link href={`/dashboard/${institucionSelected.id}/regAlumno`} >
+                                <button style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
+                                    Registrar Nuevo Alumno
+                                </button>
+                            </Link>
                         </div>
                     )}
+
                 </>
             )}
         </div>

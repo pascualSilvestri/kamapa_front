@@ -95,8 +95,8 @@ const RegAlumno = () => {
                     telefono: telefono,
                     email: email,
                     is_active: true, // O ajusta esto según tus necesidades
-                    create_for: session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
-                    update_for:  session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
+                    create_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
+                    update_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
                     password: dni, // Puedes ajustar esto según tus necesidades
                     institucionId: institucionSelected.id, // Poked
                     // Puedes ajustar esto según tus necesidades
@@ -181,7 +181,7 @@ const RegAlumno = () => {
         setSelectedRoleIds([]);
     };
 
-	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+    const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
 
     return (
@@ -343,28 +343,11 @@ const RegAlumno = () => {
                         </Form.Group>
                         <hr />
                         <Form.Group >
-                            <h1>Nivel de acceso segun el Rol *</h1>
+                            <h1>Nivel Alumno *</h1>
                         </Form.Group>
                         <Form.Group controlId='roles'>
                             <Form.Label>Roles *</Form.Label>
-                            {Object.keys(roles).filter(rol => {
-                                   // Determinar el rol de mayor jerarquía en la sesión del usuario
-                                const highestUserRole = session.user.Roles.reduce((highest, current) => {
-                                    return current.name === 'Admin' ? current.name :
-                                        current.name === 'Director' && highest !== 'Admin' ? current.name :
-                                        current.name === 'Secretario' && highest !== 'Admin' && highest !== 'Director' ? current.name :
-                                        current.name === 'Preceptor' && highest === 'Alumno' ? current.name :
-                                        current.name === 'Docente' && highest === 'Alumno' ? current.name :
-                                        highest;
-                                }, 'Alumno');
-
-                                // Filtrar los roles que se muestran en el formulario
-                                return (highestUserRole === 'Admin' || 
-                                        (highestUserRole === 'Director' && rol !== 'Admin') ||
-                                        (highestUserRole === 'Secretario' && rol !== 'Admin' && rol !== 'Director') ||
-                                        (highestUserRole === 'Preceptor' && rol === 'Alumno') ||
-                                        (highestUserRole === 'Docente' && rol === 'Alumno'));
-                            }).map((rol, index) => (
+                            {Object.keys(roles).filter(rol => rol === 'Alumno').map((rol, index) => (
                                 <Form.Check
                                     key={index}
                                     type="checkbox"
@@ -388,7 +371,7 @@ const RegAlumno = () => {
                         <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
-                                <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/consultaUsuario`}>
+                                <Link href={`/dashboard/${institucionSelected.id}/consultaUsuario`}>
                                     <Button variant='secondary' style={{
                                         padding: '0.4rem 1rem',
                                         fontSize: '1rem',
