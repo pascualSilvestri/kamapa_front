@@ -24,36 +24,33 @@ export default function Page() {
 
 	const { data: session, status } = useSession();
 	const [rol, setRol] = useRolesContext();
-	const [user, setUser] = useUserContext();
+	const [, setUser] = useUserContext();
 	const router = useRouter();
 	const [rolAdmin, setRolAdmin] = useState<Roles[]>([]);
 
 
 	useEffect(() => {
-        if (!session) {
-            router.push('/login');
-        } else if (session?.user?.first_session === false) {
-            router.push('/changePassword');
-        } else if (session?.user) {
-            setUser({
-                id: session.user.id,
-                nombre: session.user.nombre,
-                apellido: session.user.apellido,
-                legajo: session.user.legajo,
-                telefono: session.user.telefono,
-                Roles: session.user.Roles,
-                Instituciones: session.user.Instituciones
-            });
-            setRolAdmin(session.user.Roles);
-        }
-    }, [router, session]);
+		if (!session) {
+		  router.push('/login');
+		} else if (session?.user?.first_session === false) {
+		  router.push('/changePassword');
+		} else if (session?.user) { // Verifica si session.user existe
+		  setUser({
+			id: session.user.id,
+			nombre: session.user.nombre,
+			apellido: session.user.apellido,
+			legajo: session.user.legajo,
+			telefono: session.user.telefono,
+			Roles: session.user.Roles,
+			Instituciones: session.user.Instituciones
+		  });
+		  setRolAdmin(session.user.Roles);
+		}
+	  }, [router, session]);
 
     if (status === 'loading') {
         return <Loading />;
     }
-
-
-	console.log(session)
 
 
 	return (
