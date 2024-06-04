@@ -157,7 +157,7 @@ const ConsultaUsuarioPage = () => {
                 <p>Buscando usuario...</p>
             ) : (
                 <>
-                    {userData ? (
+                    {userData && userData ?(
                         <div>
                             <h2>Datos del Usuario</h2>
                             <p>Nombre: {userData.nombre}</p>

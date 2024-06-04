@@ -78,6 +78,7 @@ export const preceptorAutorizeRouter = [
     'Alumnos',
     'Aulas',
     'About',
+    'RegistroAlumno',
 ]
 
 export const profesorAutorizeRouter = [

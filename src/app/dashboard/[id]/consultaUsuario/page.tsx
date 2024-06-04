@@ -1,10 +1,10 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Environment } from '../../../../utils/EnviromenManager';
 import { useInstitucionSelectedContext } from 'context/userContext';
 import { User } from 'model/types';
-import {useRolesContext} from 'context/userContext';
+import { useRolesContext } from 'context/userContext';
 import Link from 'next/link';
 
 
@@ -19,10 +19,12 @@ const ConsultaUsuarioPage = () => {
     const [rol, setRol] = useRolesContext();
     const [userIsPreseptor, setUserIsPreseptor] = useState(false);
 
-    if (rol.some(e => e.name === 'Preceptor')) {
-        setUserIsPreseptor(true);
-    }
     
+    useEffect(() => {
+        if (rol.some(e => e.name === 'Director' || e.name === 'Secretario')) {
+            setUserIsPreseptor(true);
+        }
+    }, [rol]);
 
     const searchUserByDNI = async (dni) => {
         try {
@@ -39,7 +41,7 @@ const ConsultaUsuarioPage = () => {
             if (data.usuarios.length === 0) {
                 setUserIsNotExists(true);
             }
-            
+
         } catch (error) {
             console.error('Error al buscar usuario:', error);
             setUserData(null);
@@ -106,7 +108,7 @@ const ConsultaUsuarioPage = () => {
                         <div>
                             <p>Usuario no encontrado.</p>
                             {/* Este botón se mostrará solo si no se encontró un usuario */}
-                            { !userIsPreseptor && <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
+                            {userIsPreseptor && <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
                                 Registrar un nuevo usuario
                             </button>}
                             <br />
