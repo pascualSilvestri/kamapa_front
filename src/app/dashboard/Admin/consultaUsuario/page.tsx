@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Environment } from '../../../../utils/EnviromenManager';
@@ -30,14 +30,14 @@ const ConsultaUsuarioPage = () => {
         try {
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.roles)}`);
             if (!response.ok) {
-                throw new Error('Instituciones no encontradas');
+                throw new Error('Roles no encontrados');
             }
 
             const roles = await response.json();
-            console.log(roles)
+            console.log(roles);
             setRoles(roles);
         } catch (error) {
-            console.error('Error al buscar instituciones:', error);
+            console.error('Error al buscar roles:', error);
             setRoles([]);
         }
     }
@@ -50,7 +50,7 @@ const ConsultaUsuarioPage = () => {
             }
 
             const instituciones = await response.json();
-            console.log(instituciones)
+            console.log(instituciones);
             setInstituciones(instituciones);
         } catch (error) {
             console.error('Error al buscar instituciones:', error);
@@ -102,7 +102,6 @@ const ConsultaUsuarioPage = () => {
         setShowModal(false); // Cierra el modal
     };
 
-
     const handleRoleChange = (event) => {
         const roleId = event.target.value;
         if (event.target.checked) {
@@ -131,16 +130,16 @@ const ConsultaUsuarioPage = () => {
                 }),
             });
             if (!response.ok) {
-                throw new Error('Usuario no encontrado');
+                throw new Error('Error al registrar el usuario en la institución');
             }
-            if(response.status === 200){
+            if (response.status === 200) {
                 alert('Usuario registrado exitosamente');
             }
             const data = await response.json();
             console.log(data);
 
-        } catch (e) {
-
+        } catch (error) {
+            console.error('Error al registrar el usuario en la institución:', error);
         }
     };
 
@@ -161,14 +160,13 @@ const ConsultaUsuarioPage = () => {
                 <p>Buscando usuario...</p>
             ) : (
                 <>
-                    {userData && userData ?(
+                    {userData ? (
                         <div>
                             <h2>Datos del Usuario</h2>
                             <p>Nombre: {userData.nombre}</p>
                             <p>Apellido: {userData.apellido}</p>
                             <p>D.N.I: {userData.dni}</p>
                             <p>Telefono: {userData.telefono}</p>
-                            {/* Otros datos del usuario */}
                             <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
                                 Registrar en esta Institución
                             </button>
@@ -176,7 +174,6 @@ const ConsultaUsuarioPage = () => {
                     ) : (
                         <div>
                             <p>Usuario no encontrado.</p>
-                            {/* Este botón se mostrará solo si no se encontró un usuario */}
                             <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
                                 Registrar un nuevo usuario
                             </button>
@@ -185,7 +182,7 @@ const ConsultaUsuarioPage = () => {
                 </>
             )}
 
-            {showModal && (
+            {showModal && userData && (
                 <Modal onClose={handleModalClose}>
                     <h2>Datos del Usuario</h2>
                     <p>Nombre: {userData.nombre}</p>
@@ -217,15 +214,12 @@ const ConsultaUsuarioPage = () => {
                         </Form.Group>
                     )}
 
-
-                    {roles && roles.length > 0 && roles.map((role, index) => {
-                        return (
-                            <label key={index}>
-                                <input type="checkbox" value={role.id} onChange={handleRoleChange} />
-                                {role.name}
-                            </label>
-                        );
-                    })}
+                    {roles && roles.length > 0 && roles.map((role, index) => (
+                        <label key={index}>
+                            <input type="checkbox" value={role.id} onChange={handleRoleChange} />
+                            {role.name}
+                        </label>
+                    ))}
                     <button onClick={handleModalSubmit}>
                         Registrar en esta Institución
                     </button>
