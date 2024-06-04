@@ -4,9 +4,9 @@ import { Institucion, Roles, User } from 'model/types';
 
 // Crear el contexto para el usuario
 // Crear el contexto para el usuario
-const UserContext = createContext<[User, React.Dispatch<React.SetStateAction<User>>] | undefined>(undefined);
-const InstitucionSelectedContext = createContext<[Institucion, React.Dispatch<React.SetStateAction<Institucion>>] | undefined>(undefined);
-const RolesContext = createContext<[Roles[], React.Dispatch<React.SetStateAction<Roles[]>>] | undefined>(undefined);
+const UserContext = createContext<[User, React.Dispatch<React.SetStateAction<User>>] | null>(null);
+const InstitucionSelectedContext = createContext<[Institucion, React.Dispatch<React.SetStateAction<Institucion>>] | null>(null);
+const RolesContext = createContext<[Roles[], React.Dispatch<React.SetStateAction<Roles[]>>] | null>(null);
 
 // Crear el hook personalizado para acceder al contexto del usuario
 export const useUserContext = () => useContext(UserContext);
