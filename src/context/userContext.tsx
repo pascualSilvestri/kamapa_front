@@ -1,22 +1,40 @@
 import React, { createContext, useContext, useState } from 'react';
-
 import { Institucion, Roles, User } from 'model/types';
 
-// Crear el contexto para el usuario
 // Crear el contexto para el usuario
 const UserContext = createContext<[User, React.Dispatch<React.SetStateAction<User>>] | null>(null);
 const InstitucionSelectedContext = createContext<[Institucion, React.Dispatch<React.SetStateAction<Institucion>>] | null>(null);
 const RolesContext = createContext<[Roles[], React.Dispatch<React.SetStateAction<Roles[]>>] | null>(null);
 
 // Crear el hook personalizado para acceder al contexto del usuario
-export const useUserContext = () => useContext(UserContext);
-export const useInstitucionSelectedContext = () => useContext(InstitucionSelectedContext);
-export const useRolesContext = () => useContext(RolesContext);
+export const useUserContext = () => {
+    const context = useContext(UserContext);
+    if (!context) {
+        throw new Error('useUserContext debe ser usado dentro de un UserProvider');
+    }
+    return context;
+};
+
+export const useInstitucionSelectedContext = () => {
+    const context = useContext(InstitucionSelectedContext);
+    if (!context) {
+        throw new Error('useInstitucionSelectedContext debe ser usado dentro de un InstitucionSelectedProvider');
+    }
+    return context;
+};
+
+export const useRolesContext = () => {
+    const context = useContext(RolesContext);
+    if (!context) {
+        throw new Error('useRolesContext debe ser usado dentro de un RolesProvider');
+    }
+    return context;
+};
 
 // Componente proveedor del contexto del usuario
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User>({
-        id:'',
+        id: '',
         nombre: '',
         apellido: '',
         legajo: '',
@@ -24,6 +42,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         Roles: [],
         Instituciones: []
     });
+
     const [institucionSelected, setInstitucionSelected] = useState<Institucion>({
         id: 0,
         cue: '',
@@ -32,12 +51,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: '',
         contacto: '',
     });
-    const [rol, setRol] = useState<Roles[]>([]);
 
-    // Función para actualizar el usuario
-    const updateUser = (newUser: User) => {
-        setUser(newUser);
-    };
+    const [rol, setRol] = useState<Roles[]>([]);
 
     return (
         <UserContext.Provider value={[user, setUser]}>
