@@ -6,9 +6,11 @@ import { Curso, User, Nota } from 'model/types';  // Asegúrate de que 'User', '
 import { Environment } from 'utils/EnviromenManager';
 
 const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
+    const [cursoSeleccionado, setCursoSeleccionado] = useState<string>('');
     const [asignatura, setAsignatura] = useState<string>('');
     const [periodo, setPeriodo] = useState<string>('');
     const [cursos, setCursos] = useState<Curso[]>([]);
+    const [asignaturas, setAsignaturas] = useState<Curso[]>([]);
     const [alumnos, setAlumnos] = useState<User[]>([]);
     const [notas, setNotas] = useState<{ [key: string]: Nota[] }>({});
     const [nota, setNota] = useState<{ [key: string]: string }>({});
@@ -22,6 +24,13 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`);
         const data = await response.json();
         setCursos(Array.isArray(data) ? data : []);
+    };
+
+    const fetchAsignaturas = async (cursoId: string) => {
+        // Reemplaza esta URL con la correcta para obtener las asignaturas por curso
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${cursoId}`);
+        const data = await response.json();
+        setAsignaturas(Array.isArray(data) ? data : []);
     };
 
     const fetchAlumnos = async () => {
@@ -75,15 +84,34 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                     <Row>
                         <Col md={6}>
                             <Form.Group>
+                                <Form.Label>Curso</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    value={cursoSeleccionado}
+                                    onChange={(e) => {
+                                        setCursoSeleccionado(e.target.value);
+                                        fetchAsignaturas(e.target.value);
+                                    }}
+                                >
+                                    <option value="">Seleccionar curso</option>
+                                    {cursos.map((curso) => (
+                                        <option key={curso.id} value={curso.id}>{curso.nombre}</option>
+                                    ))}
+                                </Form.Control>
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group>
                                 <Form.Label>Asignatura</Form.Label>
                                 <Form.Control
                                     as="select"
                                     value={asignatura}
                                     onChange={(e) => setAsignatura(e.target.value)}
+                                    disabled={!cursoSeleccionado}
                                 >
                                     <option value="">Seleccionar asignatura</option>
-                                    {cursos.map((curso) => (
-                                        <option key={curso.id} value={curso.id}>{curso.nombre}</option>
+                                    {asignaturas.map((asignatura) => (
+                                        <option key={asignatura.id} value={asignatura.id}>{asignatura.nombre}</option>
                                     ))}
                                 </Form.Control>
                             </Form.Group>

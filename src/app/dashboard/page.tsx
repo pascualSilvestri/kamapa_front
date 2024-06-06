@@ -1,6 +1,6 @@
 'use client';
 import { useSession, signOut } from 'next-auth/react';
-import { Card, Button, Row, Col, Image, Container } from 'react-bootstrap';
+import { Card, Button, Row, Image, Col, Container } from 'react-bootstrap';
 import Link from 'next/link';
 import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
@@ -9,6 +9,7 @@ import { CicloLectivo, Roles, User } from '../../model/types';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { Environment } from 'utils/EnviromenManager';
 import ButtonAuth from '../components/ButtonAuth';
+
 
 const Dashboard = () => {
     const { data: session, status } = useSession();
@@ -61,7 +62,7 @@ const Dashboard = () => {
                         <Card className='text-center w-100'>
                             <Card.Header>{institucion.nombre}</Card.Header>
                             <div className="d-flex justify-content-center align-items-center" style={{ height: '150px' }}>
-                                <Image src={institucion.logo || '/Logo.png' } alt={institucion.nombre} style={{ width: '100px', height: '100px' }}/>
+                                <Image src={institucion.logo || '/Logo.png' } alt={institucion.nombre} style={{ width: '100px', height: '100px' }} />
                             </div>
                             <Card.Body>
                                 <Link href={`/dashboard/${institucion.id}/bienvenido`}>
