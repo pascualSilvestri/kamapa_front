@@ -185,3 +185,13 @@ export interface Asignatura {
     curso?: Curso;
     usuarioAsignatura:User[];
 }
+
+
+export interface Nota {
+    id: number;
+    nota?: number;
+    fecha?: string;
+    usuarioId?: number;
+    asignaturaId?: number;
+    periodoId?: number;
+}

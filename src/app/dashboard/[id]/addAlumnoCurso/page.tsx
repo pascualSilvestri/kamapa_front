@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Table, Pagination, Modal } from 'react-bootstrap';
 import { Curso, User } from 'model/types';  // Asegúrate de que 'User' y 'Curso' estén definidos en 'model/types'
 import { Environment } from 'utils/EnviromenManager';
 
@@ -13,6 +13,8 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
     const [itemsPerPage] = useState(3);
     const [filtroAlumno, setFiltroAlumno] = useState('');
     const [alumnosAgregados, setAlumnosAgregados] = useState<User[]>([]);
+    const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     useEffect(() => {
         fetchCursos();
@@ -46,23 +48,39 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
         setAlumnosAgregados(alumnosAgregados.filter(a => a.id !== alumnoId));
     };
 
-    const handleShowIds =  async() => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.addAlumnoToCurso)}`,{
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            method: 'POST',
-            body: JSON.stringify({
-                cursoId: curso,
-                alumnoIds: alumnosAgregados.map(a => a.id),
-                institucionId: params.id
-            })
-        });
-        const data = await response.json();
-        console.log(data);
-        console.log('Curso ID:', curso);
-        console.log('Alumnos IDs:', alumnosAgregados.map(a => a.id));
-        console.log('instituciones:', params.id )
+    const handleShowIds = async () => {
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.addAlumnoToCurso)}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    cursoId: curso,
+                    alumnoIds: alumnosAgregados.map(a => a.id),
+                    institucionId: params.id
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.msg || 'Error al agregar alumnos al curso');
+            }
+
+            const data = await response.json();
+            setModalMessage(data.msg);
+            setShowModal(true);
+            setTimeout(() => {
+                setShowModal(false);
+            }, 3000);
+
+        } catch (error) {
+            setModalMessage(error.message);
+            setShowModal(true);
+            setTimeout(() => {
+                setShowModal(false);
+            }, 3000);
+        }
     };
 
     // Filtrado de alumnos según el valor del filtro
@@ -73,7 +91,6 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
             alumno.dni.toString().includes(filtroAlumno)
         );
     });
-    
 
     // Logic for displaying current alumnos
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -241,6 +258,13 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
                     )}
                 </Col>
             </Row>
+
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Mesaje</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{modalMessage}</Modal.Body>
+            </Modal>
         </Container>
     );
 };

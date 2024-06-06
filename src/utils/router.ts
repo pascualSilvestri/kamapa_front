@@ -20,6 +20,7 @@ export const router = {
     'VistaUsuarios': { label: 'Usuarios', href: '/vistausuarios' },
     'resetearPasswordUsuario': { label: 'Resetear contraseña a usuario', href: '/resetPassword' },
     'AddAlumnoCurso': { label: 'Asignar cursos a alumnos', href: '/addAlumnoCurso' },
+    'AddNotaAlumno': { label: 'Agregar nota al alumno', href: '/addNota' },
 
 }
 
@@ -71,7 +72,8 @@ export const profesorAutorizeRouter = [
     'Alumnos',
     'Aulas',
     'About',
-    'Notas',
+    'Notas',    
+    "AddNotaAlumno"
 
 ]
 
