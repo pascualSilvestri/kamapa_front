@@ -34,7 +34,7 @@ const LoginPage = () => {
   return (
 <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
   <Image
-    src="/backLogin.jpg"
+    src="/backLogin5.webp"
     alt="Background"
     layout="fill"
     objectFit="cover"
@@ -51,7 +51,7 @@ const LoginPage = () => {
         />
         </Card.Header>
         <Card.Body>
-          <h2 style={{ color: 'purple' }}>Ingresar</h2>
+          <h2 style={{ color: 'white' }}>Ingresar</h2>
           <form onSubmit={handleSubmit}>
             <input
               type="text"
