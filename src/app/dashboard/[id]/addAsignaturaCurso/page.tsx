@@ -129,7 +129,7 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
 
     return (
         <Container>
-
+<h1>Agregar Asignaturas a Cursos</h1>
             <Row>
                 <Col>
                     <Table striped bordered hover>
@@ -200,7 +200,7 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
             </Row>
             <Row>
                 <Col md={6}>
-                    <h1>Agregar Asignaturas a Cursos</h1>
+                    
                     <Row>
                         <Col>
                             <Form.Group>
