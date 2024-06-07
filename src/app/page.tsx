@@ -30,7 +30,7 @@ function DarkVariantExample() {
 						zIndex: -3,
 					}}>
 					<Image
-						src='/backLogin5.webp'
+						src='/backLogin.jpg'
 						alt='Background'
 						layout='fill'
 						objectFit='cover'
