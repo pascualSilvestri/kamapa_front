@@ -23,6 +23,8 @@ export interface User {
 	Roles?: Roles[];
 	Instituciones ?: Institucion[];
 	accessToken?: string; // Agrega esta línea
+    notas?: Nota[];
+    notasPeriodo?: Nota[];
 }
 
 

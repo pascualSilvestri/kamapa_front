@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
 import { Curso, User, Nota, Periodo } from 'model/types';  // Asegúrate de que 'User', 'Curso' y 'Nota' estén definidos en 'model/types'
@@ -14,17 +13,21 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     const [cursos, setCursos] = useState<Curso[]>([]);
     const [asignaturas, setAsignaturas] = useState<Curso[]>([]);
     const [alumnos, setAlumnos] = useState<User[]>([]);
-    const [notas, setNotas] = useState<{ [key: string]: Nota[] }>({});
     const [nota, setNota] = useState<{ [key: string]: string }>({});
-    const [ user, setUser ] = useUserContext();
+    const [user, setUser] = useUserContext();
     const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
     const [periodos, setPeriodos] = useState<Periodo[]>([]);
 
     useEffect(() => {
         fetchCursos();
-        fetchAlumnos();
         fetchPeriodos();
     }, []);
+
+    useEffect(() => {
+        if (asignatura && cursoSeleccionado) {
+            fetchAlumnos();
+        }
+    }, [asignatura, cursoSeleccionado]);
 
     const fetchCursos = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosForUsuario)}`, {
@@ -33,15 +36,11 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-
                 usuarioId: user.id,
                 institucionId: params.id,
-                
-
             })
         });
         const data = await response.json();
-        console.log(data);
         setCursos(Array.isArray(data) ? data : []);
     };
 
@@ -53,57 +52,57 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
             },
         });
         const data = await response.json();
-        console.log(data);
-        setPeriodo(data);
+        setPeriodos(data);
     };
 
     const fetchAsignaturas = async (cursoId: string) => {
-        // Reemplaza esta URL con la correcta para obtener las asignaturas por curso
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaForCursoByProfesor)}`,{
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaForCursoByProfesor)}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-
                 usuarioId: user.id,
                 institucionId: params.id,
                 cursoId: Number(cursoId),
-
             })
         });
         const data = await response.json();
-        console.log(data);
         setAsignaturas(Array.isArray(data) ? data : []);
     };
 
     const fetchAlumnos = async () => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion)}${params.id}`);
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getNotasByAsignatura)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                asignaturaId: Number(asignatura),
+                cursoId: Number(cursoSeleccionado)
+            })
+        });
         const data = await response.json();
-        setAlumnos(data.usuarios);
+        setAlumnos(data);
     };
 
-    const handleAddNota = (alumnoId: number | string) => {
-        const nuevaNota = parseFloat(nota[alumnoId] || '0');
-        if (!isNaN(nuevaNota)) {
-            const nuevaNotaObj: Nota = {
-                id: Date.now(),  // Genera un ID temporal para la nota
-                nota: nuevaNota,
-                fecha: new Date().toISOString(),
-                usuarioId: Number(alumnoId),
+    const handleAddNota = async (alumnoId: number | string) => {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createNota)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
                 asignaturaId: Number(asignatura),
+                alumnoId: Number(alumnoId),
+                nota: Number(nota[alumnoId]),
                 periodoId: Number(periodo),
-            };
-
-            setNotas(prevNotas => ({
-                ...prevNotas,
-                [alumnoId]: [
-                    ...(prevNotas[alumnoId] || []),
-                    nuevaNotaObj
-                ]
-            }));
-            setNota({ ...nota, [alumnoId]: '' });
-        }
+                institucionId: params.id
+            })
+        });
+        const data = await response.json();
+        console.log(data);
+        fetchAlumnos();
     };
 
     const calcularPromedio = (alumnoNotas: Nota[]) => {
@@ -111,12 +110,12 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
         return (total / alumnoNotas.length).toFixed(2);
     };
 
-    const getNotasPorPeriodo = (alumnoId: number | string, periodoId: number | string) => {
-        return (notas[alumnoId] || []).filter(nota => nota.periodoId === periodoId);
+    const getNotasPorPeriodo = (alumno: User, periodoId: number | string) => {
+        return (alumno.notas || []).filter(nota => nota.periodoId === periodoId);
     };
 
-    const getPeriodos = (alumnoId: number | string) => {
-        const periodosSet = new Set((notas[alumnoId] || []).map(nota => nota.periodoId));
+    const getPeriodos = (alumno: User) => {
+        const periodosSet = new Set((alumno.notas || []).map(nota => nota.periodoId));
         return Array.from(periodosSet);
     };
 
@@ -169,7 +168,6 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                     onChange={(e) => setPeriodo(e.target.value)}
                                 >
                                     <option value="">Seleccionar periodo</option>
-                                    {/* Aquí se deben cargar los periodos lectivos */}
                                     {periodos.map((p) => (
                                         <option key={p.id} value={p.id}>{p.nombre}</option>
                                     ))}
@@ -197,8 +195,15 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                     <td>
                                         <Form.Control
                                             type="number"
+                                            min="0"
+                                            max="10"
                                             value={nota[alumno.id] || ''}
-                                            onChange={(e) => setNota({ ...nota, [alumno.id]: e.target.value })}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
+                                                    setNota({ ...nota, [alumno.id]: value });
+                                                }
+                                            }}
                                         />
                                     </td>
                                     <td>
@@ -230,26 +235,26 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                         <Table bordered>
                                             <thead>
                                                 <tr>
-                                                    {getPeriodos(alumno.id).map((periodoId, index) => (
+                                                    {getPeriodos(alumno).map((periodoId, index) => (
                                                         <th key={index}>{`Periodo ${periodoId}`}</th>
                                                     ))}
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    {getPeriodos(alumno.id).map((periodoId, index) => (
+                                                    {getPeriodos(alumno).map((periodoId, index) => (
                                                         <td key={index}>
                                                             <Table bordered>
                                                                 <thead>
                                                                     <tr>
-                                                                        {(getNotasPorPeriodo(alumno.id, periodoId) || []).map((_, idx) => (
+                                                                        {(getNotasPorPeriodo(alumno, periodoId) || []).map((_, idx) => (
                                                                             <th key={idx}>{`Nota ${idx + 1}`}</th>
                                                                         ))}
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
                                                                     <tr>
-                                                                        {(getNotasPorPeriodo(alumno.id, periodoId) || []).map((nota, idx) => (
+                                                                        {(getNotasPorPeriodo(alumno, periodoId) || []).map((nota, idx) => (
                                                                             <td key={idx}>{nota.nota}</td>
                                                                         ))}
                                                                     </tr>
@@ -262,7 +267,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                         </Table>
                                     </td>
                                     <td>
-                                        {calcularPromedio(notas[alumno.id] || [])}
+                                        {calcularPromedio(alumno.notas || [])}
                                     </td>
                                 </tr>
                             ))}

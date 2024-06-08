@@ -261,6 +261,17 @@ export class Environment {
          * @param {int} idCicloElectivo
             api/cicloElectivo/getPeriodosByCicloElectivo/idCicloElectivo
          */
+        createNota:'api/notas/create/',
+        /**
+         * Crea una nueva nota
+         * @body {
+            "alumnoId": 1,
+            "nota": 10,
+            "periodoId": 1
+            "asignaturaId":1
+        }
+         */
+        getNotasByAsignatura:'api/notas/getNotasByAsignatura/',
             
     }
 
