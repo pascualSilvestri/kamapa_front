@@ -30,10 +30,14 @@ function DarkVariantExample() {
 						zIndex: -3,
 					}}>
 					<Image
-						src='/backLogin5.webp'
-						alt='Background'
-						layout='fill'
-						objectFit='cover'
+						src="/fondoApp.webp"
+						alt="Background"
+						layout="fill"
+						objectFit="cover"
+						style={{
+							zIndex: -3,
+							opacity: 0.5
+						}}
 					/>
 				</div>
 				<Carousel
@@ -44,7 +48,7 @@ function DarkVariantExample() {
 						height: '50vh',
 						zIndex: -1, // Ajusta la propiedad zIndex
 						marginTop: '-40px',
-						
+
 					}}>
 					<Carousel.Item>
 						<Image

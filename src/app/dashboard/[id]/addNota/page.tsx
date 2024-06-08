@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
-import { Curso, User, Nota } from 'model/types';  // Asegúrate de que 'User', 'Curso' y 'Nota' estén definidos en 'model/types'
+import { Curso, User, Nota, Periodo } from 'model/types';  // Asegúrate de que 'User', 'Curso' y 'Nota' estén definidos en 'model/types'
 import { Environment } from 'utils/EnviromenManager';
+import { useUserContext } from 'context/userContext';
+import { useCicloLectivo } from 'context/CicloLectivoContext';
 
 const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     const [cursoSeleccionado, setCursoSeleccionado] = useState<string>('');
@@ -14,22 +16,64 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     const [alumnos, setAlumnos] = useState<User[]>([]);
     const [notas, setNotas] = useState<{ [key: string]: Nota[] }>({});
     const [nota, setNota] = useState<{ [key: string]: string }>({});
+    const [ user, setUser ] = useUserContext();
+    const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
+    const [periodos, setPeriodos] = useState<Periodo[]>([]);
 
     useEffect(() => {
         fetchCursos();
         fetchAlumnos();
+        fetchPeriodos();
     }, []);
 
     const fetchCursos = async () => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`);
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosForUsuario)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+
+                usuarioId: user.id,
+                institucionId: params.id,
+                
+
+            })
+        });
         const data = await response.json();
+        console.log(data);
         setCursos(Array.isArray(data) ? data : []);
+    };
+
+    const fetchPeriodos = async () => {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getPeriodosByCicloElectivo)}${cicloLectivo.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        const data = await response.json();
+        console.log(data);
+        setPeriodo(data);
     };
 
     const fetchAsignaturas = async (cursoId: string) => {
         // Reemplaza esta URL con la correcta para obtener las asignaturas por curso
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${cursoId}`);
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaForCursoByProfesor)}`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+
+                usuarioId: user.id,
+                institucionId: params.id,
+                cursoId: Number(cursoId),
+
+            })
+        });
         const data = await response.json();
+        console.log(data);
         setAsignaturas(Array.isArray(data) ? data : []);
     };
 
@@ -126,8 +170,9 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                 >
                                     <option value="">Seleccionar periodo</option>
                                     {/* Aquí se deben cargar los periodos lectivos */}
-                                    <option value="1">2023-1</option>
-                                    <option value="2">2023-2</option>
+                                    {periodos.map((p) => (
+                                        <option key={p.id} value={p.id}>{p.nombre}</option>
+                                    ))}
                                 </Form.Control>
                             </Form.Group>
                         </Col>

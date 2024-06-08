@@ -10,7 +10,7 @@ enum environment {
 export class Environment {
 
 
-    private static environment: environment = environment.prov;
+    private static environment: environment = environment.dev;
 
     private static getEnvironment(env: environment): string {
         if (env == environment.prov) {
@@ -249,6 +249,18 @@ export class Environment {
             "institucionId": 1
         */
         getCursosAllAlumnosByCicloLectivoActivo:'api/cursos/getCursosAllAlumnosByCicloLectivoActivo/',
+        /**
+         * Trae todos los cursos de un ciclo lectivo activo
+         * 
+         */
+        getCursosForUsuario:'api/cursos/getCursosForUsuario/',
+        getAsignaturaForCursoByProfesor:'api/cursos/getAsignaturaForCursoByProfesor',
+        getPeriodosByCicloElectivo:'api/cicloElectivo/periodos/',
+        /**
+         * Trae todos los periodos de un ciclo electivo
+         * @param {int} idCicloElectivo
+            api/cicloElectivo/getPeriodosByCicloElectivo/idCicloElectivo
+         */
             
     }
 

@@ -34,13 +34,17 @@ const LoginPage = () => {
   return (
 <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
   <Image
-    src="/backLogin5.webp"
+    src="/fondoApp.webp"
     alt="Background"
     layout="fill"
     objectFit="cover"
+    style={{
+      zIndex: -3,
+      opacity: 0.5
+  }}
   />
   <div className="d-flex justify-content-center align-items-center vh-100">
-        <Card className="text-center" style={{ borderRadius: '300px', backgroundColor: 'rgba(255, 255, 255, 0.0)',marginTop:'-200px'  }}>
+        <Card className="text-center" style={{ borderRadius: '100px', backgroundColor: 'rgba(255, 255, 255, 0.8)',marginTop:'-200px'  }}>
         <Card.Header>
         < Image
           src="/Logo.png"
@@ -51,7 +55,7 @@ const LoginPage = () => {
         />
         </Card.Header>
         <Card.Body>
-          <h2 style={{ color: 'white' }}>Ingresar</h2>
+          <h2 style={{ color: 'purple' }}>Ingresar</h2>
           <form onSubmit={handleSubmit}>
             <input
               type="text"
