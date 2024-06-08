@@ -16,7 +16,7 @@ export const router = {
     'RegistroUsuarios': { label: 'Registro de Usuarios', href: '/consultaUsuario' },
     'RegistroAlumno': { label: 'Registro de Alumnos', href: '/consultaUsuario' },
     'Notas': { label: 'Notas', href: '/calificar' },
-    'Calificaciones': { label: 'calificaciones', href: '/calificaciones' },
+    'Calificaciones': { label: 'calificaciones', href: '/consultaNota' },
     'VistaUsuarios': { label: 'Usuarios', href: '/vistausuarios' },
     'resetearPasswordUsuario': { label: 'Resetear contraseña a usuario', href: '/resetPassword' },
     'AddAlumnoCurso': { label: 'Asignar cursos a alumnos', href: '/addAlumnoCurso' },
@@ -82,7 +82,7 @@ export const alumnoAutorizeRouter = [
     'Aulas',
     'About',
     'Calificaciones',
-
+    
 ]
 
 export function getAuthorizedRoutes(router: {}, rolesAutorize: any) {
