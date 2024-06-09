@@ -139,6 +139,7 @@ const ConsultaNota = () => {
             <Row>
                 <Col>
                     <h1>Consulta de Notas</h1>
+                    {/* aqui se puede poner el nombre de curso y division a la que pertenecen estas notas */}
                 </Col>
             </Row>
             <Row>

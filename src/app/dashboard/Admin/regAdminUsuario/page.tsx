@@ -379,7 +379,7 @@ const RegAdminUsuario = () => {
                         <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
-                                <Link href={`/dashboard/admin/adminHome`}>
+                                <Link href={`/dashboard/Admin/adminHome`}>
                                     <Button variant='secondary' style={{
                                         padding: '0.4rem 1rem',
                                         fontSize: '1rem',
