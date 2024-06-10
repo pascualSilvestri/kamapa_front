@@ -74,6 +74,8 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
             const asignaturaId = asignaturaAsignada.id;
             const profesorId = profesorAsignado.id;
 
+            console.log('cursoId:', cursoId, 'asignaturaId:', asignaturaId, 'profesorId:', profesorId);
+
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.asociarAsignaturaCurso)}`, {
                 method: 'POST',
                 headers: {
@@ -87,9 +89,12 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
             });
 
             if (response.status !== 200) {
+                const data = await response.json();
+                console.log(data)
                 throw new Error('Error al asociar asignaturas, curso y profesor');
             } else {
-                await response.json();
+                const data = await response.json();
+                console.log(data)
                 cleandata();
                 fetchCursosConAsignaturas();
             }

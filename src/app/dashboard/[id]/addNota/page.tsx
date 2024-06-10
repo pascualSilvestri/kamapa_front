@@ -37,7 +37,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
             },
             body: JSON.stringify({
                 usuarioId: user.id,
-                institucionId: params.id,
+                cicloLectivoId: cicloLectivo.id,
             })
         });
         const data = await response.json();
@@ -72,19 +72,28 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     };
 
     const fetchAlumnos = async () => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getNotasByAsignatura)}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                asignaturaId: Number(asignatura),
-                cursoId: Number(cursoSeleccionado)
-            })
-        });
-        const data = await response.json();
-        setAlumnos(data);
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getNotasByAsignatura)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    asignaturaId: Number(asignatura),
+                    cursoId: Number(cursoSeleccionado),
+                    cicloLectivoId: Number(cicloLectivo.id),
+                })
+            });
+            const data = await response.json();
+            console.log(data);
+            console.log(data.map(a=>a.usuario));
+            setAlumnos(Array.isArray(data) ? data.map(a=>a.usuario) : []);
+        } catch (error) {
+            console.error('Error fetching alumnos:', error);
+            setAlumnos([]);  // Ensure alumnos is an array in case of error
+        }
     };
+    
 
     const handleAddNota = async (alumnoId: number | string) => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createNota)}`, {
@@ -111,12 +120,20 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     };
 
     const getNotasPorPeriodo = (alumno: User, periodoId: number | string) => {
-        return (alumno.notas || []).filter(nota => nota.periodoId === periodoId);
+        return (alumno.notas || [])
+            .filter(nota => nota.periodoId === periodoId)
+            .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     };
 
     const getPeriodos = (alumno: User) => {
         const periodosSet = new Set((alumno.notas || []).map(nota => nota.periodoId));
-        return Array.from(periodosSet);
+        return Array.from(periodosSet).map(periodoId => {
+            const periodo = periodos.find(p => p.id === periodoId);
+            return {
+                id: periodoId,
+                nombre: periodo ? periodo.nombre : `Periodo ${periodoId}`
+            };
+        });
     };
 
     return (
@@ -188,7 +205,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {alumnos.map(alumno => (
+                            {Array.isArray(alumnos) && alumnos.map(alumno => (
                                 <tr key={alumno.id}>
                                     <td>{alumno.nombre}</td>
                                     <td>{alumno.apellido}</td>
@@ -235,26 +252,26 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                         <Table bordered>
                                             <thead>
                                                 <tr>
-                                                    {getPeriodos(alumno).map((periodoId, index) => (
-                                                        <th key={index}>{`Periodo ${periodoId}`}</th>
+                                                    {getPeriodos(alumno).map((periodo, index) => (
+                                                        <th key={index}>{periodo.nombre}</th>
                                                     ))}
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    {getPeriodos(alumno).map((periodoId, index) => (
+                                                    {getPeriodos(alumno).map((periodo, index) => (
                                                         <td key={index}>
                                                             <Table bordered>
                                                                 <thead>
                                                                     <tr>
-                                                                        {(getNotasPorPeriodo(alumno, periodoId) || []).map((_, idx) => (
+                                                                        {(getNotasPorPeriodo(alumno, periodo.id) || []).map((_, idx) => (
                                                                             <th key={idx}>{`Nota ${idx + 1}`}</th>
                                                                         ))}
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
                                                                     <tr>
-                                                                        {(getNotasPorPeriodo(alumno, periodoId) || []).map((nota, idx) => (
+                                                                        {(getNotasPorPeriodo(alumno, periodo.id) || []).map((nota, idx) => (
                                                                             <td key={idx}>{nota.nota}</td>
                                                                         ))}
                                                                     </tr>

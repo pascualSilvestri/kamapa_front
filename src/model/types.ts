@@ -186,6 +186,8 @@ export interface Asignatura {
     nombre?: string;
     curso?: Curso;
     usuarioAsignatura:User[];
+    notas: Nota[];
+    notasPorPeriodo: { [key: number]: Nota[] };
 }
 
 
@@ -196,4 +198,16 @@ export interface Nota {
     usuarioId?: number;
     asignaturaId?: number;
     periodoId?: number;
+    createdAt?: string;
+    updatedAt?: string;
+    periodo?:Periodo;
+    usuario?: User;
+    asignatura?: Asignatura;
+    tipoNota?: TipoNota;
+}
+
+
+export interface TipoNota{
+    id: number;
+    tipo: string;
 }
