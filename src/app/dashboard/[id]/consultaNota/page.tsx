@@ -321,7 +321,7 @@ interface StyledButtonProps extends ButtonProps {
     variant: 'purple';
 }
 
-const StyledButton = styled(Button)<StyledButtonProps>`
+const StyledButton = styled(Button) <StyledButtonProps>`
     background-color: purple;
     border-color: purple;
     color: white;
