@@ -13,6 +13,7 @@ const ModificarPeriodoPage = () => {
         nombre: '',
         fechaInicio: '',
         fechaFin: '',
+        cicloId: cicloLectivo.id
     });
     const [showModal, setShowModal] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
@@ -26,6 +27,14 @@ const ModificarPeriodoPage = () => {
         // Lógica para cargar el ciclo lectivo activo, si es necesario
         // Aquí podrías llamar a un endpoint para obtener el ciclo lectivo activo
     }, []);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
     const handleChangePeriodo = (e, index) => {
         const { name, value } = e.target;
@@ -50,6 +59,7 @@ const ModificarPeriodoPage = () => {
             nombre: '',
             fechaInicio: '',
             fechaFin: '',
+            cicloId: cicloLectivo.id
         });
     };
 
@@ -70,25 +80,15 @@ const ModificarPeriodoPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log(cicloLectivo);
         setShowConfirmation(true);
     };
 
     const confirmSubmit = async () => {
-        try {
-            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateCicloLectivo)}/${cicloLectivo.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(cicloLectivo),
-            });
-            if (!response.ok) {
-                throw new Error(`Error ${response.status}: ${response.statusText}`);
-            }
-            alert('Ciclo lectivo actualizado exitosamente');
-        } catch (error) {
-            console.error('Error al actualizar ciclo lectivo:', error.message);
-        }
+        cicloLectivo.Periodos.forEach((periodo, index) => {
+            console.log(`Periodo ${index + 1}:`, periodo);
+        });
+        console.log('Nuevo Periodo:', nuevoPeriodo);
         setShowConfirmation(false);
     };
 
@@ -114,7 +114,7 @@ const ModificarPeriodoPage = () => {
                             <Form.Control
                                 type="date"
                                 name="fechaInicio"
-                                value={periodo.fechaInicio}
+                                value={formatDate(periodo.fechaInicio)}
                                 onChange={(e) => handleChangePeriodo(e, index)}
                                 required
                             />
@@ -124,7 +124,7 @@ const ModificarPeriodoPage = () => {
                             <Form.Control
                                 type="date"
                                 name="fechaFin"
-                                value={periodo.fechaFin}
+                                value={formatDate(periodo.fechaFin)}
                                 onChange={(e) => handleChangePeriodo(e, index)}
                                 required
                             />
