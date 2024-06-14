@@ -8,6 +8,7 @@ export const router = {
     'EditarAlumnos': { label: 'Editar Alumnos', href: '/editarAlumno' },
     'CiclosLectivos': { label: 'Ciclos Lectivos', href: '/ciclolectivo' },
     'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo' },
+    'ModificarPeriodos': { label: 'Modificar Periodos', href: '/modificarPeriodos' },
     'GestionCurso': { label: 'Gestion Cursos', href: '/gestionCurso' },
     'AddAsignaturaCurso': { label: 'Agregar Asignatura a  Cursos ', href: '/addAsignaturaCurso' },
     'GestionAsignatura': { label: 'Gestion Asignatura ', href: '/gestionAsignatura' },
@@ -31,6 +32,7 @@ export const adminAutorizeRouter = [
 export const directorAutorizeRouter = [
     'Inicio',
     'CrearCicloLectivo',
+    'ModificarPeriodos',
     'GestionCurso',
     'GestionAsignatura',
     'AddAsignaturaCurso',
@@ -72,7 +74,7 @@ export const profesorAutorizeRouter = [
     'Alumnos',
     'Aulas',
     'About',
-    'Notas',    
+    'Notas',
     "AddNotaAlumno"
 
 ]
@@ -82,7 +84,7 @@ export const alumnoAutorizeRouter = [
     'Aulas',
     'About',
     'Calificaciones',
-    
+
 ]
 
 export function getAuthorizedRoutes(router: {}, rolesAutorize: any) {
