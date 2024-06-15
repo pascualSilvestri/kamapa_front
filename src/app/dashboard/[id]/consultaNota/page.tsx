@@ -111,12 +111,28 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
         const header = document.createElement('div');
         header.style.textAlign = 'center';
         header.innerHTML = `
-            <h1>Documento Único de Evaluación: Educación Secundaria</h1>
-            <p>Escuela: ______________________</p>
-            <p>Estudiante: ______________________</p>
-            <p>Año: ____ Div: ____ DNI: ______________________</p>
-            <p>Modalidad: ______________________</p>
-            <p>Ciclo Lectivo: 20${new Date().getFullYear().toString().slice(-2)}</p>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <img src="${institucionSelected.logo|| '/Logo.png'}" alt="Logo" />
+            <h1 style="text-align: center;">Documento Único de Evaluación: Educación Secundaria</h1>
+            <div style="display: flex; justify-content: flex-end; align-items: flex-end; flex-direction: column;">
+            <p>LIBRO MATRIZ N°:______________</p>
+            <p>FOLIO N°:_____________________</p>
+            </div>
+        </div>
+        <div>
+            <p>Escuela: ${institucionSelected.nombre}</p>
+            <div style="display: flex; justify-content: flex-start; align-items: center; gap: 10px;">
+                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; >Alumno: ${user.apellido} ${user.nombre}</p> 
+                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; >DNI: ${user.dni}</p> 
+            </div>
+            <div style="display: flex; justify-content: flex-start; align-items: center ; gap: 10px;">
+                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; ">Año: 20${new Date().getFullYear().toString().slice(-2)}</p>
+                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; >Div: ________</p>
+                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; >Ciclo Lectivo: 20${new Date().getFullYear().toString().slice(-2)}</p>
+            </div>
+        </div>
+            
+           
         `;
         container.appendChild(header);
 
@@ -127,25 +143,27 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
         table.innerHTML = `
             <thead>
                 <tr>
-                    <th>Espacios Curriculares</th>
-                    <th>1° Cuatrimestre</th>
-                    <th>2° Cuatrimestre</th>
-                    <th>Valoración Final</th>
-                    <th>Fortalecimiento de Diciembre</th>
-                    <th>Firma Profesor</th>
-                    <th>Fortalecimiento de Febrero</th>
-                    <th>Firma Profesor</th>
-                    <th>Valoración Definitiva</th>
+                    <th style="border: 1px solid black; padding: 5px;"><p style="text-align: center;" >Espacios Curriculares</p>
+                    <p style="text-align: center;">O.F.A.E \n/ E.F.P.P \n/ F.T.P</p>
+                    </th>
+                    ${periodos.map(periodo => `<th style="border: 1px solid black; padding: 5px; text-align: center">${periodo.nombre}</th>`).join('')}
+                    <th style="border: 1px solid black; padding: 5px; text-align: center">Calificación Final</th>
+                    <th style="border: 1px solid black; padding: 5px; text-align: center">Periodo de Evaluación \n de Diciembre</th>
+                    <th style="border: 1px solid black; padding: 5px; text-align: center">Evaluación \n Ante Comisión de Febrero</th>
+                    <th style="border: 1px solid black; padding: 5px; text-align: center">Calificación Final</th>
                 </tr>
             </thead>
             <tbody>
                 ${asignaturas.map(asignatura => `
                     <tr>
-                        <td>${asignatura.nombre}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center">${asignatura.nombre}</td>
                         ${periodos.map(periodo => `
-                            <td>${calcularPromedioPorPeriodo(asignatura.notasPorPeriodo[periodo.id])}</td>
+                            <td style="border: 1px solid black; padding: 5px; text-align: center">${calcularPromedioPorPeriodo(asignatura.notasPorPeriodo[periodo.id])}</td>
                         `).join('')}
-                        <td>${calcularPromedioGeneral(asignatura.notasPorPeriodo)}</td>
+                        <td style="border: 1px solid black; padding: 5px; text-align: center">${calcularPromedioGeneral(asignatura.notasPorPeriodo)}</td>
+                        <td style="border: 1px solid black; padding: 5px;   text-align: center"></td>
+                        <td style="border: 1px solid black; padding: 5px;   text-align: center"></td>
+                        <td style="border: 1px solid black; padding: 5px;   text-align: center"></td>
                     </tr>
                 `).join('')}
             </tbody>
@@ -154,6 +172,8 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
 
         return container;
     };
+
+
 
     const exportToPDF = async () => {
         const input = pdfRef.current;
