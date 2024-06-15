@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useCicloLectivo } from 'context/CicloLectivoContext';
 import { useUserContext, useInstitucionSelectedContext, useRolesContext } from 'context/userContext';
-import { Environment } from 'utils/EnviromenManager';
 import { Periodo } from 'model/types';
 import { Container, Row, Col, Form, Button, Modal } from 'react-bootstrap';
+import { Environment } from 'utils/EnviromenManager';
 
 const ModificarPeriodoPage = () => {
     const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
@@ -18,16 +18,18 @@ const ModificarPeriodoPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [periodoToDelete, setPeriodoToDelete] = useState<number | null>(null);
+    const [originalPeriodos, setOriginalPeriodos] = useState<Periodo[]>([]);
 
     const [user, setUser] = useUserContext();
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
     const [roles, setRoles] = useRolesContext();
 
     useEffect(() => {
-        // Lógica para cargar el ciclo lectivo activo, si es necesario
-        // Aquí podrías llamar a un endpoint para obtener el ciclo lectivo activo
+        // Cargar los periodos originales al montar el componente
+        setOriginalPeriodos([...cicloLectivo.Periodos]);
     }, []);
 
+    
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const year = date.getFullYear();
@@ -80,15 +82,68 @@ const ModificarPeriodoPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(cicloLectivo);
         setShowConfirmation(true);
     };
 
+    const getPeriodosDiferenciados = () => {
+        const periodosActuales = cicloLectivo.Periodos;
+        const periodosNuevos = periodosActuales.filter(periodo => periodo.id === 0);
+        const periodosEliminados = originalPeriodos.filter(originalPeriodo => 
+            !periodosActuales.some(periodo => periodo.id === originalPeriodo.id)
+        );
+        const periodosModificados = periodosActuales.filter(periodo => 
+            originalPeriodos.some(originalPeriodo => 
+                originalPeriodo.id === periodo.id && (
+                    originalPeriodo.nombre !== periodo.nombre ||
+                    originalPeriodo.fechaInicio !== periodo.fechaInicio ||
+                    originalPeriodo.fechaFin !== periodo.fechaFin
+                )
+            )
+        );
+
+        return {
+            periodosActuales,
+            periodosNuevos,
+            periodosEliminados,
+            periodosModificados
+        };
+    };
+
     const confirmSubmit = async () => {
-        cicloLectivo.Periodos.forEach((periodo, index) => {
-            console.log(`Periodo ${index + 1}:`, periodo);
+        const { periodosActuales, periodosNuevos, periodosEliminados, periodosModificados } = getPeriodosDiferenciados();
+
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.updatePeriodosForCicloElectivo)}`,{
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                periodosNuevos:periodosNuevos,
+                perdiodosEliminados:periodosEliminados,
+                periodosModificados:periodosModificados,
+                cicloId: cicloLectivo.id
+            })
+        })
+
+        if (response.status === 200) {
+            alert('Los cambios se han guardado correctamente');
+        } else {
+            alert('Ha ocurrido un error al guardar los cambios');
+        }
+
+        const data = await response.json();
+        console.log(data);
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        setCicloLectivo({
+           ...cicloLectivo,
+            Periodos: periodosActuales,
         });
-        console.log('Nuevo Periodo:', nuevoPeriodo);
+
+        // Aquí puedes hacer la lógica para guardar los cambios
         setShowConfirmation(false);
     };
 
