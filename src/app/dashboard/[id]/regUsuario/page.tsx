@@ -198,6 +198,7 @@ const RegUsuario = () => {
                                 placeholder="Nombre"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="apellido">
@@ -207,6 +208,7 @@ const RegUsuario = () => {
                                 placeholder="Apellido"
                                 value={apellido}
                                 onChange={(e) => setApellido(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="dni">
@@ -216,6 +218,7 @@ const RegUsuario = () => {
                                 placeholder="DNI"
                                 value={dni}
                                 onChange={(e) => setDni(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="cuil">
@@ -225,6 +228,7 @@ const RegUsuario = () => {
                                 placeholder="CUIL"
                                 value={cuil}
                                 onChange={(e) => setCuil(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="fechaNacimiento">
@@ -233,6 +237,7 @@ const RegUsuario = () => {
                                 type="date"
                                 value={fechaNacimiento}
                                 onChange={(e) => setFechaNacimiento(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <hr />
@@ -246,6 +251,7 @@ const RegUsuario = () => {
                                 placeholder="Av. Ejemplo de Calle"
                                 value={calle}
                                 onChange={(e) => setCalle(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="numero">
@@ -255,6 +261,7 @@ const RegUsuario = () => {
                                 placeholder="123"
                                 value={numero}
                                 onChange={(e) => setNumero(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="barrio">
@@ -264,6 +271,7 @@ const RegUsuario = () => {
                                 placeholder="Ejemplo: V° Krausen"
                                 value={barrio}
                                 onChange={(e) => setBarrio(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="localidad">
@@ -273,6 +281,7 @@ const RegUsuario = () => {
                                 placeholder="Ejemplo de Localidad: Rawson"
                                 value={localidad}
                                 onChange={(e) => setLocalidad(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="provincias">
@@ -308,6 +317,7 @@ const RegUsuario = () => {
                                 placeholder="2645111111"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="email">
@@ -317,6 +327,7 @@ const RegUsuario = () => {
                                 placeholder="Ejemplo@gmail.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <hr />
@@ -330,6 +341,7 @@ const RegUsuario = () => {
                                 placeholder="Matrícula Profesional"
                                 value={matriculaProfesional}
                                 onChange={(e) => setMatriculaProfesional(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="legajo">
@@ -339,6 +351,7 @@ const RegUsuario = () => {
                                 placeholder="Legajo"
                                 value={legajo}
                                 onChange={(e) => setLegajo(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <hr />

@@ -9,8 +9,6 @@ import Link from 'next/link';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { Environment } from 'utils/EnviromenManager';
 
-
-// Define la interfaz Provincia
 interface Provincia {
     id: string;
     provincia: string;
@@ -46,8 +44,7 @@ const RegAlumno = () => {
     const [user, setUser] = useUserContext();
 
     console.log(session);
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Obtener las provincias de la base de datos para mostrarlos en los select
+
     useEffect(() => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.provincias)}`)
             .then(response => response.json())
@@ -57,35 +54,29 @@ const RegAlumno = () => {
             .catch(error => console.error('Error fetching provinces:', error));
     }, []);
 
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Obtener los roles de la base de datos para mostrarlos en los checkbox
     useEffect(() => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.roles)}`)
             .then(response => response.json())
             .then((data: Roles[]) => {
                 const rolesObj = data.reduce((obj, rol) => {
-                    obj[rol.name] = { checked: false, id: rol.id };
+                    obj[rol.name] = { checked: rol.name === 'Alumno', id: rol.id };
                     return obj;
                 }, {});
 
                 setRoles(rolesObj);
+                setSelectedRoleIds(data.filter(role => role.name === 'Alumno').map(role => role.id));
             })
             .catch(error => console.error('Error fetching provinces:', error));
     }, [rol]);
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///Obtengo los datos del formulario y los envio al backend
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (formValid) {
-            // setShowModal(true);
-
             const formData: UserFormData = {
                 usuario: {
                     legajo: legajo,
                     matricula: matriculaProfesional,
-                    fechaIngreso: new Date().toISOString(), // Puedes ajustar esto según tus necesidades
+                    fechaIngreso: new Date().toISOString(),
                     fechaEgreso: null,
                     nombre: nombre,
                     apellido: apellido,
@@ -94,19 +85,18 @@ const RegAlumno = () => {
                     fechaNacimiento: fechaNacimiento,
                     telefono: telefono,
                     email: email,
-                    is_active: true, // O ajusta esto según tus necesidades
-                    create_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
-                    update_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
-                    password: dni, // Puedes ajustar esto según tus necesidades
-                    institucionId: institucionSelected.id, // Poked
-                    // Puedes ajustar esto según tus necesidades
+                    is_active: true,
+                    create_for: session.user.nombre + ' ' + session.user.apellido,
+                    update_for: session.user.nombre + ' ' + session.user.apellido,
+                    password: dni,
+                    institucionId: institucionSelected.id,
                 },
                 rols: selectedRoleIds,
                 domicilio: {
                     calle: calle,
-                    numero: numero, // Puedes ajustar esto según tus necesidades
-                    barrio: barrio, // Puedes ajustar esto según tus necesidades
-                    localidad: localidad, // Puedes ajustar esto según tus necesidades
+                    numero: numero,
+                    barrio: barrio,
+                    localidad: localidad,
                     provinciaId: provinciaSeleccionada,
                 },
             };
@@ -140,22 +130,74 @@ const RegAlumno = () => {
         }
     };
 
-    // Función para manejar el cierre del modal
     const handleCloseModal = () => {
         setShowModal(false);
-        limpiarCampos(); // Limpia los campos del formulario
+        limpiarCampos();
     };
 
-    // Función para validar el formulario
+    const regexValidations = {
+        nombre: /^[a-zA-Z\s]+$/,
+        apellido: /^[a-zA-Z\s]+$/,
+        dni: /^\d{8}$/,
+        cuil: /^\d{2}-\d{8}-\d{1}$/,
+        telefono: /^\d{10,11}$/,
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        legajo: /^\d+$/,
+        calle: /^[a-zA-Z\s]+$/,
+        numero: /^\d+$/,
+        barrio: /^[a-zA-Z\s]+$/,
+        localidad: /^[a-zA-Z\s]+$/,
+    };
+
     useEffect(() => {
-        if (nombre && apellido && dni && provinciaSeleccionada && telefono && matriculaProfesional && legajo && cuil && fechaNacimiento && email) {
+        const validNombre = regexValidations.nombre.test(nombre);
+        const validApellido = regexValidations.apellido.test(apellido);
+        const validDni = regexValidations.dni.test(dni);
+        const validCuil = regexValidations.cuil.test(cuil);
+        const validTelefono = regexValidations.telefono.test(telefono);
+        const validEmail = regexValidations.email.test(email);
+        const validLegajo = regexValidations.legajo.test(legajo);
+        const validCalle = regexValidations.calle.test(calle);
+        const validNumero = regexValidations.numero.test(numero);
+        const validBarrio = regexValidations.barrio.test(barrio);
+        const validLocalidad = regexValidations.localidad.test(localidad);
+        const validRoles = roles.Alumno?.checked;
+
+        if (
+            validNombre &&
+            validApellido &&
+            validDni &&
+            validCuil &&
+            validTelefono &&
+            validEmail &&
+            validLegajo &&
+            validCalle &&
+            validNumero &&
+            validBarrio &&
+            validLocalidad &&
+            provinciaSeleccionada &&
+            validRoles
+        ) {
             setFormValid(true);
         } else {
             setFormValid(false);
         }
-    }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email]);
+    }, [
+        nombre,
+        apellido,
+        dni,
+        cuil,
+        telefono,
+        email,
+        legajo,
+        calle,
+        numero,
+        barrio,
+        localidad,
+        provinciaSeleccionada,
+        roles
+    ]);
 
-    // Función para limpiar los campos del formulario
     const limpiarCampos = () => {
         setNombre('');
         setApellido('');
@@ -172,17 +214,13 @@ const RegAlumno = () => {
         setFechaNacimiento('');
         setEmail('');
         setRoles({
-            admin: false,
-            director: false,
-            secretario: false,
-            preseptor: false,
-            profesor: false,
+            ...roles,
+            Alumno: { ...roles.Alumno, checked: true },
         });
-        setSelectedRoleIds([]);
+        setSelectedRoleIds([roles.Alumno.id]);
     };
 
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
-
 
     return (
         <Container>
@@ -198,7 +236,12 @@ const RegAlumno = () => {
                                 placeholder="Nombre"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.nombre.test(nombre)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un nombre válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="apellido">
                             <Form.Label>Apellido *</Form.Label>
@@ -207,7 +250,12 @@ const RegAlumno = () => {
                                 placeholder="Apellido"
                                 value={apellido}
                                 onChange={(e) => setApellido(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.apellido.test(apellido)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un apellido válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="dni">
                             <Form.Label>DNI *</Form.Label>
@@ -216,7 +264,12 @@ const RegAlumno = () => {
                                 placeholder="DNI"
                                 value={dni}
                                 onChange={(e) => setDni(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.dni.test(dni)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un DNI válido de 8 dígitos.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="cuil">
                             <Form.Label>CUIL *</Form.Label>
@@ -225,7 +278,12 @@ const RegAlumno = () => {
                                 placeholder="CUIL"
                                 value={cuil}
                                 onChange={(e) => setCuil(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.cuil.test(cuil)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un CUIL válido (Ejemplo: 12-34567890-1).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="fechaNacimiento">
                             <Form.Label>Fecha de Nacimiento *</Form.Label>
@@ -233,10 +291,11 @@ const RegAlumno = () => {
                                 type="date"
                                 value={fechaNacimiento}
                                 onChange={(e) => setFechaNacimiento(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <hr />
-                        <Form.Group >
+                        <Form.Group>
                             <h1>Datos del Domicilio</h1>
                         </Form.Group>
                         <Form.Group controlId="calle">
@@ -246,7 +305,12 @@ const RegAlumno = () => {
                                 placeholder="Av. Ejemplo de Calle"
                                 value={calle}
                                 onChange={(e) => setCalle(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.calle.test(calle)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un nombre de calle válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="numero">
                             <Form.Label>Numero o Altura del Domicilio *</Form.Label>
@@ -255,7 +319,12 @@ const RegAlumno = () => {
                                 placeholder="123"
                                 value={numero}
                                 onChange={(e) => setNumero(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.numero.test(numero)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un número válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="barrio">
                             <Form.Label>Barrio *</Form.Label>
@@ -264,7 +333,12 @@ const RegAlumno = () => {
                                 placeholder="Ejemplo: V° Krausen"
                                 value={barrio}
                                 onChange={(e) => setBarrio(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.barrio.test(barrio)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un nombre de barrio válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="localidad">
                             <Form.Label>Localidad *</Form.Label>
@@ -273,7 +347,12 @@ const RegAlumno = () => {
                                 placeholder="Ejemplo de Localidad: Rawson"
                                 value={localidad}
                                 onChange={(e) => setLocalidad(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.localidad.test(localidad)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un nombre de localidad válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="provincias">
                             <Form.Label>Provincia *</Form.Label>
@@ -282,6 +361,7 @@ const RegAlumno = () => {
                                     as="select"
                                     value={provinciaSeleccionada}
                                     onChange={(e) => setProvinciaSeleccionada(e.target.value)}
+                                    isInvalid={!provinciaSeleccionada}
                                 >
                                     <option value="">Selecciona una provincia</option>
                                     {provincias.map((provincia) => (
@@ -295,10 +375,13 @@ const RegAlumno = () => {
                                         <BsChevronDown />
                                     </span>
                                 </div>
+                                <Form.Control.Feedback type="invalid">
+                                    Seleccione una provincia.
+                                </Form.Control.Feedback>
                             </div>
                         </Form.Group>
                         <hr />
-                        <Form.Group >
+                        <Form.Group>
                             <h1>Datos de Contacto *</h1>
                         </Form.Group>
                         <Form.Group controlId="telefono">
@@ -308,7 +391,12 @@ const RegAlumno = () => {
                                 placeholder="2645111111"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.telefono.test(telefono)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un teléfono válido (10 o 11 dígitos).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="email">
                             <Form.Label>Email *</Form.Label>
@@ -317,19 +405,25 @@ const RegAlumno = () => {
                                 placeholder="Ejemplo@gmail.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.email.test(email)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un email válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <hr />
-                        <Form.Group >
-                            <h1>Datos Institucional *</h1>
+                        <Form.Group>
+                            <h1>Datos Institucionales *</h1>
                         </Form.Group>
                         <Form.Group controlId="matriculaProfesional">
-                            <Form.Label>Matrícula Profesional ( Solo en caso de ser Profesional ).</Form.Label>
+                            <Form.Label>Matrícula Profesional (Solo en caso de ser Profesional)</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Matrícula Profesional"
                                 value={matriculaProfesional}
                                 onChange={(e) => setMatriculaProfesional(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="legajo">
@@ -339,10 +433,15 @@ const RegAlumno = () => {
                                 placeholder="Legajo"
                                 value={legajo}
                                 onChange={(e) => setLegajo(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.legajo.test(legajo)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un legajo válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <hr />
-                        <Form.Group >
+                        <Form.Group>
                             <h1>Nivel Alumno *</h1>
                         </Form.Group>
                         <Form.Group controlId='roles'>
@@ -410,19 +509,18 @@ const RegAlumno = () => {
                         </Form.Group>
                     </Form>
 
-                    {/* Modal para confirmar el registro */}
                     <Modal show={showModal} onHide={handleCloseModal}>
                         <Modal.Header closeButton>
                             <Modal.Title>Confirmar Registro</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            ¿Está seguro que desea registrar a: {nombre} {apellido} con permisos de: {Object.keys(roles).filter(rol => roles[rol]).join(', ')}?
+                            ¿Está seguro que desea registrar a: {nombre} {apellido} con permisos de: {Object.keys(roles).filter(rol => roles[rol].checked).join(', ')}?
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant='secondary' style={{
                                 padding: '0.4rem 1rem',
                                 fontSize: '1rem',
-                                transition: 'all 0.3s ease',
+                                transition: 'all 0.3',
                             }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = 'white';
@@ -450,7 +548,7 @@ const RegAlumno = () => {
                                     e.currentTarget.style.backgroundColor = 'purple';
                                     e.currentTarget.style.color = 'white';
                                 }}
-                                onClick={handleCloseModal}>
+                                onClick={handleSubmit}>
                                 Confirmar Registro
                             </Button>
                         </Modal.Footer>
@@ -461,7 +559,10 @@ const RegAlumno = () => {
                         </Modal.Header>
                         <Modal.Body>{successMessage}</Modal.Body>
                         <Modal.Footer>
-                            <Button variant="purple" onClick={() => setShowSuccessModal(false)}>
+                            <Button variant="purple" onClick={() => {
+                                setShowSuccessModal(false);
+                                limpiarCampos();
+                            }}>
                                 Cerrar
                             </Button>
                         </Modal.Footer>
