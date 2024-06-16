@@ -15,8 +15,11 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     const [filtroDivision, setFiltroDivision] = useState('');
     const [showModalModify, setShowModalModify] = useState(false);
     const [currentCursoId, setCurrentCursoId] = useState<number | null>(null);
+    const [showModalDelete, setShowModalDelete] = useState(false);
+    const [showModalConfirmDelete, setShowModalConfirmDelete] = useState(false);
+    const [cursoToDelete, setCursoToDelete] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(3);// Modificar el numero dependiendo cuantos elementos se quiere mostrar en la paginacion
+    const [itemsPerPage] = useState(3); // Modificar el numero dependiendo cuantos elementos se quiere mostrar en la paginacion
 
     useEffect(() => {
         fetchCursos();
@@ -107,20 +110,34 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
         }
     };
 
-    const handleEliminarCurso = async (id: number) => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteCurso)}${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+    const handleEliminarCurso = (id: number) => {
+        setCursoToDelete(id);
+        setShowModalDelete(true);
+    };
 
-        if (response.status !== 200) {
-            alert('Error al eliminar curso');
-            return;
-        } else {
-            await response.json();
-            fetchCursos();
+    const confirmDeleteCurso = () => {
+        setShowModalDelete(false);
+        setShowModalConfirmDelete(true);
+    };
+
+    const submitDeleteCurso = async () => {
+        if (cursoToDelete !== null) {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteCurso)}${cursoToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.status !== 200) {
+                alert('Error al eliminar curso');
+                return;
+            } else {
+                await response.json();
+                fetchCursos();
+                setShowModalConfirmDelete(false);
+                setCursoToDelete(null);
+            }
         }
     };
 
@@ -325,6 +342,40 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                     </Button>
                     <Button variant="primary" onClick={handleSubmitModificarCurso}>
                         Guardar Cambios
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showModalDelete} onHide={() => setShowModalDelete(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Eliminación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModalDelete(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={confirmDeleteCurso}>
+                        Confirmar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showModalConfirmDelete} onHide={() => setShowModalConfirmDelete(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Eliminar Curso</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás absolutamente seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModalConfirmDelete(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="danger" onClick={submitDeleteCurso}>
+                        Eliminar
                     </Button>
                 </Modal.Footer>
             </Modal>

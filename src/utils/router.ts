@@ -6,7 +6,6 @@ import path from 'path';
 export const router = {
     'Inicio': { label: 'Inicio', href: `/bienvenido` },
     'EditarAlumnos': { label: 'Editar Alumnos', href: '/editarAlumno' },
-    'CiclosLectivos': { label: 'Ciclos Lectivos', href: '/ciclolectivo' },
     'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo' },
     'ModificarPeriodos': { label: 'Modificar Periodos', href: '/modificarPeriodos' },
     'GestionCurso': { label: 'Gestion Cursos', href: '/gestionCurso' },
