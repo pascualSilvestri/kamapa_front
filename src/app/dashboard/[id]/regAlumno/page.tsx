@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
-import { Roles, User, UserFormData } from '../../../../model/types';
+import { User, UserFormData } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -12,6 +12,16 @@ import { Environment } from 'utils/EnviromenManager';
 interface Provincia {
     id: string;
     provincia: string;
+}
+
+interface Role {
+    id: string;
+    name: string;
+    checked: boolean;
+}
+
+interface RolesMap {
+    [key: string]: Role;
 }
 
 const RegAlumno = () => {
@@ -38,10 +48,11 @@ const RegAlumno = () => {
     const [formValid, setFormValid] = useState(false);
 
     const { data: session, status: sessionStatus } = useSession();
-    const [selectedRoleIds, setSelectedRoleIds] = useState([]);
-    const [roles, setRoles] = useState({});
+    const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
+    const [roles, setRoles] = useState<RolesMap>({});
     const [rol, setRol] = useRolesContext();
     const [user, setUser] = useUserContext();
+    const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
     console.log(session);
 
@@ -57,16 +68,16 @@ const RegAlumno = () => {
     useEffect(() => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.roles)}`)
             .then(response => response.json())
-            .then((data: Roles[]) => {
+            .then((data: Role[]) => {
                 const rolesObj = data.reduce((obj, rol) => {
-                    obj[rol.name] = { checked: rol.name === 'Alumno', id: rol.id };
+                    obj[rol.name] = { ...rol, checked: rol.name === 'Alumno' };
                     return obj;
-                }, {});
+                }, {} as RolesMap);
 
                 setRoles(rolesObj);
                 setSelectedRoleIds(data.filter(role => role.name === 'Alumno').map(role => role.id));
             })
-            .catch(error => console.error('Error fetching provinces:', error));
+            .catch(error => console.error('Error fetching roles:', error));
     }, [rol]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -114,7 +125,7 @@ const RegAlumno = () => {
                         body: JSON.stringify(formData),
                     }
                 );
-                console.log(await response.json())
+                console.log(await response.json());
 
                 if (response.ok) {
                     setShowSuccessModal(true);
@@ -131,22 +142,22 @@ const RegAlumno = () => {
     };
 
     const handleCloseModal = () => {
-        setShowModal(false);
-        limpiarCampos();
+        setShowSuccessModal(false);
+        limpiarCampos(); // Limpia los campos del formulario
     };
 
     const regexValidations = {
-        nombre: /^[a-zA-Z\s]+$/,
-        apellido: /^[a-zA-Z\s]+$/,
+        nombre: /^[a-zA-ZñÑ\s]+$/,
+        apellido: /^[a-zA-ZñÑ\s]+$/,
         dni: /^\d{8}$/,
         cuil: /^\d{2}-\d{8}-\d{1}$/,
         telefono: /^\d{10,11}$/,
         email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         legajo: /^\d+$/,
-        calle: /^[a-zA-Z\s]+$/,
+        calle: /^[a-zA-ZñÑ\s]+$/,
         numero: /^\d+$/,
-        barrio: /^[a-zA-Z\s]+$/,
-        localidad: /^[a-zA-Z\s]+$/,
+        barrio: /^[a-zA-ZñÑ\s]+$/,
+        localidad: /^[a-zA-ZñÑ\s]+$/,
     };
 
     useEffect(() => {
@@ -195,7 +206,19 @@ const RegAlumno = () => {
         barrio,
         localidad,
         provinciaSeleccionada,
-        roles
+        roles,
+        regexValidations.nombre,
+        regexValidations.apellido,
+        regexValidations.dni,
+        regexValidations.cuil,
+        regexValidations.telefono,
+        regexValidations.email,
+        regexValidations.legajo,
+        regexValidations.calle,
+        regexValidations.numero,
+        regexValidations.barrio,
+        regexValidations.localidad,
+        roles.Alumno?.checked,
     ]);
 
     const limpiarCampos = () => {
@@ -220,15 +243,18 @@ const RegAlumno = () => {
         setSelectedRoleIds([roles.Alumno.id]);
     };
 
-    const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
-
     return (
         <Container>
             <Row className="justify-content-md-center">
                 <Col md={6}>
                     <h1>Registro de Usuarios</h1>
                     <h3>(Campos Obligatorios *)</h3>
+                    <hr />
                     <Form onSubmit={handleSubmit}>
+                        <Form.Group>
+                            <h3>Datos del Alumno</h3>
+                        </Form.Group>
+                        <hr />
                         <Form.Group controlId="nombre">
                             <Form.Label>Nombre *</Form.Label>
                             <Form.Control
@@ -268,7 +294,7 @@ const RegAlumno = () => {
                                 isInvalid={!regexValidations.dni.test(dni)}
                             />
                             <Form.Control.Feedback type="invalid">
-                                Ingrese un DNI válido de 8 dígitos.
+                                Ingrese un DNI válido.
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="cuil">
@@ -282,7 +308,7 @@ const RegAlumno = () => {
                                 isInvalid={!regexValidations.cuil.test(cuil)}
                             />
                             <Form.Control.Feedback type="invalid">
-                                Ingrese un CUIL válido (Ejemplo: 12-34567890-1).
+                                Ingrese un CUIL válido Ejemplo( 20-00000000-0).
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="fechaNacimiento">
@@ -296,27 +322,28 @@ const RegAlumno = () => {
                         </Form.Group>
                         <hr />
                         <Form.Group>
-                            <h1>Datos del Domicilio</h1>
+                            <h3>Datos de Contacto del Alumno</h3>
                         </Form.Group>
+                        <hr />
                         <Form.Group controlId="calle">
-                            <Form.Label>Nombre de la Calle *</Form.Label>
+                            <Form.Label>Calle *</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Av. Ejemplo de Calle"
+                                placeholder="Calle"
                                 value={calle}
                                 onChange={(e) => setCalle(e.target.value)}
                                 autoComplete='off'
                                 isInvalid={!regexValidations.calle.test(calle)}
                             />
                             <Form.Control.Feedback type="invalid">
-                                Ingrese un nombre de calle válido.
+                                Ingrese una calle válida.
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="numero">
-                            <Form.Label>Numero o Altura del Domicilio *</Form.Label>
+                            <Form.Label>Número *</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="123"
+                                placeholder="Número"
                                 value={numero}
                                 onChange={(e) => setNumero(e.target.value)}
                                 autoComplete='off'
@@ -330,79 +357,69 @@ const RegAlumno = () => {
                             <Form.Label>Barrio *</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Ejemplo: V° Krausen"
+                                placeholder="Barrio"
                                 value={barrio}
                                 onChange={(e) => setBarrio(e.target.value)}
                                 autoComplete='off'
                                 isInvalid={!regexValidations.barrio.test(barrio)}
                             />
                             <Form.Control.Feedback type="invalid">
-                                Ingrese un nombre de barrio válido.
+                                Ingrese un barrio válido.
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="localidad">
                             <Form.Label>Localidad *</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Ejemplo de Localidad: Rawson"
+                                placeholder="Localidad"
                                 value={localidad}
                                 onChange={(e) => setLocalidad(e.target.value)}
                                 autoComplete='off'
                                 isInvalid={!regexValidations.localidad.test(localidad)}
                             />
                             <Form.Control.Feedback type="invalid">
-                                Ingrese un nombre de localidad válido.
+                                Ingrese una localidad válida.
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group controlId="provincias">
+                        <Form.Group controlId="provincia">
                             <Form.Label>Provincia *</Form.Label>
-                            <div className="input-group">
-                                <Form.Control
-                                    as="select"
-                                    value={provinciaSeleccionada}
-                                    onChange={(e) => setProvinciaSeleccionada(e.target.value)}
-                                    isInvalid={!provinciaSeleccionada}
-                                >
-                                    <option value="">Selecciona una provincia</option>
-                                    {provincias.map((provincia) => (
-                                        <option key={provincia.id} value={provincia.id}>
-                                            {provincia.provincia}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                                <div className="input-group-append">
-                                    <span className="input-group-text">
-                                        <BsChevronDown />
-                                    </span>
-                                </div>
-                                <Form.Control.Feedback type="invalid">
-                                    Seleccione una provincia.
-                                </Form.Control.Feedback>
-                            </div>
-                        </Form.Group>
-                        <hr />
-                        <Form.Group>
-                            <h1>Datos de Contacto *</h1>
+                            <Form.Control
+                                as="select"
+                                value={provinciaSeleccionada}
+                                onChange={(e) => setProvinciaSeleccionada(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!provinciaSeleccionada}
+                            >
+                                <option value="">Seleccionar provincia</option>
+                                {provincias.map((provincia) => (
+                                    <option key={provincia.id} value={provincia.id}>
+                                        {provincia.provincia}
+                                    </option>
+                                ))}
+                            </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                Seleccione una provincia.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="telefono">
                             <Form.Label>Teléfono *</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="2645111111"
+                                placeholder="Teléfono"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}
                                 autoComplete='off'
                                 isInvalid={!regexValidations.telefono.test(telefono)}
                             />
                             <Form.Control.Feedback type="invalid">
-                                Ingrese un teléfono válido (10 o 11 dígitos).
+                                Ingrese un teléfono válido.
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="email">
                             <Form.Label>Email *</Form.Label>
                             <Form.Control
                                 type="email"
-                                placeholder="Ejemplo@gmail.com"
+                                placeholder="Email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 autoComplete='off'
@@ -414,18 +431,9 @@ const RegAlumno = () => {
                         </Form.Group>
                         <hr />
                         <Form.Group>
-                            <h1>Datos Institucionales *</h1>
+                            <h3>Datos Institucionales del Alumno</h3>
                         </Form.Group>
-                        <Form.Group controlId="matriculaProfesional">
-                            <Form.Label>Matrícula Profesional (Solo en caso de ser Profesional)</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Matrícula Profesional"
-                                value={matriculaProfesional}
-                                onChange={(e) => setMatriculaProfesional(e.target.value)}
-                                autoComplete='off'
-                            />
-                        </Form.Group>
+                        <hr />
                         <Form.Group controlId="legajo">
                             <Form.Label>Legajo *</Form.Label>
                             <Form.Control
@@ -440,33 +448,32 @@ const RegAlumno = () => {
                                 Ingrese un legajo válido.
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <hr />
-                        <Form.Group>
-                            <h1>Nivel Alumno *</h1>
-                        </Form.Group>
-                        <Form.Group controlId='roles'>
+                        <Form.Group controlId="roles">
                             <Form.Label>Roles *</Form.Label>
-                            {Object.keys(roles).filter(rol => rol === 'Alumno').map((rol, index) => (
-                                <Form.Check
-                                    key={index}
-                                    type="checkbox"
-                                    id={rol}
-                                    label={rol}
-                                    checked={roles[rol].checked}
-                                    onChange={(e) => {
-                                        const isChecked = e.target.checked;
-                                        setRoles({ ...roles, [rol]: { ...roles[rol], checked: isChecked } });
-
-                                        if (isChecked) {
-                                            setSelectedRoleIds([...selectedRoleIds, roles[rol].id]);
-                                        } else {
-                                            setSelectedRoleIds(selectedRoleIds.filter(id => id !== roles[rol].id));
-                                        }
-                                    }}
-                                />
-                            ))}
+                            <div>
+                                {Object.keys(roles).filter((key) => roles[key].name === 'Alumno').map((key) => (
+                                    <Form.Check
+                                        key={roles[key].id}
+                                        type="checkbox"
+                                        id={`role-${roles[key].id}`}
+                                        label={roles[key].name}
+                                        checked={roles[key].checked}
+                                        onChange={() => {
+                                            const updatedRoles = {
+                                                ...roles,
+                                                [key]: { ...roles[key], checked: !roles[key].checked },
+                                            };
+                                            setRoles(updatedRoles);
+                                            setSelectedRoleIds(
+                                                Object.values(updatedRoles)
+                                                    .filter((role) => role.checked)
+                                                    .map((role) => role.id)
+                                            );
+                                        }}
+                                    />
+                                ))}
+                            </div>
                         </Form.Group>
-
                         <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
@@ -508,81 +515,31 @@ const RegAlumno = () => {
                             </div>
                         </Form.Group>
                     </Form>
-
-                    <Modal show={showModal} onHide={handleCloseModal}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Confirmar Registro</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            ¿Está seguro que desea registrar a: {nombre} {apellido} con permisos de: {Object.keys(roles).filter(rol => roles[rol].checked).join(', ')}?
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant='secondary' style={{
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                transition: 'all 0.3',
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'white';
-                                    e.currentTarget.style.color = 'black';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'grey';
-                                    e.currentTarget.style.color = 'white';
-                                }}
-                                onClick={handleCloseModal}>
-                                Cancelar
-                            </Button>
-                            <Button variant='flat' style={{
-                                backgroundColor: 'purple',
-                                color: 'white',
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease',
-                            }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'white';
-                                    e.currentTarget.style.color = 'black';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'purple';
-                                    e.currentTarget.style.color = 'white';
-                                }}
-                                onClick={handleSubmit}>
-                                Confirmar Registro
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-                    <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Éxito</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{successMessage}</Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="purple" onClick={() => {
-                                setShowSuccessModal(false);
-                                limpiarCampos();
-                            }}>
-                                Cerrar
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-
-                    <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Error</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{errorMessage}</Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="danger" onClick={() => setShowErrorModal(false)}>
-                                Cerrar
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
                 </Col>
             </Row>
-            <br />
-            <br />
+            <Modal show={showSuccessModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Registro exitoso</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{successMessage}</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="success" onClick={handleCloseModal}>
+                        Cerrar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showErrorModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Error en el registro</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>{errorMessage}</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="danger" onClick={handleCloseModal}>
+                        Cerrar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };
