@@ -30,25 +30,34 @@ function DarkVariantExample() {
 						zIndex: -3,
 					}}>
 					<Image
-						src='/backLogin.jpg'
-						alt='Background'
-						layout='fill'
-						objectFit='cover'
+						src="/fondoApp.webp"
+						alt="Background"
+						layout="fill"
+						objectFit="cover"
+						style={{
+							zIndex: -3,
+							opacity: 0.5
+						}}
 					/>
 				</div>
 				<Carousel
 					data-bs-theme='dark'
 					style={{
 						backgroundColor: 'transparent',
-						width: '50vw',
+						width: '500px',
 						height: '50vh',
 						zIndex: -1, // Ajusta la propiedad zIndex
+						marginTop: '-40px',
+
 					}}>
 					<Carousel.Item>
 						<Image
 							src={Bienvenida2}
 							className='d-block w-100'
 							alt='Third slide'
+							style={{
+								borderRadius: '300px'
+							}}
 						/>
 					</Carousel.Item>
 					<Carousel.Item>
@@ -56,6 +65,9 @@ function DarkVariantExample() {
 							src={Bienvenida2}
 							className='d-block w-100'
 							alt='Third slide'
+							style={{
+								borderRadius: '300px'
+							}}
 						/>
 					</Carousel.Item>
 					<Carousel.Item>
@@ -63,6 +75,9 @@ function DarkVariantExample() {
 							src={Bienvenida2}
 							className='d-block w-100'
 							alt='Third slide'
+							style={{
+								borderRadius: '300px'
+							}}
 						/>
 					</Carousel.Item>
 				</Carousel>

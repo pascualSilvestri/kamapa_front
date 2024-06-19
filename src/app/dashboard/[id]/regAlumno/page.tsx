@@ -1,25 +1,30 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
-import { Institucion, Roles, User, UserFormData } from '../../../../model/types';
+import { User, UserFormData } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { Environment } from 'utils/EnviromenManager';
 
-// Define la interfaz Provincia
 interface Provincia {
     id: string;
     provincia: string;
 }
 
-const RegAdminUsuario = () => {
+interface Role {
+    id: string;
+    name: string;
+    checked: boolean;
+}
 
-    const [instituciones, setInstituciones] = useState([]);
-    const [institucionSeleccionada, setInstitucionSeleccionada] = useState('');
+interface RolesMap {
+    [key: string]: Role;
+}
 
+const RegAlumno = () => {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [dni, setDni] = useState('');
@@ -43,15 +48,14 @@ const RegAdminUsuario = () => {
     const [formValid, setFormValid] = useState(false);
 
     const { data: session, status: sessionStatus } = useSession();
-    const [selectedRoleIds, setSelectedRoleIds] = useState([]);
-    const [roles, setRoles] = useState({});
+    const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
+    const [roles, setRoles] = useState<RolesMap>({});
     const [rol, setRol] = useRolesContext();
     const [user, setUser] = useUserContext();
+    const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
     console.log(session);
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Obtener las provincias de la base de datos para mostrarlas en el select
     useEffect(() => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.provincias)}`)
             .then(response => response.json())
@@ -60,38 +64,22 @@ const RegAdminUsuario = () => {
             })
             .catch(error => console.error('Error fetching provinces:', error));
     }, []);
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Obtener las instituciones de la base de datos
-    useEffect(() => {
-        fetch(`${Environment.getEndPoint(Environment.endPoint.institucion)}`)
-            .then(response => response.json())
-            .then((data) => {
-                console.log(data);
-                setInstituciones(data);
-            })
-            .catch(error => console.error('Error fetching institutions:', error));
-    }, []);
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Obtener los roles de la base de datos para mostrarlos en los checkbox
     useEffect(() => {
         fetch(`${Environment.getEndPoint(Environment.endPoint.roles)}`)
             .then(response => response.json())
-            .then((data: Roles[]) => {
-                console.log(data)
+            .then((data: Role[]) => {
                 const rolesObj = data.reduce((obj, rol) => {
-                    obj[rol.name] = { checked: false, id: rol.id };
+                    obj[rol.name] = { ...rol, checked: rol.name === 'Alumno' };
                     return obj;
-                }, {});
+                }, {} as RolesMap);
 
                 setRoles(rolesObj);
+                setSelectedRoleIds(data.filter(role => role.name === 'Alumno').map(role => role.id));
             })
-            .catch(error => console.error('Error fetching provinces:', error));
+            .catch(error => console.error('Error fetching roles:', error));
     }, [rol]);
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Obtengo los datos del formulario y los envio al backend
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (formValid) {
@@ -99,7 +87,7 @@ const RegAdminUsuario = () => {
                 usuario: {
                     legajo: legajo,
                     matricula: matriculaProfesional,
-                    fechaIngreso: new Date().toISOString(), // Puedes ajustar esto según tus necesidades
+                    fechaIngreso: new Date().toISOString(),
                     fechaEgreso: null,
                     nombre: nombre,
                     apellido: apellido,
@@ -108,18 +96,18 @@ const RegAdminUsuario = () => {
                     fechaNacimiento: fechaNacimiento,
                     telefono: telefono,
                     email: email,
-                    is_active: true, // O ajusta esto según tus necesidades
-                    create_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
-                    update_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
-                    password: dni, // Puedes ajustar esto según tus necesidades
-                    institucionId: parseInt(institucionSeleccionada), // Cambiado para usar el id de la institución seleccionada
+                    is_active: true,
+                    create_for: session.user.nombre + ' ' + session.user.apellido,
+                    update_for: session.user.nombre + ' ' + session.user.apellido,
+                    password: dni,
+                    institucionId: institucionSelected.id,
                 },
                 rols: selectedRoleIds,
                 domicilio: {
                     calle: calle,
-                    numero: numero, // Puedes ajustar esto según tus necesidades
-                    barrio: barrio, // Puedes ajustar esto según tus necesidades
-                    localidad: localidad, // Puedes ajustar esto según tus necesidades
+                    numero: numero,
+                    barrio: barrio,
+                    localidad: localidad,
                     provinciaId: provinciaSeleccionada,
                 },
             };
@@ -137,15 +125,14 @@ const RegAdminUsuario = () => {
                         body: JSON.stringify(formData),
                     }
                 );
-                console.log(await response.json())
+                console.log(await response.json());
 
                 if (response.ok) {
                     setShowSuccessModal(true);
                     setSuccessMessage('El empleado se registró con éxito.');
-                    limpiarCampos(); // Limpia los campos del formulario
                 } else {
                     setShowErrorModal(true);
-                    setErrorMessage('Hubo un problema al registrar al empleado. Por favor, En Consultar Usuario Verifica que no exista.');
+                    setErrorMessage('Hubo un problema al registrar al empleado. Por favor, inténtalo nuevamente.');
                 }
             } catch (error) {
                 setShowErrorModal(true);
@@ -154,22 +141,86 @@ const RegAdminUsuario = () => {
         }
     };
 
-    // Función para manejar el cierre del modal
     const handleCloseModal = () => {
-        setShowModal(false);
+        setShowSuccessModal(false);
         limpiarCampos(); // Limpia los campos del formulario
     };
 
-    // Función para validar el formulario
+    const regexValidations = {
+        nombre: /^[a-zA-ZñÑ\s]+$/,
+        apellido: /^[a-zA-ZñÑ\s]+$/,
+        dni: /^\d{8}$/,
+        cuil: /^\d{2}-\d{8}-\d{1}$/,
+        telefono: /^\d{10,11}$/,
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        legajo: /^\d+$/,
+        calle: /^[a-zA-ZñÑ\s]+$/,
+        numero: /^\d+$/,
+        barrio: /^[a-zA-ZñÑ\s]+$/,
+        localidad: /^[a-zA-ZñÑ\s]+$/,
+    };
+
     useEffect(() => {
-        if (nombre && apellido && dni && provinciaSeleccionada && telefono && legajo && cuil && fechaNacimiento && email && institucionSeleccionada) {
+        const validNombre = regexValidations.nombre.test(nombre);
+        const validApellido = regexValidations.apellido.test(apellido);
+        const validDni = regexValidations.dni.test(dni);
+        const validCuil = regexValidations.cuil.test(cuil);
+        const validTelefono = regexValidations.telefono.test(telefono);
+        const validEmail = regexValidations.email.test(email);
+        const validLegajo = regexValidations.legajo.test(legajo);
+        const validCalle = regexValidations.calle.test(calle);
+        const validNumero = regexValidations.numero.test(numero);
+        const validBarrio = regexValidations.barrio.test(barrio);
+        const validLocalidad = regexValidations.localidad.test(localidad);
+        const validRoles = roles.Alumno?.checked;
+
+        if (
+            validNombre &&
+            validApellido &&
+            validDni &&
+            validCuil &&
+            validTelefono &&
+            validEmail &&
+            validLegajo &&
+            validCalle &&
+            validNumero &&
+            validBarrio &&
+            validLocalidad &&
+            provinciaSeleccionada &&
+            validRoles
+        ) {
             setFormValid(true);
         } else {
             setFormValid(false);
         }
-    }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email, calle, barrio, institucionSeleccionada]);
+    }, [
+        nombre,
+        apellido,
+        dni,
+        cuil,
+        telefono,
+        email,
+        legajo,
+        calle,
+        numero,
+        barrio,
+        localidad,
+        provinciaSeleccionada,
+        roles,
+        regexValidations.nombre,
+        regexValidations.apellido,
+        regexValidations.dni,
+        regexValidations.cuil,
+        regexValidations.telefono,
+        regexValidations.email,
+        regexValidations.legajo,
+        regexValidations.calle,
+        regexValidations.numero,
+        regexValidations.barrio,
+        regexValidations.localidad,
+        roles.Alumno?.checked,
+    ]);
 
-    // Función para limpiar los campos del formulario
     const limpiarCampos = () => {
         setNombre('');
         setApellido('');
@@ -185,13 +236,12 @@ const RegAdminUsuario = () => {
         setCuil('');
         setFechaNacimiento('');
         setEmail('');
-        setInstitucionSeleccionada('');
-        setRoles({});
-        setSelectedRoleIds([]);
-        setShowSuccessModal(false)
+        setRoles({
+            ...roles,
+            Alumno: { ...roles.Alumno, checked: true },
+        });
+        setSelectedRoleIds([roles.Alumno.id]);
     };
-
-	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
     return (
         <Container>
@@ -199,7 +249,12 @@ const RegAdminUsuario = () => {
                 <Col md={6}>
                     <h1>Registro de Usuarios</h1>
                     <h3>(Campos Obligatorios *)</h3>
+                    <hr />
                     <Form onSubmit={handleSubmit}>
+                        <Form.Group>
+                            <h3>Datos del Alumno</h3>
+                        </Form.Group>
+                        <hr />
                         <Form.Group controlId="nombre">
                             <Form.Label>Nombre *</Form.Label>
                             <Form.Control
@@ -207,7 +262,12 @@ const RegAdminUsuario = () => {
                                 placeholder="Nombre"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.nombre.test(nombre)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un nombre válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="apellido">
                             <Form.Label>Apellido *</Form.Label>
@@ -216,7 +276,12 @@ const RegAdminUsuario = () => {
                                 placeholder="Apellido"
                                 value={apellido}
                                 onChange={(e) => setApellido(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.apellido.test(apellido)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un apellido válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="dni">
                             <Form.Label>DNI *</Form.Label>
@@ -225,7 +290,12 @@ const RegAdminUsuario = () => {
                                 placeholder="DNI"
                                 value={dni}
                                 onChange={(e) => setDni(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.dni.test(dni)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un DNI válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="cuil">
                             <Form.Label>CUIL *</Form.Label>
@@ -234,52 +304,82 @@ const RegAdminUsuario = () => {
                                 placeholder="CUIL"
                                 value={cuil}
                                 onChange={(e) => setCuil(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.cuil.test(cuil)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un CUIL válido Ejemplo( 20-00000000-0).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="fechaNacimiento">
                             <Form.Label>Fecha de Nacimiento *</Form.Label>
                             <Form.Control
                                 type="date"
-                                placeholder="Fecha de Nacimiento"
                                 value={fechaNacimiento}
                                 onChange={(e) => setFechaNacimiento(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
+                        <hr />
+                        <Form.Group>
+                            <h3>Datos de Contacto del Alumno</h3>
+                        </Form.Group>
+                        <hr />
                         <Form.Group controlId="calle">
-                            <Form.Label>Calle</Form.Label>
+                            <Form.Label>Calle *</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Calle"
                                 value={calle}
                                 onChange={(e) => setCalle(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.calle.test(calle)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese una calle válida.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="numero">
-                            <Form.Label>Altura</Form.Label>
+                            <Form.Label>Número *</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Altura"
+                                placeholder="Número"
                                 value={numero}
                                 onChange={(e) => setNumero(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.numero.test(numero)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un número válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="barrio">
-                            <Form.Label>Barrio</Form.Label>
+                            <Form.Label>Barrio *</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Barrio"
                                 value={barrio}
                                 onChange={(e) => setBarrio(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.barrio.test(barrio)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un barrio válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="localidad">
-                            <Form.Label>Localidad</Form.Label>
+                            <Form.Label>Localidad *</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Localidad"
                                 value={localidad}
                                 onChange={(e) => setLocalidad(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.localidad.test(localidad)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese una localidad válida.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="provincia">
                             <Form.Label>Provincia *</Form.Label>
@@ -287,14 +387,19 @@ const RegAdminUsuario = () => {
                                 as="select"
                                 value={provinciaSeleccionada}
                                 onChange={(e) => setProvinciaSeleccionada(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!provinciaSeleccionada}
                             >
-                                <option value="">Selecciona una provincia</option>
+                                <option value="">Seleccionar provincia</option>
                                 {provincias.map((provincia) => (
                                     <option key={provincia.id} value={provincia.id}>
                                         {provincia.provincia}
                                     </option>
                                 ))}
                             </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                Seleccione una provincia.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="telefono">
                             <Form.Label>Teléfono *</Form.Label>
@@ -303,40 +408,12 @@ const RegAdminUsuario = () => {
                                 placeholder="Teléfono"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.telefono.test(telefono)}
                             />
-                        </Form.Group>
-                        <Form.Group controlId="matriculaProfesional">
-                            <Form.Label>Matrícula Profesional</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Matrícula Profesional"
-                                value={matriculaProfesional}
-                                onChange={(e) => setMatriculaProfesional(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="legajo">
-                            <Form.Label>Legajo *</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Legajo"
-                                value={legajo}
-                                onChange={(e) => setLegajo(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="institucion">
-                            <Form.Label>Institución *</Form.Label>
-                            <Form.Control
-                                as="select"
-                                value={institucionSeleccionada}
-                                onChange={(e) => setInstitucionSeleccionada(e.target.value)}
-                            >
-                                <option value="">Selecciona una institución</option>
-                                {instituciones.map((institucion) => (
-                                    <option key={institucion.id} value={institucion.id}>
-                                        {institucion.nombre}
-                                    </option>
-                                ))}
-                            </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un teléfono válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="email">
                             <Form.Label>Email *</Form.Label>
@@ -345,41 +422,62 @@ const RegAdminUsuario = () => {
                                 placeholder="Email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.email.test(email)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un email válido.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <hr />
+                        <Form.Group>
+                            <h3>Datos Institucionales del Alumno</h3>
+                        </Form.Group>
+                        <hr />
+                        <Form.Group controlId="legajo">
+                            <Form.Label>Legajo *</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Legajo"
+                                value={legajo}
+                                onChange={(e) => setLegajo(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.legajo.test(legajo)}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un legajo válido.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="roles">
                             <Form.Label>Roles *</Form.Label>
                             <div>
-                                {Object.keys(roles).map((rolName) => (
+                                {Object.keys(roles).filter((key) => roles[key].name === 'Alumno').map((key) => (
                                     <Form.Check
-                                        key={rolName}
+                                        key={roles[key].id}
                                         type="checkbox"
-                                        label={rolName}
-                                        checked={roles[rolName].checked}
-                                        onChange={(e) => {
-                                            const checked = e.target.checked;
-                                            setRoles((prevRoles) => ({
-                                                ...prevRoles,
-                                                [rolName]: {
-                                                    ...prevRoles[rolName],
-                                                    checked,
-                                                },
-                                            }));
-                                            if (checked) {
-                                                setSelectedRoleIds((prevSelected) => [...prevSelected, roles[rolName].id]);
-                                            } else {
-                                                setSelectedRoleIds((prevSelected) => prevSelected.filter((id) => id !== roles[rolName].id));
-                                            }
+                                        id={`role-${roles[key].id}`}
+                                        label={roles[key].name}
+                                        checked={roles[key].checked}
+                                        onChange={() => {
+                                            const updatedRoles = {
+                                                ...roles,
+                                                [key]: { ...roles[key], checked: !roles[key].checked },
+                                            };
+                                            setRoles(updatedRoles);
+                                            setSelectedRoleIds(
+                                                Object.values(updatedRoles)
+                                                    .filter((role) => role.checked)
+                                                    .map((role) => role.id)
+                                            );
                                         }}
                                     />
                                 ))}
                             </div>
                         </Form.Group>
-                        
                         <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
-                                <Link href={`/dashboard/Admin/adminHome`}>
+                                <Link href={`/dashboard/${institucionSelected.id}/consultaUsuario`}>
                                     <Button variant='secondary' style={{
                                         padding: '0.4rem 1rem',
                                         fontSize: '1rem',
@@ -419,26 +517,25 @@ const RegAdminUsuario = () => {
                     </Form>
                 </Col>
             </Row>
-
-            <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)}>
+            <Modal show={showSuccessModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Éxito</Modal.Title>
+                    <Modal.Title>Registro exitoso</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>{successMessage}</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="success" onClick={() => limpiarCampos() } >
+                    <Button variant="success" onClick={handleCloseModal}>
                         Cerrar
                     </Button>
                 </Modal.Footer>
             </Modal>
 
-            <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)}>
+            <Modal show={showErrorModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Error</Modal.Title>
+                    <Modal.Title>Error en el registro</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>{errorMessage}</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger" onClick={() => setShowErrorModal(false)}>
+                    <Button variant="danger" onClick={handleCloseModal}>
                         Cerrar
                     </Button>
                 </Modal.Footer>
@@ -447,4 +544,4 @@ const RegAdminUsuario = () => {
     );
 };
 
-export default RegAdminUsuario;
+export default RegAlumno;

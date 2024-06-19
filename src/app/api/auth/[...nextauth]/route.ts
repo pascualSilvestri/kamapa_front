@@ -49,7 +49,7 @@ const handler = NextAuth({
     },
     async session({ session, token  }) {
       // Asigna directamente el objeto de usuario desde el token al objeto de sesión
-      if (session) {
+      if (session && token.user) {
         session.user = token.user as User;
         }
       return session; // Cast the session to the correct type

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Table, Modal, Pagination, Alert } from 'react-bootstrap';
 import { Environment } from 'utils/EnviromenManager';
 import { Curso } from 'model/types';
 
@@ -15,21 +15,32 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     const [filtroDivision, setFiltroDivision] = useState('');
     const [showModalModify, setShowModalModify] = useState(false);
     const [currentCursoId, setCurrentCursoId] = useState<number | null>(null);
+    const [showModalDelete, setShowModalDelete] = useState(false);
+    const [showModalConfirmDelete, setShowModalConfirmDelete] = useState(false);
+    const [showModalConfirmModify, setShowModalConfirmModify] = useState(false);
+    const [cursoToDelete, setCursoToDelete] = useState<number | null>(null);
+    const [cursoToDeleteName, setCursoToDeleteName] = useState<string>('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(3); // Modificar el numero dependiendo cuantos elementos se quiere mostrar en la paginacion
+
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [showModifySuccessMessage, setShowModifySuccessMessage] = useState(false);
+    const [currentCursoName, setCurrentCursoName] = useState<string>('');
 
     useEffect(() => {
-        fecthCursos();
+        fetchCursos();
     }, []);
 
-    const fecthCursos = async () => {
-        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`, {
+    const fetchCursos = async () => {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
         });
 
-        const response = await fecth.json();
-        setCursos(response);
+        const data = await response.json();
+        setCursos(data);
     };
 
     const handleCrearCurso = async () => {
@@ -40,7 +51,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             division,
             institucionId: params.id,
         };
-        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.createCurso)}`, {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createCurso)}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -53,12 +64,16 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             })
         });
 
-        if (fecth.status !== 200) {
+        if (response.status !== 200) {
             alert('Error al crear curso');
             return;
         } else {
-            const response = await fecth.json();
-            fecthCursos();
+            await response.json();
+            fetchCursos();
+            setShowSuccessMessage(true);
+            setTimeout(() => {
+                setShowSuccessMessage(false);
+            }, 3000); // Ocultar mensaje después de 3 segundos
         }
 
         setNombre('');
@@ -73,13 +88,18 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             setNominacion(curso.nominacion);
             setDivision(curso.division);
             setCurrentCursoId(id);
+            setCurrentCursoName(curso.nombre); // Set current curso name
             setShowModalModify(true);
         }
     };
 
     const handleSubmitModificarCurso = async () => {
+        setShowModalConfirmModify(true);
+    };
+
+    const confirmSubmitModificarCurso = async () => {
         if (currentCursoId !== null) {
-            const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateCursor)}${currentCursoId}`, {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateCursor)}${currentCursoId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -92,11 +112,16 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                 })
             });
 
-            if (res.status !== 200) {
+            if (response.status !== 200) {
                 throw new Error('No se pudo modificar el curso');
             } else {
-                fecthCursos();
+                fetchCursos();
                 setShowModalModify(false);
+                setShowModalConfirmModify(false);
+                setShowModifySuccessMessage(true);
+                setTimeout(() => {
+                    setShowModifySuccessMessage(false);
+                }, 3000); // Ocultar mensaje después de 3 segundos
                 setNombre('');
                 setNominacion('');
                 setDivision('');
@@ -105,24 +130,47 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
         }
     };
 
-    const handleEliminarCurso = async (id: number) => {
-        const fecth = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteCurso)}${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (fecth.status !== 200) {
-            alert('Error al eliminar curso');
-            return;
-        } else {
-            const response = await fecth.json();
-            console.log(response);
-            fecthCursos();
+    const handleEliminarCurso = (id: number) => {
+        const curso = cursos.find(curso => curso.id === id);
+        if (curso) {
+            setCursoToDelete(id);
+            setCursoToDeleteName(curso.nombre); // Set curso to delete name
+            setShowModalDelete(true);
         }
     };
 
+    const confirmDeleteCurso = () => {
+        setShowModalDelete(false);
+        setShowModalConfirmDelete(true);
+    };
+
+    const submitDeleteCurso = async () => {
+        if (cursoToDelete !== null) {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteCurso)}${cursoToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.status !== 200) {
+                alert('Error al eliminar curso');
+                return;
+            } else {
+                await response.json();
+                fetchCursos();
+                setShowModalConfirmDelete(false);
+                setCursoToDelete(null);
+                setCursoToDeleteName('');
+            }
+        }
+    };
+
+    const handlePageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
+    };
+
+    // Filtrar cursos según los criterios de filtro
     const filteredCursos = cursos.filter(curso => {
         return (
             (filtroNombre === '' || curso.nombre.toLowerCase().includes(filtroNombre.toLowerCase())) &&
@@ -131,9 +179,25 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
         );
     });
 
+    // Obtener los cursos a mostrar en la página actual
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentCursos = filteredCursos.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredCursos.length / itemsPerPage);
+
     return (
         <Container>
             <h1 className="my-4">Gestionar Cursos</h1>
+            {showSuccessMessage && (
+                <Alert variant="success" className="text-center" style={{ color: 'green' }}>
+                    Curso creado con éxito
+                </Alert>
+            )}
+            {showModifySuccessMessage && (
+                <Alert variant="success" className="text-center" style={{ color: 'green' }}>
+                    Curso modificado con éxito
+                </Alert>
+            )}
             <Row className="mb-4">
                 <Col md={6}>
                     <Form>
@@ -144,6 +208,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                                 placeholder="Nombre del curso"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formNominacion">
@@ -153,6 +218,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                                 placeholder="Nominación del curso"
                                 value={nominacion}
                                 onChange={(e) => setNominacion(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formDivision">
@@ -162,6 +228,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                                 placeholder="División del curso"
                                 value={division}
                                 onChange={(e) => setDivision(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Button
@@ -238,7 +305,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredCursos.map((curso) => (
+                            {currentCursos.map((curso) => (
                                 <tr key={curso.id}>
                                     <td>{curso.nombre}</td>
                                     <td>{curso.nominacion}</td>
@@ -262,6 +329,13 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                             ))}
                         </tbody>
                     </Table>
+                    <Pagination>
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                                {i + 1}
+                            </Pagination.Item>
+                        ))}
+                    </Pagination>
                 </Col>
             </Row>
 
@@ -306,6 +380,57 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                     </Button>
                     <Button variant="primary" onClick={handleSubmitModificarCurso}>
                         Guardar Cambios
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showModalConfirmModify} onHide={() => setShowModalConfirmModify(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Modificación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que deseas modificar el curso {currentCursoName}?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModalConfirmModify(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={confirmSubmitModificarCurso}>
+                        Confirmar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showModalDelete} onHide={() => setShowModalDelete(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Eliminación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que deseas eliminar el curso {cursoToDeleteName}? Esta acción no se puede deshacer.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModalDelete(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={confirmDeleteCurso}>
+                        Confirmar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showModalConfirmDelete} onHide={() => setShowModalConfirmDelete(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Eliminar Curso</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás absolutamente seguro de que deseas eliminar el curso {cursoToDeleteName}? Esta acción no se puede deshacer.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowModalConfirmDelete(false)}>
+                        Cancelar
+                    </Button>
+                    <Button variant="danger" onClick={submitDeleteCurso}>
+                        Eliminar
                     </Button>
                 </Modal.Footer>
             </Modal>

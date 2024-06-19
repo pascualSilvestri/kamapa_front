@@ -5,26 +5,24 @@ import path from 'path';
 
 export const router = {
     'Inicio': { label: 'Inicio', href: `/bienvenido` },
-    'Dirección': { label: 'Dirección', href: '/director' },
-    'Preceptores': { label: 'Preceptores', href: '/preceptor' },
-    'Profesores': { label: 'Profesores', href: '/profesores' },
-    'Alumnos': { label: 'Alumnos', href: '/alumnos' },
     'EditarAlumnos': { label: 'Editar Alumnos', href: '/editarAlumno' },
-    'About': { label: 'About', href: '/about' },
-    'CiclosLectivos': { label: 'Ciclos Lectivos', href: '/ciclolectivo' },
     'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo' },
+    'ModificarPeriodos': { label: 'Modificar Periodos', href: '/modificarPeriodos' },
     'GestionCurso': { label: 'Gestion Cursos', href: '/gestionCurso' },
     'AddAsignaturaCurso': { label: 'Agregar Asignatura a  Cursos ', href: '/addAsignaturaCurso' },
     'GestionAsignatura': { label: 'Gestion Asignatura ', href: '/gestionAsignatura' },
     'CursoAlumno': { label: 'Consultar Alumnos por Curso', href: '/curso_alumno' },
     'AulasRegistro': { label: 'Aulas', href: '/regaulas' },
     'RegistroUsuarios': { label: 'Registro de Usuarios', href: '/consultaUsuario' },
-    'Permisos': { label: 'Permisos', href: '/permisos' },
-    'Secretario': { label: 'Secretario', href: '/secretario' },
+    'RegistroAlumno': { label: 'Registro de Alumnos', href: '/consultaUsuario' },
     'Notas': { label: 'Notas', href: '/calificar' },
-    'Calificaciones': { label: 'calificaciones', href: '/calificaciones' },
+    'Calificaciones': { label: 'Calificaciones', href: '/consultaNota' },
     'VistaUsuarios': { label: 'Usuarios', href: '/vistausuarios' },
     'resetearPasswordUsuario': { label: 'Resetear contraseña a usuario', href: '/resetPassword' },
+    'AddAlumnoCurso': { label: 'Asignar cursos a alumnos', href: '/addAlumnoCurso' },
+    'AddNotaAlumno': { label: 'Agregar nota al alumno', href: '/addNota' },
+    'panel': { label: 'Panel', href: '/panel' },
+
 }
 
 export const adminAutorizeRouter = [
@@ -33,32 +31,24 @@ export const adminAutorizeRouter = [
 
 export const directorAutorizeRouter = [
     'Inicio',
-    // 'Dirección',
-    // 'Secretario',
-    // 'Preceptores',
-    // 'Profesores',
-    // 'Alumnos',
     'CrearCicloLectivo',
+    'ModificarPeriodos',
     'GestionCurso',
-    'CursoAlumno',
+    'GestionAsignatura',
     'AddAsignaturaCurso',
+    'AddAlumnoCurso',
+    'CursoAlumno',
     'EditarAlumnos',
-    // 'CrearAulas',
-    // 'Aulas',
-    // 'About',
     'RegistroUsuarios',
-    // 'Permisos',
+    'RegistroAlumno',
     'VistaUsuarios',
     'resetearPasswordUsuario',
-    'GestionAsignatura'
+
+
 ]
 
 export const secretarioAutorizeRouter = [
     'Inicio',
-    'Preceptores',
-    'Profesores',
-    'Aulas',
-    'About',
     'RegistroUsuarios',
     'CrearCicloLectivo',
     'GestionCurso',
@@ -76,6 +66,7 @@ export const preceptorAutorizeRouter = [
     'Alumnos',
     'Aulas',
     'About',
+    'RegistroAlumno',
 ]
 
 export const profesorAutorizeRouter = [
@@ -84,6 +75,7 @@ export const profesorAutorizeRouter = [
     'Aulas',
     'About',
     'Notas',
+    "AddNotaAlumno"
 
 ]
 
@@ -92,6 +84,7 @@ export const alumnoAutorizeRouter = [
     'Aulas',
     'About',
     'Calificaciones',
+    'panel'
 
 ]
 

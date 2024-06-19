@@ -95,8 +95,8 @@ const RegUsuario = () => {
                     telefono: telefono,
                     email: email,
                     is_active: true, // O ajusta esto según tus necesidades
-                    create_for: session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
-                    update_for:  session.user.nombre+' '+session.user.apellido, // Puedes ajustar esto según tus necesidades
+                    create_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
+                    update_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
                     password: dni, // Puedes ajustar esto según tus necesidades
                     institucionId: institucionSelected.id, // Poked
                     // Puedes ajustar esto según tus necesidades
@@ -181,7 +181,7 @@ const RegUsuario = () => {
         setSelectedRoleIds([]);
     };
 
-	const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+    const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
 
 
     return (
@@ -198,6 +198,7 @@ const RegUsuario = () => {
                                 placeholder="Nombre"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="apellido">
@@ -207,6 +208,7 @@ const RegUsuario = () => {
                                 placeholder="Apellido"
                                 value={apellido}
                                 onChange={(e) => setApellido(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="dni">
@@ -216,6 +218,7 @@ const RegUsuario = () => {
                                 placeholder="DNI"
                                 value={dni}
                                 onChange={(e) => setDni(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="cuil">
@@ -225,6 +228,7 @@ const RegUsuario = () => {
                                 placeholder="CUIL"
                                 value={cuil}
                                 onChange={(e) => setCuil(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="fechaNacimiento">
@@ -233,6 +237,7 @@ const RegUsuario = () => {
                                 type="date"
                                 value={fechaNacimiento}
                                 onChange={(e) => setFechaNacimiento(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <hr />
@@ -246,6 +251,7 @@ const RegUsuario = () => {
                                 placeholder="Av. Ejemplo de Calle"
                                 value={calle}
                                 onChange={(e) => setCalle(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="numero">
@@ -255,6 +261,7 @@ const RegUsuario = () => {
                                 placeholder="123"
                                 value={numero}
                                 onChange={(e) => setNumero(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="barrio">
@@ -264,6 +271,7 @@ const RegUsuario = () => {
                                 placeholder="Ejemplo: V° Krausen"
                                 value={barrio}
                                 onChange={(e) => setBarrio(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="localidad">
@@ -273,6 +281,7 @@ const RegUsuario = () => {
                                 placeholder="Ejemplo de Localidad: Rawson"
                                 value={localidad}
                                 onChange={(e) => setLocalidad(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="provincias">
@@ -308,6 +317,7 @@ const RegUsuario = () => {
                                 placeholder="2645111111"
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="email">
@@ -317,6 +327,7 @@ const RegUsuario = () => {
                                 placeholder="Ejemplo@gmail.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <hr />
@@ -330,6 +341,7 @@ const RegUsuario = () => {
                                 placeholder="Matrícula Profesional"
                                 value={matriculaProfesional}
                                 onChange={(e) => setMatriculaProfesional(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group controlId="legajo">
@@ -339,31 +351,22 @@ const RegUsuario = () => {
                                 placeholder="Legajo"
                                 value={legajo}
                                 onChange={(e) => setLegajo(e.target.value)}
+                                autoComplete='off'
                             />
                         </Form.Group>
                         <hr />
                         <Form.Group >
                             <h1>Nivel de acceso segun el Rol *</h1>
                         </Form.Group>
+
                         <Form.Group controlId='roles'>
                             <Form.Label>Roles *</Form.Label>
                             {Object.keys(roles).filter(rol => {
-                                   // Determinar el rol de mayor jerarquía en la sesión del usuario
-                                const highestUserRole = session.user.Roles.reduce((highest, current) => {
-                                    return current.name === 'Admin' ? current.name :
-                                        current.name === 'Director' && highest !== 'Admin' ? current.name :
-                                        current.name === 'Secretario' && highest !== 'Admin' && highest !== 'Director' ? current.name :
-                                        current.name === 'Preceptor' && highest === 'Alumno' ? current.name :
-                                        current.name === 'Docente' && highest === 'Alumno' ? current.name :
-                                        highest;
-                                }, 'Alumno');
+                                // Verificar si el usuario de la sesión es Admin
+                                const isAdmin = session.user.Roles.some(role => role.name === 'Admin');
 
                                 // Filtrar los roles que se muestran en el formulario
-                                return (highestUserRole === 'Admin' || 
-                                        (highestUserRole === 'Director' && rol !== 'Admin') ||
-                                        (highestUserRole === 'Secretario' && rol !== 'Admin' && rol !== 'Director') ||
-                                        (highestUserRole === 'Preceptor' && rol === 'Alumno') ||
-                                        (highestUserRole === 'Docente' && rol === 'Alumno'));
+                                return isAdmin || rol !== 'Admin';
                             }).map((rol, index) => (
                                 <Form.Check
                                     key={index}
@@ -388,7 +391,7 @@ const RegUsuario = () => {
                         <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className='me-1'>
-                                <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/consultaUsuario`}>
+                                <Link href={`/dashboard/${institucionSelected.id}/consultaUsuario`}>
                                     <Button variant='secondary' style={{
                                         padding: '0.4rem 1rem',
                                         fontSize: '1rem',

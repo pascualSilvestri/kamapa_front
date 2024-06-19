@@ -17,6 +17,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
     fetchCicloLectivoActivo();
   }, []);
 
+
   const fetchCicloLectivoActivo = async () => {
     const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCicloLectivo)}${params.id}`);
 
@@ -39,6 +40,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
     return <div>Loading...</div>; // Mostrar un indicador de carga mientras se cargan los datos
   }
 
+  console.log(cicloLectivo)
   return (
     <div className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out" style={{ backgroundImage: "url('/path/to/background-image.jpg')" }}>
       <div className="sm:mx-auto sm:w-full sm:max-w-md bg-white bg-opacity-90 shadow-lg rounded-lg overflow-hidden transform transition duration-500 hover:scale-105">

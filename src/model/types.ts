@@ -1,37 +1,40 @@
 export interface User {
-	user?: UserSession; 
-	id?: number | string;
-	legajo?: string;
-	fecha_ingreso?: string;
-	fecha_egreso?: string | null;
-	nombre?: string;
-	apellido?: string;
-	dni?: string;
-	cuil?: string;
-	fechaNacimiento?: string;
-	telefono?: string;
-	is_active?: boolean;
-	create_for?: string;
-	update_for?: string;
-	password?: string;
-	createdAt?: string;
-	updatedAt?: string;
-	domicilioId?: number;
-	contactoId?: number;
-	rolId?: number;
+    user?: UserSession;
+    id?: number | string;
+    legajo?: string;
+    fecha_ingreso?: string;
+    fecha_egreso?: string | null;
+    nombre?: string;
+    apellido?: string;
+    dni?: string;
+    cuil?: string;
+    fechaNacimiento?: string;
+    telefono?: string;
+    is_active?: boolean;
+    create_for?: string;
+    update_for?: string;
+    password?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    domicilioId?: number;
+    contactoId?: number;
+    rolId?: number;
     first_session?: boolean;
-	Roles?: Roles[];
-	Instituciones ?: Institucion[];
-	accessToken?: string; // Agrega esta línea
+    Roles?: Roles[];
+    Instituciones?: Institucion[];
+    accessToken?: string; // Agrega esta línea
+    notas?: Nota[];
+    notasPeriodo?: Nota[];
 }
 
 
-export interface UserSession{
+export interface UserSession {
     nombre: string;
-	apellido: string;
-	legajo: string;
-	telefono: string;
+    apellido: string;
+    legajo: string;
+    telefono: string;
 }
+
 
 export interface Roles {
     id: number;
@@ -52,12 +55,12 @@ export interface Session {
 }
 
 export interface Domicilio {
-	id: number;
-	calle: string;
-	numero: string;
-	localidad: string;
-	provincia: string;
-	pais: string;
+    id: number;
+    calle: string;
+    numero: string;
+    localidad: string;
+    provincia: string;
+    pais: string;
 }
 
 export interface Provincia {
@@ -78,9 +81,9 @@ export interface Institucion {
 
 
 export interface Contacto {
-	id: number;
-	email: string;
-	telefono: string;
+    id: number;
+    email: string;
+    telefono: string;
 }
 
 
@@ -175,6 +178,7 @@ export interface Curso {
     division: string;
     institucionId?: string;
     asignaturas?: Asignatura[];
+    cursosUsuario?: User[];
 }
 
 
@@ -182,5 +186,29 @@ export interface Asignatura {
     id?: number;
     nombre?: string;
     curso?: Curso;
-    usuarioAsignatura:User[];
+    usuarioAsignatura: User[];
+    notas: Nota[];
+    notasPorPeriodo: { [key: number]: Nota[] };
+}
+
+
+export interface Nota {
+    id: number;
+    nota?: number;
+    fecha?: string;
+    usuarioId?: number;
+    asignaturaId?: number;
+    periodoId?: number;
+    createdAt?: string;
+    updatedAt?: string;
+    periodo?: Periodo;
+    usuario?: User;
+    asignatura?: Asignatura;
+    tipoNota?: TipoNota;
+}
+
+
+export interface TipoNota {
+    id: number;
+    tipo: string;
 }
