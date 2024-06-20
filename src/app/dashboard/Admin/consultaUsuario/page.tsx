@@ -3,16 +3,16 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Environment } from '../../../../utils/EnviromenManager';
 import { useInstitucionSelectedContext } from 'context/userContext';
-import Modal from '../../../components/ModalConsultaUser'; // Asegúrate de importar tu componente Modal
+import Modal from '../../../components/ModalConsultaUser';
 import { Form } from 'react-bootstrap';
 import { BsChevronDown } from 'react-icons/bs';
 import { Institucion, Roles } from 'model/types';
 
 const ConsultaUsuarioPage = () => {
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
-    const [showModal, setShowModal] = useState(false); // Estado para manejar la visibilidad del modal
-    const [selectedInstitution, setSelectedInstitution] = useState(''); // Estado para la institución seleccionada
-    const [selectedRoles, setSelectedRoles] = useState([]); // Estado para los roles seleccionados
+    const [showModal, setShowModal] = useState(false);
+    const [selectedInstitution, setSelectedInstitution] = useState('');
+    const [selectedRoles, setSelectedRoles] = useState([]);
     const [instituciones, setInstituciones] = useState<Institucion[]>([]);
     const [roles, setRoles] = useState<Roles[]>([]);
 
@@ -20,6 +20,7 @@ const ConsultaUsuarioPage = () => {
     const [dni, setDNI] = useState('');
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [searched, setSearched] = useState(false); // Estado para saber si se realizó una búsqueda
 
     useEffect(() => {
         getInstituciones();
@@ -60,9 +61,8 @@ const ConsultaUsuarioPage = () => {
 
     const searchUserByDNI = async (dni) => {
         try {
-            setLoading(true); // Activamos el estado de carga
+            setLoading(true);
 
-            // Llamada a la API para buscar el usuario por DNI
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getUsuarioByDni)}${dni}`);
             if (!response.ok) {
                 throw new Error('Usuario no encontrado');
@@ -78,7 +78,8 @@ const ConsultaUsuarioPage = () => {
             console.error('Error al buscar usuario:', error);
             setUserData(null);
         } finally {
-            setLoading(false); // Desactivamos el estado de carga, independientemente del resultado
+            setLoading(false);
+            setSearched(true); // Indicamos que se realizó una búsqueda
         }
     };
 
@@ -92,23 +93,21 @@ const ConsultaUsuarioPage = () => {
 
     const handleRegisterNewUser = () => {
         if (!userData) {
-            router.push(`/dashboard/Admin/regAdminUsuario`); // Redirecciona a la página de registro de usuario
+            router.push(`/dashboard/Admin/regAdminUsuario`);
         } else {
-            setShowModal(true); // Muestra el modal
+            setShowModal(true);
         }
     };
 
     const handleModalClose = () => {
-        setShowModal(false); // Cierra el modal
+        setShowModal(false);
     };
 
     const handleRoleChange = (event) => {
         const roleId = event.target.value;
         if (event.target.checked) {
-            // Si el checkbox está marcado, añade el rol al estado
             setSelectedRoles(prevRoles => [...prevRoles, roleId]);
         } else {
-            // Si el checkbox no está marcado, quita el rol del estado
             setSelectedRoles(prevRoles => prevRoles.filter(role => role !== roleId));
         }
     };
@@ -159,27 +158,23 @@ const ConsultaUsuarioPage = () => {
             {loading ? (
                 <p>Buscando usuario...</p>
             ) : (
-                <>
-                    {userData ? (
-                        <div>
-                            <h2>Datos del Usuario</h2>
-                            <p>Nombre: {userData.nombre}</p>
-                            <p>Apellido: {userData.apellido}</p>
-                            <p>D.N.I: {userData.dni}</p>
-                            <p>Telefono: {userData.telefono}</p>
-                            <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
-                                Registrar en esta Institución
-                            </button>
-                        </div>
-                    ) : (
-                        <div>
-                            <p>Usuario no encontrado.</p>
-                            <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
-                                Registrar un nuevo usuario
-                            </button>
-                        </div>
-                    )}
-                </>
+                searched && (
+                    <>
+                        {userData ? (
+                            <div>
+                                <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
+                                    Registrar en esta Institución
+                                </button>
+                            </div>
+                        ) : (
+                            <div>
+                                <button onClick={handleRegisterNewUser} style={{ backgroundColor: 'purple', color: 'white', padding: '0.4rem 1rem', fontSize: '1rem', marginBottom: '1rem', transition: 'all 0.3s ease' }}>
+                                    Registrar un nuevo usuario
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )
             )}
 
             {showModal && userData && (
@@ -221,7 +216,7 @@ const ConsultaUsuarioPage = () => {
                         </label>
                     ))}
                     <button onClick={handleModalSubmit}>
-                        Registrar en esta Institución
+                        Registrar en una institucion
                     </button>
                 </Modal>
             )}
