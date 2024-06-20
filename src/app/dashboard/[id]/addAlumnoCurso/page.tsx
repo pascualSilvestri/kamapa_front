@@ -30,7 +30,7 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
     const fetchAlumnos = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion)}${params.id}`);
         const data = await response.json();
-        setAlumnosDisponibles(data.usuarios);
+        setAlumnosDisponibles(data.alumnos);
     };
 
     const handlePageChange = (pageNumber: number) => {

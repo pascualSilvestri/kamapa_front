@@ -102,7 +102,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 
             const data = await response.json();
             console.log(data);
-            setAlumnos(data.usuarios);
+            setAlumnos(data.alumnos);
         } catch (error) {
             console.error('Error al obtener empleados:', error.message);
         }
