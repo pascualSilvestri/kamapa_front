@@ -118,13 +118,13 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
     };
 
     // Filtrado de profesores según el valor del filtro
-    const filteredProfesores = profesores.filter(profesor => {
+    const filteredProfesores = profesores &&  profesores.filter(profesor => {
         const fullName = `${profesor.nombre} ${profesor.apellido}`.toLowerCase();
         return (
             fullName.includes(filtroProfesor.toLowerCase()) ||
             profesor.dni.toString().includes(filtroProfesor)
         );
-    });
+    }) || [];
 
     // Logic for displaying current professors
     const indexOfLastItem = currentPage * itemsPerPage;
