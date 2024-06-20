@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Environment } from '../../../../utils/EnviromenManager'; // Asegúrate de que esta ruta es correcta
+import { Spinner } from 'react-bootstrap';
 
 function Page() {
-    const [userCount, setUserCount] = useState(0);
-    const [institutionCount, setInstitutionCount] = useState(0);
+    const [userCount, setUserCount] = useState(null);
+    const [institutionCount, setInstitutionCount] = useState(null);
 
     useEffect(() => {
         fetchUserCount();
@@ -23,6 +24,7 @@ function Page() {
             setUserCount(data.usuarios.length);
         } catch (error) {
             console.error('Error al obtener la cantidad de usuarios:', error);
+            setUserCount(0);
         }
     }
 
@@ -36,6 +38,7 @@ function Page() {
             setInstitutionCount(data.length);
         } catch (error) {
             console.error('Error al obtener la cantidad de instituciones:', error);
+            setInstitutionCount(0);
         }
     }
 
@@ -47,7 +50,13 @@ function Page() {
                     <div className="card text-center shadow-sm border-0 mb-4" style={{ backgroundColor: '#f8f9fa' }}>
                         <div className="card-body">
                             <h5 className="card-title text-uppercase text-muted mb-2">Usuarios Registrados</h5>
-                            <h2 className="card-text display-4 font-weight-bold" style={{ color: '#007bff' }}>{userCount}</h2>
+                            {userCount === null ? (
+                                <Spinner animation="border" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </Spinner>
+                            ) : (
+                                <h2 className="card-text display-4 font-weight-bold" style={{ color: '#007bff' }}>{userCount}</h2>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -55,7 +64,13 @@ function Page() {
                     <div className="card text-center shadow-sm border-0 mb-4" style={{ backgroundColor: '#f8f9fa' }}>
                         <div className="card-body">
                             <h5 className="card-title text-uppercase text-muted mb-2">Instituciones Registradas</h5>
-                            <h2 className="card-text display-4 font-weight-bold" style={{ color: '#28a745' }}>{institutionCount}</h2>
+                            {institutionCount === null ? (
+                                <Spinner animation="border" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </Spinner>
+                            ) : (
+                                <h2 className="card-text display-4 font-weight-bold" style={{ color: '#28a745' }}>{institutionCount}</h2>
+                            )}
                         </div>
                     </div>
                 </div>
