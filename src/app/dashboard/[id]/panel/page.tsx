@@ -52,8 +52,7 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
   const fetchCiclosLectivos = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${
-          params.id
+        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id
         }`
       );
       const data = await response.json();
@@ -131,6 +130,7 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
     return (total / evaluaciones.length).toFixed(2);
   };
 
+
   const calcularPromedioGeneral = (notasPorPeriodo: {
     [key: number]: Nota[];
   }) => {
@@ -144,9 +144,9 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
   };
   const PDFContent = React.forwardRef<HTMLDivElement, PDFContentProps>(
     ({ user, institucionSelected, asignaturas, periodos }, ref) => (
-      <div ref={ref} style={{ padding: "20px", border: "1px solid #000" }}>
+      < div ref={ref} style={{ padding: "20px", border: "1px solid #000" }}>
         {/* Header Section */}
-        <div style={{ textAlign: "center" }}>
+        <div div style={{ textAlign: "center" }}>
           <div
             style={{
               display: "flex",
@@ -342,10 +342,10 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
               </p>
             </div>
           </div>
-        </div>
+        </div >
 
         {/* Table Section */}
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
               <th
@@ -528,8 +528,8 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
+        </table >
+      </div >
     )
   );
 
@@ -546,6 +546,7 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save("Notas.pdf");
   };
+
 
   return (
     <Container>
@@ -604,7 +605,7 @@ interface StyledButtonProps extends ButtonProps {
   variant: "purple";
 }
 
-const StyledButton = styled(Button)<StyledButtonProps>`
+const StyledButton = styled(Button) <StyledButtonProps>`
   background-color: purple;
   border-color: purple;
   color: white;
