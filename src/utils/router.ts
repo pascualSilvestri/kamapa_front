@@ -22,7 +22,8 @@ export const router = {
     'AddAlumnoCurso': { label: 'Asignar cursos a alumnos', href: '/addAlumnoCurso' },
     'AddNotaAlumno': { label: 'Agregar nota al alumno', href: '/addNota' },
     'due': { label: 'Due', href: '/due' },
-    'consultaAsignaturaPorCurso':{label:'Consultar Asignatura por curso',href:'/consultaAsignaturasCurso'}
+    'consultaAsignaturaPorCurso':{label:'Consultar Asignatura por curso',href:'/consultaAsignaturasCurso'},
+    'consultaListaAlumnoPorcurso':{label:'Consultar Lista de Alumnos por curso',href:'/alumnosPorCurso'},
 
 }
 
@@ -45,7 +46,8 @@ export const directorAutorizeRouter = [
     'VistaUsuarios',
     'resetearPasswordUsuario',
     "AddNotaAlumno",
-    'consultaAsignaturaPorCurso'
+    'consultaAsignaturaPorCurso',
+    'consultaListaAlumnoPorcurso'
 
 
 ]

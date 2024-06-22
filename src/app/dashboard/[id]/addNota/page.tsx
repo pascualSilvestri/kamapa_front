@@ -114,6 +114,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
         fetchAlumnos();
     };
 
+
     const calcularPromedio = (alumnoNotas: Nota[]) => {
         const total = alumnoNotas.reduce((acc, nota) => acc + (nota.nota || 0), 0);
         return (total / alumnoNotas.length).toFixed(2);
