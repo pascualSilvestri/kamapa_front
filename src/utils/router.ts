@@ -43,6 +43,8 @@ export const directorAutorizeRouter = [
     'RegistroAlumno',
     'VistaUsuarios',
     'resetearPasswordUsuario',
+    "AddNotaAlumno"
+
 
 
 ]
