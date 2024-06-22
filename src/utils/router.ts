@@ -21,7 +21,8 @@ export const router = {
     'resetearPasswordUsuario': { label: 'Resetear contraseña a usuario', href: '/resetPassword' },
     'AddAlumnoCurso': { label: 'Asignar cursos a alumnos', href: '/addAlumnoCurso' },
     'AddNotaAlumno': { label: 'Agregar nota al alumno', href: '/addNota' },
-    'panel': { label: 'Panel', href: '/panel' },
+    'due': { label: 'Due', href: '/due' },
+    'consultaAsignaturaPorCurso':{label:'Consultar Asignatura por curso',href:'/consultaAsignaturasCurso'}
 
 }
 
@@ -43,8 +44,8 @@ export const directorAutorizeRouter = [
     'RegistroAlumno',
     'VistaUsuarios',
     'resetearPasswordUsuario',
-    "AddNotaAlumno"
-
+    "AddNotaAlumno",
+    'consultaAsignaturaPorCurso'
 
 
 ]
@@ -57,7 +58,8 @@ export const secretarioAutorizeRouter = [
     'AddAsignaturaCurso',
     'CursoAlumno',
     'VistaUsuarios',
-    'GestionAsignatura'
+    'GestionAsignatura',
+    'consultaAsignaturaPorCurso'
 ]
 
 export const preceptorAutorizeRouter = [
@@ -69,6 +71,7 @@ export const preceptorAutorizeRouter = [
     'Aulas',
     'About',
     'RegistroAlumno',
+    'consultaAsignaturaPorCurso'
 ]
 
 export const profesorAutorizeRouter = [
@@ -86,7 +89,7 @@ export const alumnoAutorizeRouter = [
     'Aulas',
     'About',
     'Calificaciones',
-    'panel'
+    'due'
 
 ]
 

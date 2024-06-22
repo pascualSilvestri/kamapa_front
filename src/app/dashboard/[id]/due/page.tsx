@@ -27,7 +27,7 @@ interface PDFContentProps {
   periodos: Periodo[];
 }
 
-const ConsultaNota = ({ params }: { params: { id: string } }) => {
+const Due = ({ params }: { params: { id: string } }) => {
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [periodos, setPeriodos] = useState<Periodo[]>([]);
   const [ciclosLectivos, setCiclosLectivos] = useState<CicloLectivo[]>([]);
@@ -43,6 +43,8 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
     fetchCiclosLectivos();
   }, []);
 
+
+  console.log(user)
   useEffect(() => {
     if (selectedCicloLectivo) {
       fetchAsignaturasYNotas();
@@ -144,9 +146,9 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
   };
   const PDFContent = React.forwardRef<HTMLDivElement, PDFContentProps>(
     ({ user, institucionSelected, asignaturas, periodos }, ref) => (
-      < div ref={ref} style={{ padding: "20px", border: "1px solid #000" }}>
+      <div ref={ref} style={{ padding: "20px", border: "1px solid #000" }}>
         {/* Header Section */}
-        <div div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center" }}>
           <div
             style={{
               display: "flex",
@@ -155,7 +157,11 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
             }}
           >
             <div>
-              <img src={institucionSelected.logo || "/Logo.png"} alt="Logo" />
+              <img
+                src={institucionSelected.logo || "/Logo.png"}
+                alt="Logo"
+                style={{ maxWidth: "100px", height: "auto" }}
+              />
             </div>
             <div>
               <h1
@@ -208,7 +214,7 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                 padding: "5px",
               }}
             >
-              Escuela:{"  "}
+              Escuela:{" "}
               <span
                 style={{ fontWeight: "normal", borderBottom: "2px solid #000" }}
               >
@@ -342,10 +348,10 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
               </p>
             </div>
           </div>
-        </div >
-
+        </div>
+  
         {/* Table Section */}
-        <table table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
               <th
@@ -528,16 +534,19 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
               </tr>
             ))}
           </tbody>
-        </table >
-      </div >
+        </table>
+      </div>
     )
   );
-
+  
   const exportToPDF = async () => {
     const input = pdfRef.current;
     if (!input) return;
-
-    const canvas = await html2canvas(input);
+  
+    const canvas = await html2canvas(input, {
+      scale: 2,
+      useCORS: true,
+    });
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF();
     const imgProps = pdf.getImageProperties(imgData);
@@ -546,6 +555,7 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save("Notas.pdf");
   };
+  
 
 
   return (
@@ -620,4 +630,4 @@ const StyledButton = styled(Button) <StyledButtonProps>`
   }
 `;
 
-export default ConsultaNota;
+export default Due;

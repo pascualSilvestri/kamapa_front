@@ -327,11 +327,11 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                         Visualizar PDF Analítico Provisorio
                     </StyledButton>
                 </Col>
-                <Col xs="auto">
+                {/* <Col xs="auto">
                     <StyledButton variant="purple" className="mx-2" onClick={exportToPDFDue}>
                         Visualizar PDF DUE
                     </StyledButton>
-                </Col>
+                </Col> */}
             </Row>
         </Container>
     );

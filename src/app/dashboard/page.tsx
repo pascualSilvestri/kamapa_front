@@ -30,6 +30,7 @@ const Dashboard = () => {
                 id: session.user.id,
                 nombre: session.user.nombre,
                 apellido: session.user.apellido,
+                dni: session.user.dni,
                 legajo: session.user.legajo,
                 telefono: session.user.telefono,
                 Roles: session.user.Roles,
