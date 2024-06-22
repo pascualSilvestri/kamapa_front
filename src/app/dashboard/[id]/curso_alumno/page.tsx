@@ -1,8 +1,11 @@
-'use client'
+'use client';
 import { Curso, User } from 'model/types';
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Table, Form } from 'react-bootstrap';
+import { Container, Row, Col, Table, Form, Button } from 'react-bootstrap';
 import { Environment } from 'utils/EnviromenManager';
+import { jsPDF } from 'jspdf'; // Importar jsPDF para la exportación a PDF
+import autoTable from 'jspdf-autotable'; // Importar autoTable para la exportación a PDF
+import * as XLSX from 'xlsx'; // Importar XLSX para la exportación a Excel
 
 const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     const [cursos, setCursos] = useState<Curso[]>([]);
@@ -33,6 +36,35 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         );
     };
 
+    const exportPDF = () => {
+        const doc = new jsPDF();
+        cursos.forEach((curso, index) => {
+            if (index > 0) doc.addPage();
+            doc.text(`Curso: ${curso.nombre}`, 10, 10);
+            autoTable(doc, {
+                startY: 20,
+                head: [['Nombre']],
+                body: filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [alumno.nombre])
+            });
+        });
+        doc.save('cursos_alumnos.pdf');
+    };
+
+    const exportExcel = () => {
+        const wb = XLSX.utils.book_new();
+        cursos.forEach(curso => {
+            const wsData = [
+                [`Curso: ${curso.nombre}`],
+                ['Nombre'],
+                ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [alumno.nombre]),
+                ['']
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, curso.nombre);
+        });
+        XLSX.writeFile(wb, 'cursos_alumnos.xlsx');
+    };
+
     return (
         <Container>
             <h1>Visualizar Cursos y Alumnos</h1>
@@ -46,6 +78,12 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                             onChange={handleFiltroChange}
                         />
                     </Form.Group>
+                    <Button variant="primary" onClick={exportPDF} style={{ margin: '10px' }}>
+                        Exportar a PDF
+                    </Button>
+                    <Button variant="success" onClick={exportExcel} style={{ margin: '10px' }}>
+                        Exportar a Excel
+                    </Button>
                     <Table striped bordered hover>
                         <thead>
                             <tr>
