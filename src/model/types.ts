@@ -76,6 +76,7 @@ export interface Institucion {
     logo: string;
     email?: string;
     contacto?: string;
+    Roles?:Roles[]
 }
 
 

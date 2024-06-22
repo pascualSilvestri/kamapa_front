@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Loading from '../components/Loading';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { CicloLectivo, Roles, User } from '../../model/types';
+import { CicloLectivo, Institucion, Roles, User } from '../../model/types';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { Environment } from 'utils/EnviromenManager';
 import ButtonAuth from '../components/ButtonAuth';
@@ -18,6 +18,7 @@ const Dashboard = () => {
     const [user, setUser] = useUserContext();
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
     const [rol, setRol] = useRolesContext();
+    
 
 
     useEffect(() => {
@@ -48,6 +49,8 @@ const Dashboard = () => {
         await signOut();
         router.push('/');
     };
+
+    console.log(user)
 
 
     return (
@@ -85,27 +88,19 @@ const Dashboard = () => {
                                             e.currentTarget.style.color = 'white';
                                         }}
                                         onClick={async (e) => {
-                                            const inst = await fetch(`${Environment.getEndPoint(Environment.endPoint.getInstitucionForRolsForUser)}${institucion.id}`, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'Accept': 'application/json',
-                                                    'Authorization': `Bearer ${session.accessToken}`
-                                                },
-                                                body: JSON.stringify({
-                                                    usuarioId: user.id,
-                                                })
-                                            });
-                                            const institucionSelected = await inst.json();
-                                            setInstitucionSelected({
-                                                id: institucionSelected.institucion.id,
-                                                nombre: institucionSelected.institucion.nombre,
-                                                logo: institucionSelected.institucion.logo,
-                                                cue: institucionSelected.institucion.cue,
-                                                email: institucionSelected.institucion.email,
-                                                contacto: institucionSelected.institucion.contacto,
-                                            });
-                                            setRol(institucionSelected.Roles);
+                                            console.log(`InstiSelected: ${JSON.stringify(institucion)}`);
+                                            const insti : Institucion = {
+                                                
+                                                    id: institucion.id,
+                                                    nombre: institucion.nombre,
+                                                    logo: institucion.logo,
+                                                    cue: institucion.cue,
+                                                    email: institucion.email,
+                                                    contacto: institucion.contacto,
+                                                
+                                            }
+                                            setInstitucionSelected(insti);
+                                            setRol(institucion.Roles);
                                         }}>
                                         Ingresar
                                     </Button>

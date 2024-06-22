@@ -17,6 +17,8 @@ function PageBienvenido({ params }: { params: { id: string } }) {
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [periodos, setPeriodos] = useState<Periodo[]>([]);
 
+  console.log(institucionSelected)
+
   useEffect(() => {
     fetchCicloLectivoActivo();
   }, []);
