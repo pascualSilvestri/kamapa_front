@@ -1,12 +1,27 @@
 'use client';
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from './components/Loading'; // Importa el componente de carga
+import DataLoading from './components/DataLoading'; // Importa el componente de carga de datos
 import SessionAuthProvider from '../context/SessionAuthProvider';
 import { UserProvider } from '../context/userContext';
 import { CicloLectivoProvider } from 'context/CicloLectivoContext';
 
 export default function RootLayout({ children }) {
+	const [loading, setLoading] = useState(true);
+
+	// Simula la carga de datos desde el servidor
+	useEffect(() => {
+		// Aquí podrías agregar tu lógica para cargar los datos necesarios
+		const fetchData = async () => {
+			// Simulación de una llamada a la API
+			await new Promise(resolve => setTimeout(resolve, 2000));
+			setLoading(false);
+		};
+
+		fetchData();
+	}, []);
+
 	return (
 		<html lang='es'>
 			<head>
@@ -62,8 +77,13 @@ export default function RootLayout({ children }) {
 					<SessionAuthProvider>
 						<UserProvider>
 							<CicloLectivoProvider>
-							<Suspense fallback={<Loading />} />
-								{children}
+								{loading ? (
+									<DataLoading loading={loading} />
+								) : (
+									<Suspense fallback={<Loading />}>
+										{children}
+									</Suspense>
+								)}
 							</CicloLectivoProvider>
 						</UserProvider>
 					</SessionAuthProvider>

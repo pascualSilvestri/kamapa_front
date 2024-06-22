@@ -6,6 +6,7 @@ import { Navigation } from '../../components/Navigation';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Loading from '../../components/Loading';
 
+
 export default function RootLayout({ children }) {
 	const { data: session } = useSession();
 	const router = useRouter();
