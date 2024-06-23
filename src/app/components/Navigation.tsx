@@ -9,6 +9,10 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { getRolesRouters } from '../../utils/router';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
+import { formatNombre } from '../../utils/formatNombre';
+
+
+
 
 export function Navigation() {
   const { data: session } = useSession();
@@ -37,7 +41,7 @@ export function Navigation() {
         <Navbar
           key={expand} expand={expand} className='bg-body-tertiary mb-3'
         >
-          <Container fluid className='d-flex justify-content-between'>
+          <Container className='d-flex justify-content-between'>
             <Navbar.Brand href='#' className='d-flex align-items-end'>
               {/* Logo de KAMAPA */}
               <Image
@@ -50,7 +54,8 @@ export function Navigation() {
                   borderRadius: '50%'
                 }}
               />
-              <h2 className='ms-2 mb-0'>{institucionSelected.nombre}</h2>
+              {/* Aplicar ternaria para mostrar nombre formateado si está seleccionado */}
+              <h2 className='ms-2 mb-0'>{institucionSelected.nombre ? formatNombre(institucionSelected.nombre) : ''}</h2>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
             <Navbar.Offcanvas

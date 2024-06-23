@@ -30,7 +30,7 @@ export function NavigationAdmin() {
         <Navbar
           key={expand} expand={expand} className='bg-body-tertiary mb-3'
         >
-          <Container fluid>
+          <Container >
             <Navbar.Brand href='#'>
               {/* Logo de KAMAPA */}
               <Image

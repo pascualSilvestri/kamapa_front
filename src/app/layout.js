@@ -104,7 +104,7 @@ export default function RootLayout({ children }) {
                 `}</style>
             </head>
             <body>
-                <div className='container-fluid d-flex flex-column min-vh-100'>
+                <div className='container-fluid d-flex flex-column min-vh-100 mx-0'>
                     <SessionAuthProvider>
                         <UserProvider>
                             <CicloLectivoProvider>
