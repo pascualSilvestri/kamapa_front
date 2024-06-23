@@ -4,8 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from '../../components/Navigation';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Loading from '../../components/Loading';
-
+import Loading from '../../components/Loading';  
 
 export default function RootLayout({ children }) {
 	const { data: session } = useSession();
@@ -43,6 +42,7 @@ export default function RootLayout({ children }) {
 			<Suspense fallback={<Loading />}>
 				<Navigation />
 				{children}
+				
 			</Suspense>
 		</>
 	);
