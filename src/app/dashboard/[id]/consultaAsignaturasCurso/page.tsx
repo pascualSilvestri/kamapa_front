@@ -36,10 +36,18 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
         const canvas = await html2canvas(input);
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF();
+        const fecha = new Date().toLocaleDateString();
+
+        // Agregar encabezado con nombre de la institución y fecha
+        pdf.setFontSize(18);
+        pdf.text(institucionSelected.nombre, 10, 20); // Ajusta la posición del texto según sea necesario
+        pdf.setFontSize(12);
+        pdf.text(`Fecha: ${fecha}`, 10, 30); // Ajusta la posición del texto según sea necesario
+
         const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(imgData, 'PNG', 0, 40, pdfWidth, pdfHeight);
         pdf.save('Cursos_Asignaturas_Profesores.pdf');
     };
 

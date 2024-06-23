@@ -9,7 +9,7 @@ import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRol
 import { Environment } from 'utils/EnviromenManager';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 
-const VistaEmpleadosPage = () => {
+const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
     const [empleados, setEmpleados] = useState([]);
     const [selectedEmpleado, setSelectedEmpleado] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -49,9 +49,10 @@ const VistaEmpleadosPage = () => {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     useEffect(() => {
         const fetchData = async () => {
+
             try {
                 const response = await fetch(
-                    `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`,
+                    `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${params.id}`,
                     {
                         method: 'GET',
                         headers: {
@@ -65,7 +66,7 @@ const VistaEmpleadosPage = () => {
                 }
 
                 const data = await response.json();
-                console.log(data);
+                console.log('soy data ',data);
                 setEmpleados(data.usuarios);
             } catch (error) {
                 console.error('Error al obtener empleados:', error.message);

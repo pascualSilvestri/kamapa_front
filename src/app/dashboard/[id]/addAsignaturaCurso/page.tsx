@@ -1,30 +1,33 @@
 'use client';
-
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table, Pagination, Modal } from 'react-bootstrap';
-import { Asignatura, Curso, User } from 'model/types';  // Asegúrate de que 'User' esté definido en 'model/types'
+import { Container, Row, Col, Form, Button, Table, Pagination } from 'react-bootstrap';
+import { Asignatura, Curso, User } from 'model/types';
 import { Environment } from 'utils/EnviromenManager';
 
-const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
-    const [curso, setCurso] = useState<string>('');
-    const [asignatura, setAsignatura] = useState<string>('');
-    const [cursos, setCursos] = useState<Curso[]>([]);
-    const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
-    const [cursoAsignado, setCursoAsignado] = useState<Curso | null>(null);
-    const [asignaturaAsignada, setAsignaturaAsignada] = useState<Asignatura>(null);
-    const [profesorAsignado, setProfesorAsignado] = useState<User>(null);
-    const [cursosConAsignaturas, setCursosConAsignaturas] = useState<Curso[]>([]);
-    const [profesores, setProfesores] = useState<User[]>([]);
+const AddAsignaturaCurso = ({ params }) => {
+    const [curso, setCurso] = useState('');
+    const [asignatura, setAsignatura] = useState('');
+    const [cursos, setCursos] = useState([]);
+    const [asignaturas, setAsignaturas] = useState([]);
+    const [cursoAsignado, setCursoAsignado] = useState(null);
+    const [asignaturaAsignada, setAsignaturaAsignada] = useState(null);
+    const [profesorAsignado, setProfesorAsignado] = useState(null);
+    const [cursosConAsignaturas, setCursosConAsignaturas] = useState([]);
+    const [profesores, setProfesores] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(3);
     const [filtroProfesor, setFiltroProfesor] = useState('');
     const [showModalModify, setShowModalModify] = useState(false);
 
     useEffect(() => {
-        fetchCursos();
-        fetchAsignaturas();
-        fetchCursosConAsignaturas();
-        fetchProfesores();
+        const fetchData = async () => {
+            await fetchCursos();
+            await fetchAsignaturas();
+            await fetchCursosConAsignaturas();
+            await fetchProfesores();
+        };
+
+        fetchData();
     }, []);
 
     const fetchCursos = async () => {
@@ -63,7 +66,7 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
         }
     };
 
-    const handleAddProfesor = (profesorId: number | string) => {
+    const handleAddProfesor = (profesorId) => {
         const profesorSelecte = profesores.find(p => p.id.toString() === profesorId.toString());
         setProfesorAsignado(profesorSelecte);
     };
@@ -73,8 +76,6 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
             const cursoId = cursoAsignado.id;
             const asignaturaId = asignaturaAsignada.id;
             const profesorId = profesorAsignado.id;
-
-            console.log('cursoId:', cursoId, 'asignaturaId:', asignaturaId, 'profesorId:', profesorId);
 
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.asociarAsignaturaCurso)}`, {
                 method: 'POST',
@@ -90,11 +91,9 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
 
             if (response.status !== 200) {
                 const data = await response.json();
-                console.log(data)
                 throw new Error('Error al asociar asignaturas, curso y profesor');
             } else {
                 const data = await response.json();
-                console.log(data)
                 cleandata();
                 fetchCursosConAsignaturas();
             }
@@ -113,12 +112,11 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
         setCursosConAsignaturas(Array.isArray(data) ? data : []);
     };
 
-    const handlePageChange = (pageNumber: number) => {
+    const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
-    // Filtrado de profesores según el valor del filtro
-    const filteredProfesores = profesores &&  profesores.filter(profesor => {
+    const filteredProfesores = profesores && profesores.filter(profesor => {
         const fullName = `${profesor.nombre} ${profesor.apellido}`.toLowerCase();
         return (
             fullName.includes(filtroProfesor.toLowerCase()) ||
@@ -126,7 +124,6 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
         );
     }) || [];
 
-    // Logic for displaying current professors
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentProfessors = filteredProfesores.slice(indexOfFirstItem, indexOfLastItem);
@@ -134,7 +131,7 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
 
     return (
         <Container>
-<h1>Agregar Asignaturas a Cursos</h1>
+            <h1>Agregar Asignaturas a Cursos</h1>
             <Row>
                 <Col>
                     <Table striped bordered hover>
@@ -205,7 +202,6 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
             </Row>
             <Row>
                 <Col md={6}>
-                    
                     <Row>
                         <Col>
                             <Form.Group>
@@ -334,7 +330,6 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
                             </Pagination>
                         </Col>
                     </Row>
-
                 </Col>
                 <Col md={6}>
                     <h2>Cursos con Asignaturas y Profesores Asociados</h2>
@@ -344,7 +339,6 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
                                 <th>Curso</th>
                                 <th>Asignaturas</th>
                                 <th>Profesor</th>
-                                {/* <th>Acción</th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -361,79 +355,12 @@ const AddAsignaturaCurso = ({ params }: { params: { id: string } }) => {
                                             {a.usuarioAsignatura ? `${a.usuarioAsignatura[0].nombre} ${a.usuarioAsignatura[0].apellido}` : 'No asignado'}
                                         </li>
                                     ))}</td>
-                                    {/* <td><Button onClick={() => {
-                                        setShowModalModify(true);
-                                        setCursoAsignado(c);
-                                        setAsignaturaAsignada(c.asignaturas[0]);
-                                        setProfesorAsignado(c.asignaturas[0].usuarioAsignatura[0]);
-                                    }}>Modificar</Button></td> */}
                                 </tr>
                             ))}
                         </tbody>
                     </Table>
                 </Col>
             </Row>
-            {/* <Modal show={showModalModify} onHide={() => setShowModalModify(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Modificar Asignatura</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <h2>{cursoAsignado == null ? '' : cursoAsignado.nombre}</h2>
-                        <Form.Group className="mb-3" controlId="formNombreModal">
-                            <Row>
-                                <Col>
-                                    <Form.Label>Asignatura</Form.Label>
-                                </Col>
-                                <Col>
-                                    <Form.Label>Profesor</Form.Label>
-                                </Col>
-                                <Col>
-                                    <Form.Label>Actions</Form.Label>
-                                </Col>
-                            </Row>
-                            {cursoAsignado && cursoAsignado.asignaturas.map(a => (
-                                <Row>
-                                    <Col>
-                                        <Form.Control
-                                            as="select"
-                                            value={a ? a.id : ''}
-                                            onChange={(e) => setAsignaturaAsignada(() => asignaturas.find(a => a.id === parseInt(e.target.value)))}
-                                        >
-                                            <option value="">Seleccionar asignatura</option>
-                                            {asignaturas && asignaturas.map((asignatura) => (
-                                                <option key={asignatura.id} value={asignatura.id}>{asignatura.nombre}</option>
-                                            ))}
-                                        </Form.Control>
-                                    </Col>
-                                    <Col>
-                                        <Form.Control
-                                            as="select"
-                                            value={a.usuarioAsignatura ? a.usuarioAsignatura[0].id : ''}
-                                            onChange={(e) => setProfesorAsignado(() => currentProfessors.find(a => a.id === parseInt(e.target.value)))}
-                                        >
-                                            <option value="">Seleccionar Profesor</option>
-                                            {currentProfessors && currentProfessors.map((profesor) => (
-                                                <option key={profesor.id} value={profesor.id}>{profesor.nombre}</option>
-                                            ))}
-                                        </Form.Control>
-                                    </Col>
-                                    <Col>
-                                        <Button variant="primary" onClick={() => handleModificarAsignaturas()}>
-                                            Modificar
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            ))}
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModalModify(false)}>
-                        Cancelar
-                    </Button>
-                </Modal.Footer>
-            </Modal> */}
         </Container>
     );
 };

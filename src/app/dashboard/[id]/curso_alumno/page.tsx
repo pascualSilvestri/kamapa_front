@@ -6,17 +6,19 @@ import { Environment } from 'utils/EnviromenManager';
 import { jsPDF } from 'jspdf'; // Importar jsPDF para la exportación a PDF
 import autoTable from 'jspdf-autotable'; // Importar autoTable para la exportación a PDF
 import * as XLSX from 'xlsx'; // Importar XLSX para la exportación a Excel
+import { useInstitucionSelectedContext } from 'context/userContext';
 
 const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     const [cursos, setCursos] = useState<Curso[]>([]);
     const [filtroAlumno, setFiltroAlumno] = useState<string>('');
+    const [institucionSelected] = useInstitucionSelectedContext();
 
     useEffect(() => {
         fecthCursosAndAlumnos();
     }, []);
 
     async function fecthCursosAndAlumnos() {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosAllAlumnosByCicloLectivoActivo)}${params.id}`,{
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosAllAlumnosByCicloLectivoActivo)}${params.id}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -38,11 +40,19 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
 
     const exportPDF = () => {
         const doc = new jsPDF();
+        const fecha = new Date().toLocaleDateString();
+
         cursos.forEach((curso, index) => {
             if (index > 0) doc.addPage();
-            doc.text(`Curso: ${curso.nombre}`, 10, 10);
+            // Agregar encabezado con nombre de la institución y fecha
+            doc.setFontSize(18);
+            doc.text(institucionSelected.nombre, 10, 20); // Ajusta la posición del texto según sea necesario
+            doc.setFontSize(12);
+            doc.text(`Fecha: ${fecha}`, 10, 30); // Ajusta la posición del texto según sea necesario
+
+            doc.text(`Curso: ${curso.nombre}`, 10, 50);
             autoTable(doc, {
-                startY: 20,
+                startY: 60,
                 head: [['Nombre']],
                 body: filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [alumno.nombre])
             });

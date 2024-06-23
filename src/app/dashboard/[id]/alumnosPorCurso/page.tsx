@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
 import { Curso, User } from 'model/types';  // Asegúrate de que 'User' y 'Curso' estén definidos en 'model/types'
 import { Environment } from 'utils/EnviromenManager';
-import { useUserContext } from 'context/userContext';
+import { useInstitucionSelectedContext, useUserContext } from 'context/userContext';
 import { useCicloLectivo } from 'context/CicloLectivoContext';
 import { jsPDF } from 'jspdf'; // Importar jsPDF para la exportación a PDF
 import autoTable from 'jspdf-autotable'; // Importar autoTable para la exportación a PDF
@@ -16,6 +16,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     const [nombreCursoSeleccionado, setNombreCursoSeleccionado] = useState<string>('');
     const [user] = useUserContext();
     const [cicloLectivo] = useCicloLectivo();
+    const [institucionSelected] = useInstitucionSelectedContext();
 
     useEffect(() => {
         fetchCursos();
@@ -67,9 +68,17 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
 
     const exportPDF = () => {
         const doc = new jsPDF();
-        doc.text(`Lista de Alumnos - ${nombreCursoSeleccionado}`, 10, 10);
+        const fecha = new Date().toLocaleDateString();
+
+        // Agregar encabezado con nombre de la institución y fecha
+        doc.setFontSize(18);
+        doc.text(institucionSelected.nombre, 10, 20); // Ajusta la posición del texto según sea necesario
+        doc.setFontSize(12);
+        doc.text(`Fecha: ${fecha}`, 10, 30); // Ajusta la posición del texto según sea necesario
+
+        doc.text(`Lista de Alumnos - ${nombreCursoSeleccionado}`, 10, 50);
         autoTable(doc, {
-            startY: 20,
+            startY: 60,
             head: [['Nombre', 'Apellido', 'DNI']],
             body: alumnos.map(alumno => [alumno.nombre, alumno.apellido, alumno.dni])
         });
