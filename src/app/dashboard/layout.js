@@ -4,10 +4,11 @@ import Images from 'next/image';
 
 
 
+
 const DashboardLayout = ({ children }) => {
 
     return (
-      <main >
+      <>
          <Images
                 src="/fondoApp.webp"
                 alt="Background"
@@ -19,7 +20,9 @@ const DashboardLayout = ({ children }) => {
                 }}
             />
           {children}
-      </main>
+        
+      </>
+      
     );
   };
 

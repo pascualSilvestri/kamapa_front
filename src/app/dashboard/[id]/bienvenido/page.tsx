@@ -124,7 +124,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
           </h1>
           <div className="mt-6">
             <Row className="mb-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center">
                 Ciclo Lectivo {cicloLectivo.nombre}
               </h2>
             </Row>
