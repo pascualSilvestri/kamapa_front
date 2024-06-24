@@ -48,7 +48,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
     // FUNCIONES PARA EL Search
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     useEffect(() => {
-        
+
         fetchData();
     }, [session]);
 
@@ -289,7 +289,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                     </Link>
                 </Col>
                 <Col>
-                    <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/curso_alumno`}>
+                    <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/consultaUsuario`}>
                         <Button
                             variant='flat'
                             style={{

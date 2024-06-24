@@ -1,31 +1,45 @@
-'use client';
+'use client'
 import { Curso, User } from 'model/types';
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Table, Form, Button } from 'react-bootstrap';
-import { Environment } from 'utils/EnviromenManager';
-import { jsPDF } from 'jspdf'; // Importar jsPDF para la exportación a PDF
-import autoTable from 'jspdf-autotable'; // Importar autoTable para la exportación a PDF
-import * as XLSX from 'xlsx'; // Importar XLSX para la exportación a Excel
+import { Environment } from '../../../../utils/EnviromenManager';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 import { useInstitucionSelectedContext } from 'context/userContext';
 
 const CursosAlumnos = ({ params }: { params: { id: string } }) => {
-    const [cursos, setCursos] = useState<Curso[]>([]);
+    const [cursos, setCursos] = useState<Curso[]>([]); // Asegúrate de que cursos se inicialice como un array vacío
     const [filtroAlumno, setFiltroAlumno] = useState<string>('');
     const [institucionSelected] = useInstitucionSelectedContext();
 
     useEffect(() => {
-        fecthCursosAndAlumnos();
+        fetchCursosAndAlumnos(); // Llama a la función correcta fetchCursosAndAlumnos en useEffect
     }, []);
 
-    async function fecthCursosAndAlumnos() {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosAllAlumnosByCicloLectivoActivo)}${params.id}`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            method: 'GET',
-        });
-        const data = await response.json();
-        setCursos(data);
+    async function fetchCursosAndAlumnos() {
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosAllAlumnosByCicloLectivoActivo)}${params.id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                method: 'GET',
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            // Verifica si data es un array antes de establecerlo en cursos
+            if (Array.isArray(data)) {
+                setCursos(data); // Establece cursos con los datos recibidos
+            } else {
+                console.error("Error: Data received is not an array");
+                // Podrías manejar el error aquí, por ejemplo, mostrando un mensaje al usuario
+            }
+        } catch (error) {
+            console.error("Error fetching courses and students:", error);
+            // Podrías manejar el error aquí, por ejemplo, mostrando un mensaje al usuario
+        }
     }
 
     const handleFiltroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,12 +58,10 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
 
         cursos.forEach((curso, index) => {
             if (index > 0) doc.addPage();
-            // Agregar encabezado con nombre de la institución y fecha
             doc.setFontSize(18);
-            doc.text(institucionSelected.nombre, 10, 20); // Ajusta la posición del texto según sea necesario
+            doc.text(institucionSelected.nombre, 10, 20);
             doc.setFontSize(12);
-            doc.text(`Fecha: ${fecha}`, 10, 30); // Ajusta la posición del texto según sea necesario
-
+            doc.text(`Fecha: ${fecha}`, 10, 30);
             doc.text(`Curso: ${curso.nombre}`, 10, 50);
             autoTable(doc, {
                 startY: 60,
