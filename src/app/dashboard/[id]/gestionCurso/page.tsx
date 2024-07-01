@@ -21,7 +21,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     const [cursoToDelete, setCursoToDelete] = useState<number | null>(null);
     const [cursoToDeleteName, setCursoToDeleteName] = useState<string>('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(3); // Modificar el numero dependiendo cuantos elementos se quiere mostrar en la paginacion
+    const [itemsPerPage] = useState(5); // Número de elementos por página
 
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [showModifySuccessMessage, setShowModifySuccessMessage] = useState(false);
@@ -32,53 +32,59 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     }, []);
 
     const fetchCursos = async () => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`);
+            if (!response.ok) {
+                throw new Error('Error al obtener los cursos');
             }
-        });
-
-        const data = await response.json();
-        setCursos(data);
+            const data = await response.json();
+            setCursos(data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
     const handleCrearCurso = async () => {
-        const nuevoCurso: Curso = {
-            id: cursos.length + 1,
-            nombre,
-            nominacion,
-            division,
-            institucionId: params.id,
-        };
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createCurso)}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                nombre: nuevoCurso.nombre,
-                nominacion: nuevoCurso.nominacion,
-                division: nuevoCurso.division,
-                institucionId: nuevoCurso.institucionId
-            })
-        });
+        try {
+            const nuevoCurso: Curso = {
+                id: cursos.length + 1,
+                nombre,
+                nominacion,
+                division,
+                institucionId: params.id,
+            };
 
-        if (response.status !== 200) {
-            alert('Error al crear curso');
-            return;
-        } else {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createCurso)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombre: nuevoCurso.nombre,
+                    nominacion: nuevoCurso.nominacion,
+                    division: nuevoCurso.division,
+                    institucionId: nuevoCurso.institucionId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al crear curso');
+            }
+
             await response.json();
             fetchCursos();
             setShowSuccessMessage(true);
             setTimeout(() => {
                 setShowSuccessMessage(false);
             }, 3000); // Ocultar mensaje después de 3 segundos
-        }
 
-        setNombre('');
-        setNominacion('');
-        setDivision('');
+            setNombre('');
+            setNominacion('');
+            setDivision('');
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
     const handleModificarCurso = (id: number) => {
@@ -88,7 +94,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             setNominacion(curso.nominacion);
             setDivision(curso.division);
             setCurrentCursoId(id);
-            setCurrentCursoName(curso.nombre); // Set current curso name
+            setCurrentCursoName(curso.nombre);
             setShowModalModify(true);
         }
     };
@@ -98,23 +104,25 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     };
 
     const confirmSubmitModificarCurso = async () => {
-        if (currentCursoId !== null) {
-            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateCursor)}${currentCursoId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    nombre,
-                    nominacion,
-                    division,
-                    institucionId: params.id
-                })
-            });
+        try {
+            if (currentCursoId !== null) {
+                const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateCurso)}${currentCursoId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nombre,
+                        nominacion,
+                        division,
+                        institucionId: params.id
+                    })
+                });
 
-            if (response.status !== 200) {
-                throw new Error('No se pudo modificar el curso');
-            } else {
+                if (!response.ok) {
+                    throw new Error('Error al modificar curso');
+                }
+
                 fetchCursos();
                 setShowModalModify(false);
                 setShowModalConfirmModify(false);
@@ -122,11 +130,14 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                 setTimeout(() => {
                     setShowModifySuccessMessage(false);
                 }, 3000); // Ocultar mensaje después de 3 segundos
+
                 setNombre('');
                 setNominacion('');
                 setDivision('');
                 setCurrentCursoId(null);
             }
+        } catch (error) {
+            console.error('Error:', error);
         }
     };
 
@@ -134,7 +145,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
         const curso = cursos.find(curso => curso.id === id);
         if (curso) {
             setCursoToDelete(id);
-            setCursoToDeleteName(curso.nombre); // Set curso to delete name
+            setCursoToDeleteName(curso.nombre);
             setShowModalDelete(true);
         }
     };
@@ -145,24 +156,27 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     };
 
     const submitDeleteCurso = async () => {
-        if (cursoToDelete !== null) {
-            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteCurso)}${cursoToDelete}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+        try {
+            if (cursoToDelete !== null) {
+                const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteCurso)}${cursoToDelete}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-            if (response.status !== 200) {
-                alert('Error al eliminar curso');
-                return;
-            } else {
+                if (!response.ok) {
+                    throw new Error('Error al eliminar curso');
+                }
+
                 await response.json();
                 fetchCursos();
                 setShowModalConfirmDelete(false);
                 setCursoToDelete(null);
                 setCursoToDeleteName('');
             }
+        } catch (error) {
+            console.error('Error:', error);
         }
     };
 
@@ -170,7 +184,6 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
         setCurrentPage(pageNumber);
     };
 
-    // Filtrar cursos según los criterios de filtro
     const filteredCursos = cursos.filter(curso => {
         return (
             (filtroNombre === '' || curso.nombre.toLowerCase().includes(filtroNombre.toLowerCase())) &&
@@ -179,7 +192,6 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
         );
     });
 
-    // Obtener los cursos a mostrar en la página actual
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentCursos = filteredCursos.slice(indexOfFirstItem, indexOfLastItem);
@@ -189,12 +201,12 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
         <Container>
             <h1 className="my-4">Gestionar Cursos</h1>
             {showSuccessMessage && (
-                <Alert variant="success" className="text-center" style={{ color: 'green' }}>
+                <Alert variant="success" className="text-center">
                     Curso creado con éxito
                 </Alert>
             )}
             {showModifySuccessMessage && (
-                <Alert variant="success" className="text-center" style={{ color: 'green' }}>
+                <Alert variant="success" className="text-center">
                     Curso modificado con éxito
                 </Alert>
             )}
@@ -208,7 +220,6 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                                 placeholder="Nombre del curso"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
-                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formNominacion">
@@ -218,7 +229,6 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                                 placeholder="Nominación del curso"
                                 value={nominacion}
                                 onChange={(e) => setNominacion(e.target.value)}
-                                autoComplete='off'
                             />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formDivision">
@@ -228,29 +238,11 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                                 placeholder="División del curso"
                                 value={division}
                                 onChange={(e) => setDivision(e.target.value)}
-                                autoComplete='off'
                             />
                         </Form.Group>
                         <Button
                             variant="primary"
                             onClick={handleCrearCurso}
-                            style={{
-                                backgroundColor: 'purple',
-                                color: 'white',
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease',
-                                border: '2px solid purple',
-                                cursor: 'pointer',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = 'white';
-                                e.currentTarget.style.color = 'purple';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'purple';
-                                e.currentTarget.style.color = 'white';
-                            }}
                         >
                             Crear Curso
                         </Button>
@@ -295,7 +287,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             <Row>
                 <Col>
                     <h3 className="mb-4">Lista de Cursos</h3>
-                    <Table striped bordered hover>
+                    <Table striped bordered hover responsive>
                         <thead>
                             <tr>
                                 <th>Nombre</th>

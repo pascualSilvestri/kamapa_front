@@ -264,18 +264,13 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
     console.log(alumnos)
     console.log(selectedAlumno)
     return (
-        <div className='p-3'>
-            <Row className='mb-3  justify-content-center'>
-                <Col>
+        <div className="p-3">
+            <Row className="mb-3 justify-content-between align-items-center">
+                <Col xs="auto">
                     <Link href={`/dashboard/${institucionSelected.id}/bienvenido`}>
                         <Button
-                            variant='secondary'
-                            style={{
-                                marginRight: '10px',
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease',
-                            }}
+                            variant="secondary"
+                            className="responsive-button"
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.backgroundColor = 'white';
                                 e.currentTarget.style.color = 'black';
@@ -288,18 +283,12 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                         </Button>
                     </Link>
                 </Col>
-                <Col>
+                <Col xs="auto">
                     <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/consultaUsuario`}>
                         <Button
-                            variant='flat'
-                            style={{
-                                backgroundColor: 'purple',
-                                color: 'white',
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                marginBottom: '1rem',
-                                transition: 'all 0.3s ease',
-                            }}
+                            variant="flat"
+                            className="responsive-button"
+                            style={{ backgroundColor: 'purple', color: 'white' }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.backgroundColor = 'white';
                                 e.currentTarget.style.color = 'black';
@@ -314,21 +303,16 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                 </Col>
             </Row>
 
-            {/* //buscador */}
-            <Form.Group controlId='formBuscar'>
+            <Form.Group controlId="formBuscar" className="mb-3">
                 <Form.Control
-                    type='text'
-                    placeholder='Buscar por DNI, nombre o apellido...'
+                    type="text"
+                    placeholder="Buscar por DNI, nombre o apellido..."
                     value={searchTerm}
                     onChange={handleSearch}
                 />
             </Form.Group>
 
-
-            <Table
-                striped
-                bordered
-                hover>
+            <Table striped bordered hover responsive>
                 <thead>
                     <tr>
                         <th>Legajo</th>
@@ -338,350 +322,222 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                         <th>Acciones</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {Array.isArray(filteredAlumnos) && filteredAlumnos.length > 0 ? (
                         filteredAlumnos.map((alumno) => (
                             <tr key={alumno.id}>
-                                <td>{alumno?.legajo}</td>
+                                <td>{alumno.legajo}</td>
+                                <td>{alumno.nombre} {alumno.apellido}</td>
+                                <td>{alumno.dni}</td>
+                                <td>{alumno.telefono}</td>
                                 <td>
-                                    {alumno?.nombre} {alumno?.apellido}
-                                </td>
-                                <td>
-                                    {alumno?.dni}
-                                </td>
-                                <td>
-                                    {alumno?.telefono}
-                                </td>
-                                <td>
-                                    <Button
-                                        variant='link'
-                                        onClick={() => handleConsultar(alumno)}
-                                        title='Consultar Empleado'>
+                                    <Button variant="link" onClick={() => handleConsultar(alumno)} title="Consultar Alumno">
                                         <BsEye />
                                     </Button>
-
-                                    <Button
-                                        variant='link'
-                                        onClick={() => handleModificar(alumno)}
-                                        title='Modificar Empleado'>
+                                    <Button variant="link" onClick={() => handleModificar(alumno)} title="Modificar Alumno">
                                         <BsPencil />
                                     </Button>
-
-                                    <Button
-                                        variant='link'
-                                        onClick={() => handleEliminar(alumno)}
-                                        title='Eliminar Empleado'>
+                                    <Button variant="link" onClick={() => handleEliminar(alumno)} title="Eliminar Alumno">
                                         <BsTrash />
                                     </Button>
-
                                 </td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan={4}>No hay empleados disponibles</td>
+                            <td colSpan="5" className="text-center">No hay alumnos disponibles</td>
                         </tr>
                     )}
                 </tbody>
             </Table>
 
-            <Modal
-                show={showModal}
-                onHide={() => setShowModal(false)}>
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Detalles del Empleado</Modal.Title>
+                    <Modal.Title>Detalles del Alumno</Modal.Title>
                 </Modal.Header>
-
                 <Modal.Body>
                     {selectedAlumno && (
-                        <p>
-                            <p>Legajo: {selectedAlumno?.legajo}</p>
-                            <p>
-                                Fecha de ingreso:{' '}
-                                {new Date(
-                                    selectedAlumno?.fecha_ingreso,
-                                ).toLocaleDateString()}
-                            </p>
-                            <p>
-                                Fecha de egreso:{' '}
-                                {selectedAlumno?.fecha_egreso
-                                    ? new Date(
-                                        selectedAlumno?.fecha_egreso,
-                                    ).toLocaleDateString()
-                                    : 'N/A'}
-                            </p>
-                            <p>Nombre: {selectedAlumno?.nombre}</p>
-                            <p>Apellido: {selectedAlumno?.apellido}</p>
-                            <p>DNI: {selectedAlumno?.dni}</p>
-                            <p>CUIL: {selectedAlumno?.cuil}</p>
-                            <p>
-                                Fecha de nacimiento:{' '}
-                                {new Date(
-                                    selectedAlumno?.fechaNacimiento,
-                                ).toLocaleDateString()}
-                            </p>
-                            <p>Teléfono: {selectedAlumno.telefono || 'No disponible'}</p>
-                            {/* <p>Provincia: {selectedEmpleado.domicilioUsuario?.provincia || 'No disponible'}</p> */}
-                            <p>Localidad: {selectedAlumno?.domicilioUsuario?.localidad || 'No disponible'}</p>
-                            <p>Barrio: {selectedAlumno.domicilioUsuario?.barrio || 'No disponible'}</p>
-                            <p>Calle: {selectedAlumno.domicilioUsuario?.calle || 'No disponible'}</p>
-                            <p>Número: {selectedAlumno.domicilioUsuario?.numero || 'No disponible'}</p>
-                            {/* <p>
-                                Estado:{' '}
-                                {selectedAlumno?.is_active
-                                    ? 'Activo'
-                                    : 'Inactivo'}
-                            </p> */}
-                        </p>
+                        <>
+                            <p><strong>Legajo:</strong> {selectedAlumno.legajo}</p>
+                            <p><strong>Fecha de ingreso:</strong> {new Date(selectedAlumno.fecha_ingreso).toLocaleDateString()}</p>
+                            <p><strong>Fecha de egreso:</strong> {selectedAlumno.fecha_egreso ? new Date(selectedAlumno.fecha_egreso).toLocaleDateString() : 'N/A'}</p>
+                            <p><strong>Nombre:</strong> {selectedAlumno.nombre}</p>
+                            <p><strong>Apellido:</strong> {selectedAlumno.apellido}</p>
+                            <p><strong>DNI:</strong> {selectedAlumno.dni}</p>
+                            <p><strong>CUIL:</strong> {selectedAlumno.cuil}</p>
+                            <p><strong>Fecha de nacimiento:</strong> {new Date(selectedAlumno.fechaNacimiento).toLocaleDateString()}</p>
+                            <p><strong>Teléfono:</strong> {selectedAlumno.telefono || 'No disponible'}</p>
+                            <p><strong>Localidad:</strong> {selectedAlumno.domicilioUsuario.localidad || 'No disponible'}</p>
+                            <p><strong>Barrio:</strong> {selectedAlumno.domicilioUsuario.barrio || 'No disponible'}</p>
+                            <p><strong>Calle:</strong> {selectedAlumno.domicilioUsuario.calle || 'No disponible'}</p>
+                            <p><strong>Número:</strong> {selectedAlumno.domicilioUsuario.numero || 'No disponible'}</p>
+                        </>
                     )}
                 </Modal.Body>
-
                 <Modal.Footer>
-                    <Button
-                        variant='secondary'
-                        onClick={() => setShowModal(false)}>
-                        Cerrar
-                    </Button>
+                    <Button variant="secondary" onClick={() => setShowModal(false)}>Cerrar</Button>
                 </Modal.Footer>
             </Modal>
 
-            <Modal
-                show={showEditModal}
-                onHide={() => setShowEditModal(false)}>
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Editar Empleado</Modal.Title>
+                    <Modal.Title>Editar Alumno</Modal.Title>
                 </Modal.Header>
-
                 <Modal.Body>
                     {selectedAlumno && (
-
                         <Form>
-                            <Form.Group controlId='formLegajo'>
+                            <Form.Group controlId="formLegajo" className="mb-3">
                                 <Form.Label>Legajo</Form.Label>
                                 <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno?.legajo}
-                                    onChange={(e) => { editedAlumno.legajo = e.target.value }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.legajo}
+                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, legajo: e.target.value })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formNombre'>
+                            <Form.Group controlId="formNombre" className="mb-3">
                                 <Form.Label>Nombre</Form.Label>
                                 <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno?.nombre}
-                                    onChange={(e) => { editedAlumno.nombre = e.target.value }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.nombre}
+                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, nombre: e.target.value })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formApellido'>
+                            <Form.Group controlId="formApellido" className="mb-3">
                                 <Form.Label>Apellido</Form.Label>
                                 <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno?.apellido}
-                                    onChange={(e) => { editedAlumno.apellido = e.target.value }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.apellido}
+                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, apellido: e.target.value })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formDni'>
+                            <Form.Group controlId="formDni" className="mb-3">
                                 <Form.Label>D.N.I:</Form.Label>
                                 <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno?.dni}
-                                    onChange={(e) => { editedAlumno.dni = e.target.value }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.dni}
+                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, dni: e.target.value })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formCuil'>
+                            <Form.Group controlId="formCuil" className="mb-3">
                                 <Form.Label>C.U.I.L:</Form.Label>
                                 <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno?.cuil}
-                                    onChange={(e) => { editedAlumno.cuil = e.target.value }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.cuil}
+                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, cuil: e.target.value })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formFechaNacimiento'>
+                            <Form.Group controlId="formFechaNacimiento" className="mb-3">
                                 <Form.Label>Fecha de Nacimiento</Form.Label>
                                 <Form.Control
-                                    type='date'
-                                    defaultValue={selectedAlumno?.fechaNacimiento}
-                                    onChange={(e) => { editedAlumno.fechaNacimiento = e.target.value }}
+                                    type="date"
+                                    defaultValue={selectedAlumno.fechaNacimiento}
+                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, fechaNacimiento: e.target.value })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formTelefono'>
-                                <Form.Label>Telefono</Form.Label>
+                            <Form.Group controlId="formTelefono" className="mb-3">
+                                <Form.Label>Teléfono</Form.Label>
                                 <Form.Control
-                                    type='telefono'
-                                    defaultValue={selectedAlumno?.telefono}
-                                    onChange={(e) => { editedAlumno.telefono = e.target.value }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.telefono}
+                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, telefono: e.target.value })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formEmail'>
+                            <Form.Group controlId="formEmail" className="mb-3">
                                 <Form.Label>Email</Form.Label>
                                 <Form.Control
-                                    type='email'
-                                    defaultValue={selectedAlumno?.email}
-                                    onChange={(e) => { editedAlumno.email = e.target.value }}
+                                    type="email"
+                                    defaultValue={selectedAlumno.email}
+                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, email: e.target.value })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formLocalidad'>
+                            <Form.Group controlId="formLocalidad" className="mb-3">
                                 <Form.Label>Localidad</Form.Label>
                                 <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno?.domicilioUsuario?.localidad || ''}
-                                    onChange={(e) => {
-                                        setEditedAlumno((prevState) => ({
-                                            ...prevState,
-                                            domicilioUsuario: {
-                                                ...prevState.domicilioUsuario,
-                                                localidad: e.target.value,
-                                            },
-                                        }));
-                                    }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.domicilioUsuario.localidad || ''}
+                                    onChange={(e) => setEditedAlumno({
+                                        ...editedAlumno,
+                                        domicilioUsuario: {
+                                            ...editedAlumno.domicilioUsuario,
+                                            localidad: e.target.value,
+                                        },
+                                    })}
                                 />
                             </Form.Group>
-
-
-                            <Form.Group controlId='formBarrio'>
+                            <Form.Group controlId="formBarrio" className="mb-3">
                                 <Form.Label>Barrio</Form.Label>
                                 <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno?.domicilioUsuario?.barrio || ''}
-                                    onChange={(e) => {
-                                        setEditedAlumno((prevState) => ({
-                                            ...prevState,
-                                            domicilioUsuario: {
-                                                ...prevState.domicilioUsuario,
-                                                barrio: e.target.value,
-                                            },
-                                        }));
-                                    }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.domicilioUsuario.barrio || ''}
+                                    onChange={(e) => setEditedAlumno({
+                                        ...editedAlumno,
+                                        domicilioUsuario: {
+                                            ...editedAlumno.domicilioUsuario,
+                                            barrio: e.target.value,
+                                        },
+                                    })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formCalle'>
+                            <Form.Group controlId="formCalle" className="mb-3">
                                 <Form.Label>Calle</Form.Label>
                                 <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno?.domicilioUsuario?.calle || ''}
-                                    onChange={(e) => {
-                                        setEditedAlumno((prevState) => ({
-                                            ...prevState,
-                                            domicilioUsuario: {
-                                                ...prevState.domicilioUsuario,
-                                                calle: e.target.value,
-                                            },
-                                        }));
-                                    }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.domicilioUsuario.calle || ''}
+                                    onChange={(e) => setEditedAlumno({
+                                        ...editedAlumno,
+                                        domicilioUsuario: {
+                                            ...editedAlumno.domicilioUsuario,
+                                            calle: e.target.value,
+                                        },
+                                    })}
                                 />
                             </Form.Group>
-
-                            <Form.Group controlId='formNumero'>
-                                <Form.Label>Numeracion de la calle</Form.Label>
+                            <Form.Group controlId="formNumero" className="mb-3">
+                                <Form.Label>Numeración de la calle</Form.Label>
                                 <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno?.domicilioUsuario?.numero || ''}
-                                    onChange={(e) => {
-                                        setEditedAlumno((prevState) => ({
-                                            ...prevState,
-                                            domicilioUsuario: {
-                                                ...prevState.domicilioUsuario,
-                                                numero: e.target.value,
-                                            },
-                                        }));
-                                    }}
+                                    type="text"
+                                    defaultValue={selectedAlumno.domicilioUsuario.numero || ''}
+                                    onChange={(e) => setEditedAlumno({
+                                        ...editedAlumno,
+                                        domicilioUsuario: {
+                                            ...editedAlumno.domicilioUsuario,
+                                            numero: e.target.value,
+                                        },
+                                    })}
                                 />
                             </Form.Group>
-
-                            {/* <Form.Group controlId='formRoles'>
-                                <Form.Label>Roles</Form.Label>
-                                {roles.map((rol) => {
-                                    const isChecked = selectedEmpleado?.Roles?.some((r) => r.id === rol.id);
-                                    return (
-                                        <Form.Check
-                                            key={rol.id}
-                                            type="checkbox"
-                                            id={rol.id}
-                                            label={rol.name}
-                                            defaultChecked={isChecked}
-                                            onChange={(e) => handleRoleChange(rol.id, e.target.checked)}
-                                        />
-                                    )
-                                })}
-                            </Form.Group> */}
                         </Form>
                     )}
                 </Modal.Body>
-
                 <Modal.Footer>
-                    <Button
-                        variant='secondary'
-                        onClick={() => setShowEditModal(false)}>
-                        Cancelar
-                    </Button>
-
-                    <Button
-                        variant='purple'
-                        onClick={handleSave}>
-                        Guardar
-                    </Button>
+                    <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancelar</Button>
+                    <Button variant="primary" onClick={handleSave}>Guardar</Button>
                 </Modal.Footer>
             </Modal>
 
-            <Modal
-                show={showSaveConfirmModal}
-                onHide={() => setShowSaveConfirmModal(false)}>
+            <Modal show={showSaveConfirmModal} onHide={() => setShowSaveConfirmModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirmar cambios</Modal.Title>
                 </Modal.Header>
-
                 <Modal.Body>
                     ¿Estás seguro de que quieres guardar los cambios?
                 </Modal.Body>
-
                 <Modal.Footer>
-                    <Button
-                        variant='secondary'
-                        onClick={() => setShowSaveConfirmModal(false)}>
-                        Cancelar
-                    </Button>
-
-                    <Button
-                        variant='purple'
-                        onClick={handleConfirmSave}>
-                        Confirmar
-                    </Button>
+                    <Button variant="secondary" onClick={() => setShowSaveConfirmModal(false)}>Cancelar</Button>
+                    <Button variant="primary" onClick={handleConfirmSave}>Confirmar</Button>
                 </Modal.Footer>
             </Modal>
 
-            <Modal
-                show={showConfirmModal}
-                onHide={() => setShowConfirmModal(false)}>
+            <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirmar eliminación</Modal.Title>
                 </Modal.Header>
-
                 <Modal.Body>
-                    ¿Estás seguro de que quieres eliminar a este empleado?
+                    ¿Estás seguro de que quieres eliminar a este alumno?
                 </Modal.Body>
-
                 <Modal.Footer>
-                    <Button
-                        variant='secondary'
-                        onClick={() => setShowConfirmModal(false)}>
-                        No
-                    </Button>
-
-                    <Button
-                        variant='danger'
-                        onClick={handleConfirmDelete}>
-                        Sí, eliminar
-                    </Button>
+                    <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>No</Button>
+                    <Button variant="danger" onClick={handleConfirmDelete}>Sí, eliminar</Button>
                 </Modal.Footer>
             </Modal>
         </div>
