@@ -15,6 +15,11 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
     const [currentAsignaturaId, setCurrentAsignaturaId] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(5); // Ajustado a 5 elementos por página
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [asignaturaToDelete, setAsignaturaToDelete] = useState<Asignatura | null>(null);
+    const [showFinalDeleteConfirm, setShowFinalDeleteConfirm] = useState(false);
 
     useEffect(() => {
         fetchAsignaturas();
@@ -59,6 +64,8 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
 
             await res.json();
             fetchAsignaturas();
+            setSuccessMessage(`La asignatura "${nombre}" se creó con éxito.`);
+            setShowSuccessAlert(true);
         } catch (error) {
             console.error('Error creating asignatura:', error);
         }
@@ -104,9 +111,11 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
         }
     };
 
-    const handleEliminarAsignatura = async (id: number) => {
+    const handleEliminarAsignatura = async () => {
+        if (!asignaturaToDelete) return;
+
         try {
-            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAsignatura)}${id}`, {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAsignatura)}${asignaturaToDelete.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -119,6 +128,11 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
 
             await response.json();
             fetchAsignaturas();
+            setShowFinalDeleteConfirm(false);
+            setShowDeleteConfirm(false);
+            setSuccessMessage(`La asignatura "${asignaturaToDelete.nombre}" se eliminó con éxito.`);
+            setShowSuccessAlert(true);
+            setAsignaturaToDelete(null);
         } catch (error) {
             console.error('Error deleting asignatura:', error);
         }
@@ -128,7 +142,6 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
         setCurrentPage(pageNumber);
     };
 
-    // Filtrar asignaturas según los criterios de filtro
     const filteredAsignaturas = asignaturas.filter(asignatura => {
         return (
             (filtroNombre === '' || asignatura.nombre.toLowerCase().includes(filtroNombre.toLowerCase())) &&
@@ -136,7 +149,6 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
         );
     });
 
-    // Obtener las asignaturas a mostrar en la página actual
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentAsignaturas = filteredAsignaturas.slice(indexOfFirstItem, indexOfLastItem);
@@ -145,6 +157,11 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
     return (
         <Container>
             <h1 className="my-4">Gestionar Asignaturas</h1>
+            {showSuccessAlert && (
+                <Alert variant="success" onClose={() => setShowSuccessAlert(false)} dismissible>
+                    {successMessage}
+                </Alert>
+            )}
             <Row className="mb-4">
                 <Col md={6}>
                     <Form>
@@ -155,6 +172,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                                 placeholder="Nombre de la asignatura"
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
+                                autoComplete="off"
                             />
                         </Form.Group>
                         <Button
@@ -174,17 +192,9 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                             placeholder="Nombre de la asignatura"
                             value={filtroNombre}
                             onChange={(e) => setFiltroNombre(e.target.value)}
+                            autoComplete="off"
                         />
                     </Form.Group>
-                    {/*  <Form.Group className="mb-3" controlId="formFiltroCurso">
-                        <Form.Label>Filtrar por Nombre de Curso</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Nombre del curso"
-                            value={filtroCurso}
-                            onChange={(e) => setFiltroCurso(e.target.value)}
-                        /> 
-                    </Form.Group>*/}
                 </Col>
             </Row>
             <Row>
@@ -194,7 +204,6 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                         <thead>
                             <tr>
                                 <th>Nombre</th>
-                                {/* <th>Curso</th> */}
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -202,7 +211,6 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                             {currentAsignaturas.map((asignatura) => (
                                 <tr key={asignatura.id}>
                                     <td>{asignatura.nombre}</td>
-                                    {/* <td>{asignatura.curso?.nombre}</td> */}
                                     <td>
                                         <Button
                                             variant="warning"
@@ -213,7 +221,10 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                                         </Button>
                                         <Button
                                             variant="danger"
-                                            onClick={() => handleEliminarAsignatura(asignatura.id)}
+                                            onClick={() => {
+                                                setAsignaturaToDelete(asignatura);
+                                                setShowDeleteConfirm(true);
+                                            }}
                                         >
                                             Eliminar
                                         </Button>
@@ -255,6 +266,53 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                     </Button>
                     <Button variant="primary" onClick={handleSubmitModificarAsignatura}>
                         Modificar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showDeleteConfirm} onHide={() => setShowDeleteConfirm(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Eliminación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {asignaturaToDelete && (
+                        <p>¿Estás seguro de que deseas eliminar la asignatura "{asignaturaToDelete.nombre}"?</p>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+                        Cancelar
+                    </Button>
+                    <Button
+                        variant="danger"
+                        onClick={() => {
+                            setShowDeleteConfirm(false);
+                            setShowFinalDeleteConfirm(true);
+                        }}
+                    >
+                        Confirmar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showFinalDeleteConfirm} onHide={() => setShowFinalDeleteConfirm(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Eliminación Definitiva</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {asignaturaToDelete && (
+                        <p>Vas a eliminar la asignatura "{asignaturaToDelete.nombre}". ¿Estás seguro? No habrá vuelta atrás.</p>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowFinalDeleteConfirm(false)}>
+                        Cancelar
+                    </Button>
+                    <Button
+                        variant="danger"
+                        onClick={handleEliminarAsignatura}
+                    >
+                        Eliminar
                     </Button>
                 </Modal.Footer>
             </Modal>
