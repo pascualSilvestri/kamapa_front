@@ -2,7 +2,7 @@
 
 import { Asignatura, Curso } from 'model/types';
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table, Modal, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Table, Modal, Pagination, Alert } from 'react-bootstrap';
 import { Environment } from 'utils/EnviromenManager';
 
 const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
@@ -14,41 +14,53 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
     const [showModalModify, setShowModalModify] = useState(false);
     const [currentAsignaturaId, setCurrentAsignaturaId] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(3);// Modificar el numero dependiendo cuantos elementos se quiere mostrar en la paginacion
+    const [itemsPerPage] = useState(5); // Ajustado a 5 elementos por página
 
     useEffect(() => {
         fetchAsignaturas();
     }, []);
 
     const fetchAsignaturas = async () => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaByInstitucion)}${params.id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaByInstitucion)}${params.id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        const asignaturas = await response.json();
-        setAsignaturas(asignaturas);
+            if (!response.ok) {
+                throw new Error('Error al obtener las asignaturas');
+            }
+
+            const asignaturasData = await response.json();
+            setAsignaturas(asignaturasData);
+        } catch (error) {
+            console.error('Error fetching asignaturas:', error);
+        }
     };
 
     const handleCrearAsignatura = async () => {
-        const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.crearAsignatura)}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                nombre: nombre,
-                institucionId: params.id
-            })
-        });
+        try {
+            const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.crearAsignatura)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombre: nombre,
+                    institucionId: params.id
+                })
+            });
 
-        if (res.status !== 200) {
-            throw new Error('No se pudo crear la asignatura');
-        } else {
+            if (!res.ok) {
+                throw new Error('No se pudo crear la asignatura');
+            }
+
             await res.json();
             fetchAsignaturas();
+        } catch (error) {
+            console.error('Error creating asignatura:', error);
         }
 
         setNombre('');
@@ -59,50 +71,56 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
         const asignatura = asignaturas.find(asig => asig.id === id);
         if (asignatura) {
             setNombre(asignatura.nombre);
-            // Asignar otros campos si los hay
             setCurrentAsignaturaId(id);
             setShowModalModify(true);
         }
     };
 
     const handleSubmitModificarAsignatura = async () => {
-        if (currentAsignaturaId !== null) {
-            const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateAsignatura)}${currentAsignaturaId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    nombre,
-                    institucionId: params.id
-                })
-            });
+        try {
+            if (currentAsignaturaId !== null) {
+                const res = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateAsignatura)}${currentAsignaturaId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nombre,
+                        institucionId: params.id
+                    })
+                });
 
-            if (res.status !== 200) {
-                throw new Error('No se pudo modificar la asignatura');
-            } else {
+                if (!res.ok) {
+                    throw new Error('No se pudo modificar la asignatura');
+                }
+
                 fetchAsignaturas();
                 setShowModalModify(false);
                 setNombre('');
                 setCurrentAsignaturaId(null);
             }
+        } catch (error) {
+            console.error('Error updating asignatura:', error);
         }
     };
 
     const handleEliminarAsignatura = async (id: number) => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAsignatura)}${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAsignatura)}${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        if (response.status !== 200) {
-            alert('Error al eliminar la asignatura');
-            return;
-        } else {
+            if (!response.ok) {
+                throw new Error('Error al eliminar la asignatura');
+            }
+
             await response.json();
             fetchAsignaturas();
+        } catch (error) {
+            console.error('Error deleting asignatura:', error);
         }
     };
 
@@ -110,6 +128,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
         setCurrentPage(pageNumber);
     };
 
+    // Filtrar asignaturas según los criterios de filtro
     const filteredAsignaturas = asignaturas.filter(asignatura => {
         return (
             (filtroNombre === '' || asignatura.nombre.toLowerCase().includes(filtroNombre.toLowerCase())) &&
@@ -141,30 +160,12 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                         <Button
                             variant="primary"
                             onClick={handleCrearAsignatura}
-                            style={{
-                                backgroundColor: 'purple',
-                                color: 'white',
-                                padding: '0.4rem 1rem',
-                                fontSize: '1rem',
-                                transition: 'all 0.3s ease',
-                                border: '2px solid purple',
-                                cursor: 'pointer',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = 'white';
-                                e.currentTarget.style.color = 'purple';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'purple';
-                                e.currentTarget.style.color = 'white';
-                            }}
+                            className="custom-button"
                         >
                             Crear Asignatura
                         </Button>
                     </Form>
                 </Col>
-            </Row>
-            <Row className="mb-4">
                 <Col md={6}>
                     <Form.Group className="mb-3" controlId="formFiltroNombre">
                         <Form.Label>Filtrar por Nombre de la Asignatura</Form.Label>
@@ -175,6 +176,15 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                             onChange={(e) => setFiltroNombre(e.target.value)}
                         />
                     </Form.Group>
+                    {/*  <Form.Group className="mb-3" controlId="formFiltroCurso">
+                        <Form.Label>Filtrar por Nombre de Curso</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Nombre del curso"
+                            value={filtroCurso}
+                            onChange={(e) => setFiltroCurso(e.target.value)}
+                        /> 
+                    </Form.Group>*/}
                 </Col>
             </Row>
             <Row>
@@ -184,6 +194,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                         <thead>
                             <tr>
                                 <th>Nombre</th>
+                                {/* <th>Curso</th> */}
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -191,6 +202,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                             {currentAsignaturas.map((asignatura) => (
                                 <tr key={asignatura.id}>
                                     <td>{asignatura.nombre}</td>
+                                    {/* <td>{asignatura.curso?.nombre}</td> */}
                                     <td>
                                         <Button
                                             variant="warning"
