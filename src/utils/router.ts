@@ -45,7 +45,7 @@ export const directorAutorizeRouter = [
     'RegistroAlumno',
     'VistaUsuarios',
     'resetearPasswordUsuario',
-    "AddNotaAlumno",
+    'AddNotaAlumno',
     'consultaAsignaturaPorCurso',
     'consultaListaAlumnoPorcurso'
 
@@ -70,7 +70,6 @@ export const preceptorAutorizeRouter = [
     'CursoAlumno',
     'EditarAlumnos',
     'Alumnos',
-    'Aulas',
     'About',
     'RegistroAlumno',
     'consultaAsignaturaPorCurso',
@@ -81,7 +80,6 @@ export const preceptorAutorizeRouter = [
 export const profesorAutorizeRouter = [
     'Inicio',
     'Alumnos',
-    'Aulas',
     'About',
     'Notas',
     "AddNotaAlumno"
@@ -90,7 +88,6 @@ export const profesorAutorizeRouter = [
 
 export const alumnoAutorizeRouter = [
     'Inicio',
-    'Aulas',
     'About',
     'Calificaciones',
     'due'

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
-import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
+import { Form, Button, Modal, Container, Row, Col, Alert } from 'react-bootstrap';
 import { Roles, User, UserFormData } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
