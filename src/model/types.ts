@@ -25,6 +25,7 @@ export interface User {
     accessToken?: string; // Agrega esta línea
     notas?: Nota[];
     notasPeriodo?: Nota[];
+    genero?: Genero;
 }
 
 
@@ -160,6 +161,7 @@ export interface UserFormData {
         password: string;
         institucion?: Institucion[];
         institucionId?: number;
+        generoId?: string;
     };
     rols: any[];
     domicilio: {
@@ -212,4 +214,10 @@ export interface Nota {
 export interface TipoNota {
     id: number;
     tipo: string;
+}
+
+
+export interface Genero {
+    id: number;
+    nombre: string;
 }

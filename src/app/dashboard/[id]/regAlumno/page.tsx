@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
@@ -12,6 +12,11 @@ import { Environment } from 'utils/EnviromenManager';
 interface Provincia {
     id: string;
     provincia: string;
+}
+
+interface Genero {
+    id: string;
+    nombre: string;
 }
 
 interface Role {
@@ -33,7 +38,9 @@ const RegAlumno = () => {
     const [barrio, setBarrio] = useState('');
     const [localidad, setLocalidad] = useState('');
     const [provincias, setProvincias] = useState<Provincia[]>([]);
+    const [generos, setGeneros] = useState<Genero[]>([]);
     const [provinciaSeleccionada, setProvinciaSeleccionada] = useState<string>('');
+    const [generoSeleccionado, setGeneroSeleccionado] = useState<string>('');
     const [telefono, setTelefono] = useState('');
     const [matriculaProfesional, setMatriculaProfesional] = useState('');
     const [legajo, setLegajo] = useState('');
@@ -56,30 +63,56 @@ const RegAlumno = () => {
 
     console.log(session);
 
-    useEffect(() => {
-        fetch(`${Environment.getEndPoint(Environment.endPoint.provincias)}`)
-            .then(response => response.json())
-            .then((data: Provincia[]) => {
-                setProvincias(data);
-            })
-            .catch(error => console.error('Error fetching provinces:', error));
-    }, []);
+    // Función para obtener las provincias de la base de datos
+    const fetchProvincias = async () => {
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.provincias)}`);
+            const data: Provincia[] = await response.json();
+            setProvincias(data);
+        } catch (error) {
+            console.error('Error fetching provinces:', error);
+        }
+    };
 
-    useEffect(() => {
-        fetch(`${Environment.getEndPoint(Environment.endPoint.roles)}`)
-            .then(response => response.json())
-            .then((data: Role[]) => {
-                const rolesObj = data.reduce((obj, rol) => {
-                    obj[rol.name] = { ...rol, checked: rol.name === 'Alumno' };
-                    return obj;
-                }, {} as RolesMap);
+    // Función para obtener los géneros de la base de datos
+    const fetchGeneros = async () => {
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getGeneros)}`);
+            const data = await response.json();
+            setGeneros(data.generos);
+        } catch (error) {
+            console.error('Error fetching genres:', error);
+        }
+    };
 
-                setRoles(rolesObj);
-                setSelectedRoleIds(data.filter(role => role.name === 'Alumno').map(role => role.id));
-            })
-            .catch(error => console.error('Error fetching roles:', error));
+    // Función para obtener los roles de la base de datos
+    const fetchRoles = async () => {
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.roles)}`);
+            const data: Role[] = await response.json();
+            const rolesObj = data.reduce((obj, rol) => {
+                obj[rol.name] = { ...rol, checked: rol.name === 'Alumno' };
+                return obj;
+            }, {} as RolesMap);
+
+            setRoles(rolesObj);
+            setSelectedRoleIds(data.filter(role => role.name === 'Alumno').map(role => role.id));
+        } catch (error) {
+            console.error('Error fetching roles:', error);
+        }
+    };
+
+    // Un solo useEffect para ejecutar todas las consultas asincrónicas
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchProvincias();
+            await fetchGeneros();
+            await fetchRoles();
+        };
+        fetchData();
     }, [rol]);
 
+    // Función para manejar el envío del formulario
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (formValid) {
@@ -101,6 +134,7 @@ const RegAlumno = () => {
                     update_for: session.user.nombre + ' ' + session.user.apellido,
                     password: dni,
                     institucionId: institucionSelected.id,
+                    generoId: generoSeleccionado,
                 },
                 rols: selectedRoleIds,
                 domicilio: {
@@ -110,6 +144,7 @@ const RegAlumno = () => {
                     localidad: localidad,
                     provinciaId: provinciaSeleccionada,
                 },
+                 // Nuevo campo agregado
             };
 
             console.log(formData);
@@ -129,14 +164,14 @@ const RegAlumno = () => {
 
                 if (response.ok) {
                     setShowSuccessModal(true);
-                    setSuccessMessage('El empleado se registró con éxito.');
+                    setSuccessMessage('El alumno se registró con éxito.');
                 } else {
                     setShowErrorModal(true);
-                    setErrorMessage('Hubo un problema al registrar al empleado. Por favor, inténtalo nuevamente.');
+                    setErrorMessage('Hubo un problema al registrar al alumno. Por favor, inténtalo nuevamente.');
                 }
             } catch (error) {
                 setShowErrorModal(true);
-                setErrorMessage('Hubo un problema al registrar al empleado. Por favor, inténtalo nuevamente.');
+                setErrorMessage('Hubo un problema al registrar al alumno. Por favor, inténtalo nuevamente.');
             }
         }
     };
@@ -230,6 +265,7 @@ const RegAlumno = () => {
         setBarrio('');
         setLocalidad('');
         setProvinciaSeleccionada('');
+        setGeneroSeleccionado('');
         setTelefono('');
         setMatriculaProfesional('');
         setLegajo('');
@@ -319,6 +355,21 @@ const RegAlumno = () => {
                                 onChange={(e) => setFechaNacimiento(e.target.value)}
                                 autoComplete='off'
                             />
+                        </Form.Group>
+                        <Form.Group controlId="genero">
+                            <Form.Label>Género *</Form.Label>
+                            <Form.Control
+                                as="select"
+                                value={generoSeleccionado}
+                                onChange={(e) => setGeneroSeleccionado(e.target.value)}
+                            >
+                                <option value="">Selecciona un género</option>
+                                {generos.map((genero) => (
+                                    <option key={genero.id} value={genero.id}>
+                                        {genero.nombre}
+                                    </option>
+                                ))}
+                            </Form.Control>
                         </Form.Group>
                         <hr />
                         <Form.Group>

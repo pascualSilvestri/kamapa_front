@@ -49,6 +49,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             alumno.apellido.toLowerCase().includes(filtro.toLowerCase())
         );
     };
+
     const exportPDF = () => {
         const doc = new jsPDF({ orientation: 'landscape' });
         const fecha = new Date().toLocaleDateString();
@@ -77,8 +78,8 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                 body: body,
                 styles: {
                     cellWidth: 'wrap',
-                    lineWidth: 0.1,  // Grosor de la línea de los bordes
-                    lineColor: [0, 0, 0],  // Color de la línea de los bordes
+                    lineWidth: 0.1,
+                    lineColor: [0, 0, 0],
                 },
                 tableWidth: 'auto'
             });
@@ -106,6 +107,54 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         XLSX.writeFile(wb, 'cursos_alumnos.xlsx');
     };
 
+    const exportSimplePDF = () => {
+        const doc = new jsPDF();
+        const fecha = new Date().toLocaleDateString();
+
+        cursos.forEach((curso, index) => {
+            if (index > 0) doc.addPage();
+            doc.setFontSize(18);
+            doc.text(institucionSelected.nombre, 10, 20);
+            doc.setFontSize(12);
+            doc.text(`Fecha: ${fecha}`, 10, 30);
+            doc.text(`Curso: ${curso.nombre}`, 10, 40);
+
+            const head = [['Apellido', 'Nombre', 'DNI']];
+            const body = filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
+                alumno.apellido.toUpperCase(),
+                alumno.nombre,
+                alumno.dni
+            ]);
+
+            autoTable(doc, {
+                startY: 60,
+                head: head,
+                body: body,
+            });
+        });
+
+        doc.save('cursos_alumnos_simple.pdf');
+    };
+
+    const exportSimpleExcel = () => {
+        const wb = XLSX.utils.book_new();
+        cursos.forEach(curso => {
+            const wsData = [
+                [`Curso: ${curso.nombre}`],
+                ['Apellido', 'Nombre', 'DNI'],
+                ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
+                    alumno.apellido.toUpperCase(),
+                    alumno.nombre,
+                    alumno.dni
+                ]),
+                ['']
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, curso.nombre);
+        });
+        XLSX.writeFile(wb, 'cursos_alumnos_simple.xlsx');
+    };
+
     return (
         <Container>
             <h1>Visualizar Cursos y Alumnos</h1>
@@ -120,10 +169,16 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                         />
                     </Form.Group>
                     <Button variant="primary" onClick={exportPDF} style={{ margin: '10px' }}>
-                        Exportar a PDF
+                        Generar planilla de asistencias PDF
                     </Button>
                     <Button variant="success" onClick={exportExcel} style={{ margin: '10px' }}>
-                        Exportar a Excel
+                        Generar planilla de asistencias Excel
+                    </Button>
+                    <Button variant="info" onClick={exportSimplePDF} style={{ margin: '10px' }}>
+                        Lista de alumnos PDF
+                    </Button>
+                    <Button variant="warning" onClick={exportSimpleExcel} style={{ margin: '10px' }}>
+                        Lista de alumnos Excel
                     </Button>
                     <Table striped bordered hover>
                         <thead>
