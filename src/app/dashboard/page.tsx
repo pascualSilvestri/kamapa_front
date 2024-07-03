@@ -66,7 +66,7 @@ const Dashboard = () => {
                         <Card className='text-center w-100'>
                             <Card.Header>{institucion.nombre}</Card.Header>
                             <div className="d-flex justify-content-center align-items-center" style={{ height: '150px' }}>
-                                <Image src={institucion.logo || '/Logo.png'} alt={institucion.nombre} style={{ width: '100px', height: '100px' }} />
+                                <Image src={institucion.logo || '/Logo.png'} alt={institucion.nombre} style={{ margin: '0', width: '100px', height: '100px' }} />
                             </div>
                             <Card.Body>
                                 <Link href={`/dashboard/${institucion.id}/bienvenido`}>

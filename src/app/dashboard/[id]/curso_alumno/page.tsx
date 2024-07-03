@@ -9,12 +9,12 @@ import * as XLSX from 'xlsx';
 import { useInstitucionSelectedContext } from 'context/userContext';
 
 const CursosAlumnos = ({ params }: { params: { id: string } }) => {
-    const [cursos, setCursos] = useState<Curso[]>([]); // Asegúrate de que cursos se inicialice como un array vacío
+    const [cursos, setCursos] = useState<Curso[]>([]);
     const [filtroAlumno, setFiltroAlumno] = useState<string>('');
     const [institucionSelected] = useInstitucionSelectedContext();
 
     useEffect(() => {
-        fetchCursosAndAlumnos(); // Llama a la función correcta fetchCursosAndAlumnos en useEffect
+        fetchCursosAndAlumnos();
     }, []);
 
     async function fetchCursosAndAlumnos() {
@@ -29,16 +29,13 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const data = await response.json();
-            // Verifica si data es un array antes de establecerlo en cursos
             if (Array.isArray(data)) {
-                setCursos(data); // Establece cursos con los datos recibidos
+                setCursos(data.sort((a, b) => a.nombre.localeCompare(b.nombre)));
             } else {
                 console.error("Error: Data received is not an array");
-                // Podrías manejar el error aquí, por ejemplo, mostrando un mensaje al usuario
             }
         } catch (error) {
             console.error("Error fetching courses and students:", error);
-            // Podrías manejar el error aquí, por ejemplo, mostrando un mensaje al usuario
         }
     }
 
@@ -48,13 +45,15 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
 
     const filtrarAlumnos = (alumnos: User[], filtro: string): User[] => {
         return alumnos.filter(alumno =>
-            alumno.nombre.toLowerCase().includes(filtro.toLowerCase())
+            alumno.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
+            alumno.apellido.toLowerCase().includes(filtro.toLowerCase())
         );
     };
-
     const exportPDF = () => {
-        const doc = new jsPDF();
+        const doc = new jsPDF({ orientation: 'landscape' });
         const fecha = new Date().toLocaleDateString();
+        const mes = new Date().toLocaleString('default', { month: 'long' });
+        const dias = Array.from({ length: 31 }, (_, i) => i + 1);
 
         cursos.forEach((curso, index) => {
             if (index > 0) doc.addPage();
@@ -62,13 +61,29 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             doc.text(institucionSelected.nombre, 10, 20);
             doc.setFontSize(12);
             doc.text(`Fecha: ${fecha}`, 10, 30);
-            doc.text(`Curso: ${curso.nombre}`, 10, 50);
+            doc.text(`Curso: ${curso.nombre}`, 10, 40);
+            doc.text(`Mes: ${mes}`, 10, 50);
+
+            const head = [['Apellido', 'Nombre', ...dias.map(dia => dia.toString())]];
+            const body = filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
+                alumno.apellido.toUpperCase(),
+                alumno.nombre,
+                ...dias.map(() => ' ')
+            ]);
+
             autoTable(doc, {
                 startY: 60,
-                head: [['Nombre']],
-                body: filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [alumno.nombre])
+                head: head,
+                body: body,
+                styles: {
+                    cellWidth: 'wrap',
+                    lineWidth: 0.1,  // Grosor de la línea de los bordes
+                    lineColor: [0, 0, 0],  // Color de la línea de los bordes
+                },
+                tableWidth: 'auto'
             });
         });
+
         doc.save('cursos_alumnos.pdf');
     };
 
@@ -77,8 +92,12 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         cursos.forEach(curso => {
             const wsData = [
                 [`Curso: ${curso.nombre}`],
-                ['Nombre'],
-                ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [alumno.nombre]),
+                ['Apellido', 'Nombre', ...Array.from({ length: 31 }, (_, i) => (i + 1).toString())],
+                ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
+                    alumno.apellido.toUpperCase(),
+                    alumno.nombre,
+                    ...Array.from({ length: 31 }, () => '')
+                ]),
                 ['']
             ];
             const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -121,7 +140,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                                         <ul>
                                             {filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(
                                                 (alumno, idx) => (
-                                                    <li key={idx}>{alumno.nombre}</li>
+                                                    <li key={idx}> <span style={{ textTransform: 'uppercase' }}>{alumno.apellido}</span>, <span>{alumno.nombre}</span></li>
                                                 )
                                             )}
                                         </ul>
