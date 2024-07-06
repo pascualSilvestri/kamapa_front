@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
-import { Form, Button, Modal, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Form, Button, Modal, Container, Row, Col, Alert, InputGroup } from 'react-bootstrap';
 import { Genero, Roles, User, UserFormData } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
@@ -117,7 +117,7 @@ const RegUsuario = () => {
                     update_for: session.user.nombre + ' ' + session.user.apellido,
                     password: dni,
                     institucionId: institucionSelected.id,
-                    generoId: generoSeleccionado, 
+                    generoId: generoSeleccionado,
                 },
                 rols: selectedRoleIds,
                 domicilio: {
@@ -127,7 +127,7 @@ const RegUsuario = () => {
                     localidad: localidad,
                     provinciaId: provinciaSeleccionada,
                 },
-               // Nuevo campo agregado
+                // Nuevo campo agregado
             };
 
             try {
@@ -253,18 +253,24 @@ const RegUsuario = () => {
                         </Form.Group>
                         <Form.Group controlId="genero">
                             <Form.Label>Género *</Form.Label>
-                            <Form.Control
-                                as="select"
-                                value={generoSeleccionado}
-                                onChange={(e) => setGeneroSeleccionado(e.target.value)}
-                            >
-                                <option value="">Selecciona un género</option>
-                                {generos.map((genero) => (
-                                    <option key={genero.id} value={genero.id}>
-                                        {genero.nombre}
-                                    </option>
-                                ))}
-                            </Form.Control>
+                            <InputGroup>
+                                <Form.Control
+                                    as="select"
+                                    value={generoSeleccionado}
+                                    onChange={(e) => setGeneroSeleccionado(e.target.value)}
+                                    required={generoSeleccionado === '1' || generoSeleccionado === '2' || generoSeleccionado === '3'}
+                                >
+                                    <option value="">Selecciona un género</option>
+                                    {generos.map((genero) => (
+                                        <option key={genero.id} value={genero.id}>
+                                            {genero.nombre}
+                                        </option>
+                                    ))}
+                                </Form.Control>
+                                <InputGroup.Text>
+                                    <BsChevronDown />
+                                </InputGroup.Text>
+                            </InputGroup>
                         </Form.Group>
                         <hr />
                         <Form.Group>
@@ -312,11 +318,12 @@ const RegUsuario = () => {
                         </Form.Group>
                         <Form.Group controlId="provincias">
                             <Form.Label>Provincia *</Form.Label>
-                            <div className="input-group">
+                            <InputGroup>
                                 <Form.Control
                                     as="select"
                                     value={provinciaSeleccionada}
                                     onChange={(e) => setProvinciaSeleccionada(e.target.value)}
+                                    required
                                 >
                                     <option value="">Selecciona una provincia</option>
                                     {provincias.map((provincia) => (
@@ -325,12 +332,10 @@ const RegUsuario = () => {
                                         </option>
                                     ))}
                                 </Form.Control>
-                                <div className="input-group-append">
-                                    <span className="input-group-text">
-                                        <BsChevronDown />
-                                    </span>
-                                </div>
-                            </div>
+                                <InputGroup.Text>
+                                    <BsChevronDown />
+                                </InputGroup.Text>
+                            </InputGroup>
                         </Form.Group>
                         <hr />
                         <Form.Group>
@@ -547,7 +552,7 @@ const RegUsuario = () => {
             </Row>
             <br />
             <br />
-        </Container>
+        </Container >
     );
 };
 
