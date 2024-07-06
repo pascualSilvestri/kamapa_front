@@ -6,7 +6,6 @@ import { Environment } from 'utils/EnviromenManager';
 import { Curso } from 'model/types';
 
 const GestionCursos = ({ params }: { params: { id: string } }) => {
-    const [nombre, setNombre] = useState('');
     const [nominacion, setNominacion] = useState('');
     const [division, setDivision] = useState('');
     const [cursos, setCursos] = useState<Curso[]>([]);
@@ -46,6 +45,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
 
     const handleCrearCurso = async () => {
         try {
+            const nombre = `${nominacion} ${division}`;
             const nuevoCurso: Curso = {
                 id: cursos.length + 1,
                 nombre,
@@ -78,7 +78,6 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                 setShowSuccessMessage(false);
             }, 3000); // Ocultar mensaje después de 3 segundos
 
-            setNombre('');
             setNominacion('');
             setDivision('');
 
@@ -90,7 +89,6 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     const handleModificarCurso = (id: number) => {
         const curso = cursos.find(curso => curso.id === id);
         if (curso) {
-            setNombre(curso.nombre);
             setNominacion(curso.nominacion);
             setDivision(curso.division);
             setCurrentCursoId(id);
@@ -106,6 +104,7 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
     const confirmSubmitModificarCurso = async () => {
         try {
             if (currentCursoId !== null) {
+                const nombre = `${nominacion} ${division}`;
                 const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.updateCurso)}${currentCursoId}`, {
                     method: 'PUT',
                     headers: {
@@ -131,7 +130,6 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                     setShowModifySuccessMessage(false);
                 }, 3000); // Ocultar mensaje después de 3 segundos
 
-                setNombre('');
                 setNominacion('');
                 setDivision('');
                 setCurrentCursoId(null);
@@ -213,15 +211,6 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
             <Row className="mb-4">
                 <Col md={6}>
                     <Form>
-                        <Form.Group className="mb-3" controlId="formNombre">
-                            <Form.Label>Nombre</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Nombre del curso"
-                                value={nombre}
-                                onChange={(e) => setNombre(e.target.value)}
-                            />
-                        </Form.Group>
                         <Form.Group className="mb-3" controlId="formNominacion">
                             <Form.Label>Nominación</Form.Label>
                             <Form.Control
@@ -337,15 +326,6 @@ const GestionCursos = ({ params }: { params: { id: string } }) => {
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
-                        <Form.Group className="mb-3" controlId="formNombreModificar">
-                            <Form.Label>Nombre</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Nombre del curso"
-                                value={nombre}
-                                onChange={(e) => setNombre(e.target.value)}
-                            />
-                        </Form.Group>
                         <Form.Group className="mb-3" controlId="formNominacionModificar">
                             <Form.Label>Nominación</Form.Label>
                             <Form.Control

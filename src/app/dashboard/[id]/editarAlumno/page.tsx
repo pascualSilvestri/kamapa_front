@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Row, Col } from 'react-bootstrap';
+import { Button, Table, Modal, Form, Row, Col, Spinner } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -23,7 +23,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-
+    const [loading, setLoading] = useState(true);
 
     // Estado local para el formulario de edición
     const [editedAlumno, setEditedAlumno] = useState({
@@ -44,15 +44,9 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
         roles: [],
     });
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // FUNCIONES PARA EL Search
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     useEffect(() => {
-
         fetchData();
     }, [session]);
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     useEffect(() => {
         const fetchRoles = async () => {
@@ -70,9 +64,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
 
-
                 const data = await response.json();
-
                 setRoles(data);
             } catch (error) {
                 console.error('Error al obtener empleados:', error.message);
@@ -82,10 +74,9 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
         fetchRoles();
     }, [session]);
 
-
-
     const fetchData = async () => {
         try {
+            setLoading(true);
             const response = await fetch(
                 `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion)}${params.id}`,
                 {
@@ -105,9 +96,10 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             setAlumnos(data.alumnos);
         } catch (error) {
             console.error('Error al obtener empleados:', error.message);
+        } finally {
+            setLoading(false);
         }
     };
-
 
     const filteredAlumnos = alumnos.filter(alumnos =>
         alumnos.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,10 +111,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
         setSearchTerm(e.target.value);
     };
 
-
-
     const handleConsultar = (alumnos) => {
-
         setSelectedRoles(alumnos.Roles.map(role => role.id));
         setSelectedAlumno(alumnos);
         setShowModal(true);
@@ -133,8 +122,6 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
         setShowConfirmModal(true);
     };
 
-
-    // Función para manejar el cambio en los checkboxes
     const handleRoleChange = (roleId, isChecked) => {
         if (isChecked) {
             setSelectedRoles(prevRoles => [...prevRoles, roleId]);
@@ -174,13 +161,11 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
         }
     };
 
-
-
     const handleModificar = (alumno) => {
         setSelectedRoles(alumno.Roles?.map(role => role.id) || []);
         setSelectedAlumno({
             ...alumno,
-            Roles: alumno.Roles || [],  // Asegúrate de que Roles sea un array vacío si no está definido
+            Roles: alumno.Roles || [],
         });
         setEditedAlumno({
             legajo: alumno.legajo,
@@ -202,16 +187,12 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
         setShowEditModal(true);
     };
 
-
     const handleSave = () => {
         setShowSaveConfirmModal(true);
     };
 
     const handleConfirmSave = async (e) => {
         try {
-            // Envíar los datos del formulario de edición al servidor
-            // e.preventDefault();
-
             const response = await fetch(
                 `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedAlumno.id}`,
                 {
@@ -243,7 +224,6 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             console.log(data);
 
             if (!response.ok) {
-                ;
                 console.log(data)
                 throw new Error(data);
             }
@@ -261,8 +241,9 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             console.error('Error al actualizar empleado:', error);
         }
     };
-    console.log(alumnos)
-    console.log(selectedAlumno)
+
+    console.log(alumnos);
+    console.log(selectedAlumno);
     return (
         <div className="p-3">
             <Row className="mb-3 justify-content-between align-items-center">
@@ -312,44 +293,52 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                 />
             </Form.Group>
 
-            <Table striped bordered hover responsive>
-                <thead>
-                    <tr>
-                        <th>Legajo</th>
-                        <th>Nombre</th>
-                        <th>D.N.I</th>
-                        <th>Telefono</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Array.isArray(filteredAlumnos) && filteredAlumnos.length > 0 ? (
-                        filteredAlumnos.map((alumno) => (
-                            <tr key={alumno.id}>
-                                <td>{alumno.legajo}</td>
-                                <td>{alumno.nombre} {alumno.apellido}</td>
-                                <td>{alumno.dni}</td>
-                                <td>{alumno.telefono}</td>
-                                <td>
-                                    <Button variant="link" onClick={() => handleConsultar(alumno)} title="Consultar Alumno">
-                                        <BsEye />
-                                    </Button>
-                                    <Button variant="link" onClick={() => handleModificar(alumno)} title="Modificar Alumno">
-                                        <BsPencil />
-                                    </Button>
-                                    <Button variant="link" onClick={() => handleEliminar(alumno)} title="Eliminar Alumno">
-                                        <BsTrash />
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
+            {loading ? (
+                <div className="d-flex justify-content-center">
+                    <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                </div>
+            ) : (
+                <Table striped bordered hover responsive>
+                    <thead>
                         <tr>
-                            <td colSpan="5" className="text-center">No hay alumnos disponibles</td>
+                            <th>Legajo</th>
+                            <th>Nombre</th>
+                            <th>D.N.I</th>
+                            <th>Telefono</th>
+                            <th>Acciones</th>
                         </tr>
-                    )}
-                </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                        {Array.isArray(filteredAlumnos) && filteredAlumnos.length > 0 ? (
+                            filteredAlumnos.map((alumno) => (
+                                <tr key={alumno.id}>
+                                    <td>{alumno.legajo}</td>
+                                    <td>{alumno.nombre} {alumno.apellido}</td>
+                                    <td>{alumno.dni}</td>
+                                    <td>{alumno.telefono}</td>
+                                    <td>
+                                        <Button variant="link" onClick={() => handleConsultar(alumno)} title="Consultar Alumno">
+                                            <BsEye />
+                                        </Button>
+                                        <Button variant="link" onClick={() => handleModificar(alumno)} title="Modificar Alumno">
+                                            <BsPencil />
+                                        </Button>
+                                        <Button variant="link" onClick={() => handleEliminar(alumno)} title="Eliminar Alumno">
+                                            <BsTrash />
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={5} className="text-center">No hay alumnos disponibles</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
+            )}
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
@@ -367,10 +356,10 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                             <p><strong>CUIL:</strong> {selectedAlumno.cuil}</p>
                             <p><strong>Fecha de nacimiento:</strong> {new Date(selectedAlumno.fechaNacimiento).toLocaleDateString()}</p>
                             <p><strong>Teléfono:</strong> {selectedAlumno.telefono || 'No disponible'}</p>
-                            <p><strong>Localidad:</strong> {selectedAlumno.domicilioUsuario.localidad || 'No disponible'}</p>
-                            <p><strong>Barrio:</strong> {selectedAlumno.domicilioUsuario.barrio || 'No disponible'}</p>
-                            <p><strong>Calle:</strong> {selectedAlumno.domicilioUsuario.calle || 'No disponible'}</p>
-                            <p><strong>Número:</strong> {selectedAlumno.domicilioUsuario.numero || 'No disponible'}</p>
+                            <p><strong>Localidad:</strong> {selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.localidad : 'No disponible'}</p>
+                            <p><strong>Barrio:</strong> {selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.barrio: 'No disponible'}</p>
+                            <p><strong>Calle:</strong> {selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.calle : 'No disponible'}</p>
+                            <p><strong>Número:</strong> {selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.numero : 'No disponible'}</p>
                         </>
                     )}
                 </Modal.Body>
@@ -454,7 +443,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Localidad</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    defaultValue={selectedAlumno.domicilioUsuario.localidad || ''}
+                                    defaultValue={selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.localidad : ''}
                                     onChange={(e) => setEditedAlumno({
                                         ...editedAlumno,
                                         domicilioUsuario: {
@@ -468,7 +457,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Barrio</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    defaultValue={selectedAlumno.domicilioUsuario.barrio || ''}
+                                    defaultValue={selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.barrio : ''}
                                     onChange={(e) => setEditedAlumno({
                                         ...editedAlumno,
                                         domicilioUsuario: {
@@ -482,7 +471,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Calle</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    defaultValue={selectedAlumno.domicilioUsuario.calle || ''}
+                                    defaultValue={selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.calle : ''}
                                     onChange={(e) => setEditedAlumno({
                                         ...editedAlumno,
                                         domicilioUsuario: {
@@ -496,7 +485,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                 <Form.Label>Numeración de la calle</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    defaultValue={selectedAlumno.domicilioUsuario.numero || ''}
+                                    defaultValue={selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.numero : ''}
                                     onChange={(e) => setEditedAlumno({
                                         ...editedAlumno,
                                         domicilioUsuario: {
@@ -545,4 +534,3 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 };
 
 export default EditarAlumnoPage;
-

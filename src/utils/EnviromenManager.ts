@@ -203,7 +203,7 @@ export class Environment {
                 "nombre": "Asignatura 1",
                 "institucionId": 1
             */
-        updateCursor: "api/cursos/update/",
+        updateCurso: "api/cursos/update/",
         /**
              * Actualizar curso
              * @param {int} cursoId
