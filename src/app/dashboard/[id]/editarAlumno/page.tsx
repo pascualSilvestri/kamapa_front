@@ -534,3 +534,4 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 };
 
 export default EditarAlumnoPage;
+    

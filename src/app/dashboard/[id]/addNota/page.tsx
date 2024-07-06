@@ -106,7 +106,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                 alumnoId: Number(alumnoId),
                 nota: Number(nota[alumnoId]),
                 periodoId: Number(periodo),
-                institucionId: params.id
+                institucionId: params.id,
             })
         });
         const data = await response.json();
