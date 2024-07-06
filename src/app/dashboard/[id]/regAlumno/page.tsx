@@ -144,7 +144,7 @@ const RegAlumno = () => {
                     localidad: localidad,
                     provinciaId: provinciaSeleccionada,
                 },
-                 // Nuevo campo agregado
+                // Nuevo campo agregado
             };
 
             console.log(formData);
