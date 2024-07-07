@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
-import { Form, Button, Modal, Container, Row, Col } from 'react-bootstrap';
+import { Form, Button, Modal, Container, Row, Col, InputGroup } from 'react-bootstrap';
 import { User, UserFormData } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { useSession } from 'next-auth/react';
@@ -358,18 +358,23 @@ const RegAlumno = () => {
                         </Form.Group>
                         <Form.Group controlId="genero">
                             <Form.Label>Género *</Form.Label>
-                            <Form.Control
-                                as="select"
-                                value={generoSeleccionado}
-                                onChange={(e) => setGeneroSeleccionado(e.target.value)}
-                            >
-                                <option value="">Selecciona un género</option>
-                                {generos.map((genero) => (
-                                    <option key={genero.id} value={genero.id}>
-                                        {genero.nombre}
-                                    </option>
-                                ))}
-                            </Form.Control>
+                            <InputGroup>
+                                <Form.Control
+                                    as="select"
+                                    value={generoSeleccionado}
+                                    onChange={(e) => setGeneroSeleccionado(e.target.value)}
+                                >
+                                    <option value="">Selecciona un género</option>
+                                    {generos.map((genero) => (
+                                        <option key={genero.id} value={genero.id}>
+                                            {genero.nombre}
+                                        </option>
+                                    ))}
+                                </Form.Control>
+                                <InputGroup.Text>
+                                    <BsChevronDown />
+                                </InputGroup.Text>
+                            </InputGroup>
                         </Form.Group>
                         <hr />
                         <Form.Group>
@@ -434,23 +439,28 @@ const RegAlumno = () => {
                         </Form.Group>
                         <Form.Group controlId="provincia">
                             <Form.Label>Provincia *</Form.Label>
-                            <Form.Control
-                                as="select"
-                                value={provinciaSeleccionada}
-                                onChange={(e) => setProvinciaSeleccionada(e.target.value)}
-                                autoComplete='off'
-                                isInvalid={!provinciaSeleccionada}
-                            >
-                                <option value="">Seleccionar provincia</option>
-                                {provincias.map((provincia) => (
-                                    <option key={provincia.id} value={provincia.id}>
-                                        {provincia.provincia}
-                                    </option>
-                                ))}
-                            </Form.Control>
-                            <Form.Control.Feedback type="invalid">
-                                Seleccione una provincia.
-                            </Form.Control.Feedback>
+                            <InputGroup>
+                                <Form.Control
+                                    as="select"
+                                    value={provinciaSeleccionada}
+                                    onChange={(e) => setProvinciaSeleccionada(e.target.value)}
+                                    autoComplete='off'
+                                    isInvalid={!provinciaSeleccionada}
+                                >
+                                    <option value="">Seleccionar provincia</option>
+                                    {provincias.map((provincia) => (
+                                        <option key={provincia.id} value={provincia.id}>
+                                            {provincia.provincia}
+                                        </option>
+                                    ))}
+                                </Form.Control>
+                                <Form.Control.Feedback type="invalid">
+                                    Seleccione una provincia.
+                                </Form.Control.Feedback>
+                                <InputGroup.Text>
+                                    <BsChevronDown />
+                                </InputGroup.Text>
+                            </InputGroup>
                         </Form.Group>
                         <Form.Group controlId="telefono">
                             <Form.Label>Teléfono *</Form.Label>
@@ -526,7 +536,7 @@ const RegAlumno = () => {
                             </div>
                         </Form.Group>
                         <hr />
-                        <Form.Group className="d-flex justify-content-center">
+                        <Form.Group className="d-flex justify-content-center mb-5">
                             <div className='me-1'>
                                 <Link href={`/dashboard/${institucionSelected.id}/consultaUsuario`}>
                                     <Button variant='secondary' style={{

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Row, Col, Spinner } from 'react-bootstrap';
-import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
+import { Button, Table, Modal, Form, Row, Col, Spinner, InputGroup } from 'react-bootstrap';
+import { BsChevronDown, BsEye, BsPencil, BsTrash } from 'react-icons/bs';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Roles, User } from '../../../../model/types';
@@ -9,9 +9,35 @@ import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRol
 import { Environment } from 'utils/EnviromenManager';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 
-const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
-    const [alumnos, setAlumnos] = useState([]);
-    const [selectedAlumno, setSelectedAlumno] = useState(null);
+interface Alumno {
+    id: string;
+    legajo: string;
+    nombre: string;
+    apellido: string;
+    dni: string;
+    cuil: string;
+    fechaNacimiento: string;
+    telefono: string;
+    email: string;
+    generoId: number;
+    fecha_ingreso: string;
+    fecha_egreso: string | null;
+    domicilioUsuario: {
+        localidad: string;
+        barrio: string;
+        calle: string;
+        numero: string;
+    };
+    Roles: { id: number }[];
+}
+
+interface EditarAlumnoPageProps {
+    params: { id: string };
+}
+
+const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
+    const [alumnos, setAlumnos] = useState<Alumno[]>([]);
+    const [selectedAlumno, setSelectedAlumno] = useState<Alumno | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -21,11 +47,11 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
     const [user, setUser] = useUserContext();
     const { data: session, status } = useSession();
     const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
-    const [selectedRoles, setSelectedRoles] = useState([]);
+    const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+    const [genero, setGenero] = useState('');
 
-    // Estado local para el formulario de edición
     const [editedAlumno, setEditedAlumno] = useState({
         legajo: '',
         nombre: '',
@@ -57,7 +83,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.accessToken}`,
+                        'Authorization': `Bearer ${session?.accessToken}`,
                     },
                 }
                 );
@@ -68,7 +94,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                 const data = await response.json();
                 setRoles(data);
             } catch (error) {
-                console.error('Error al obtener empleados:', error.message);
+                console.error('Error al obtener empleados:', error);
             }
         };
 
@@ -84,7 +110,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.accessToken}`,
+                        'Authorization': `Bearer ${session?.accessToken}`,
                     },
                 }
             );
@@ -96,34 +122,34 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             console.log(data);
             setAlumnos(data.alumnos);
         } catch (error) {
-            console.error('Error al obtener empleados:', error.message);
+            console.error('Error al obtener empleados:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const filteredAlumnos = alumnos.filter(alumnos =>
-        alumnos.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        alumnos.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        alumnos.apellido.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredAlumnos = alumnos.filter(alumno =>
+        alumno.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        alumno.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        alumno.apellido.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     };
 
-    const handleConsultar = (alumnos) => {
-        setSelectedRoles(alumnos.Roles.map(role => role.id));
-        setSelectedAlumno(alumnos);
+    const handleConsultar = (alumno: Alumno) => {
+        setSelectedRoles(alumno.Roles.map(role => role.id));
+        setSelectedAlumno(alumno);
         setShowModal(true);
     };
 
-    const handleEliminar = (alumnos) => {
-        setSelectedAlumno(alumnos);
+    const handleEliminar = (alumno: Alumno) => {
+        setSelectedAlumno(alumno);
         setShowConfirmModal(true);
     };
 
-    const handleRoleChange = (roleId, isChecked) => {
+    const handleRoleChange = (roleId: number, isChecked: boolean) => {
         if (isChecked) {
             setSelectedRoles(prevRoles => [...prevRoles, roleId]);
         } else {
@@ -133,8 +159,8 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 
     const handleConfirmDelete = async () => {
         try {
-            if (!selectedAlumno?.id) {
-                console.error('ID de empleado no válido:', selectedAlumno);
+            if (!selectedAlumno || !selectedAlumno.id) {
+                console.error('ID de alumno no válido:', selectedAlumno);
                 return;
             }
 
@@ -145,7 +171,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.accessToken}`,
+                    'Authorization': `Bearer ${session?.accessToken}`,
                 },
             });
 
@@ -155,14 +181,14 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                 throw new Error(errorMessage || 'Error en la eliminación');
             }
 
-            setAlumnos(alumnos.filter((emp) => emp.id !== selectedAlumno.id));
+            setAlumnos(alumnos.filter((alumno) => alumno.id !== selectedAlumno.id));
             setShowConfirmModal(false);
         } catch (error) {
-            console.error('Error al eliminar el empleado:', error);
+            console.error('Error al eliminar el alumno:', error);
         }
     };
 
-    const handleModificar = (alumno) => {
+    const handleModificar = (alumno: Alumno) => {
         setSelectedRoles(alumno.Roles?.map(role => role.id) || []);
         setSelectedAlumno({
             ...alumno,
@@ -177,7 +203,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             fechaNacimiento: alumno.fechaNacimiento,
             telefono: alumno.telefono,
             email: alumno.email,
-            generoId: alumno.genero,
+            generoId: alumno.generoId.toString(),
             domicilioUsuario: {
                 localidad: alumno.domicilioUsuario?.localidad || '',
                 barrio: alumno.domicilioUsuario?.barrio || '',
@@ -186,6 +212,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             },
             roles: alumno.Roles?.map(role => role.id) || [],
         });
+        setGenero(alumno.generoId.toString());
         setShowEditModal(true);
     };
 
@@ -193,14 +220,15 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
         setShowSaveConfirmModal(true);
     };
 
-    const handleConfirmSave = async (e) => {
+    const handleConfirmSave = async () => {
         try {
             const response = await fetch(
-                `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedAlumno.id}`,
+                `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedAlumno?.id}`,
                 {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session?.accessToken}`,
                     },
                     body: JSON.stringify({
                         legajo: editedAlumno.legajo,
@@ -211,7 +239,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                         fechaNacimiento: editedAlumno.fechaNacimiento,
                         telefono: editedAlumno.telefono,
                         email: editedAlumno.email,
-                        generoId: editedAlumno.generoId,
+                        generoId: parseInt(genero),
                         domicilio: {
                             localidad: editedAlumno.domicilioUsuario.localidad,
                             barrio: editedAlumno.domicilioUsuario.barrio,
@@ -233,6 +261,11 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 
             const updatedResponse = await fetch(
                 `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${session?.accessToken}`,
+                    },
+                }
             );
             const updatedData = await updatedResponse.json();
 
@@ -356,7 +389,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                             <p><strong>Nombre:</strong> {selectedAlumno.nombre}</p>
                             <p><strong>Apellido:</strong> {selectedAlumno.apellido}</p>
                             <p><strong>DNI:</strong> {selectedAlumno.dni}</p>
-                            <p><strong>Genero:</strong>{selectedAlumno.generoId?.nombre}</p>
+                            <p><strong>Genero:</strong> {selectedAlumno.generoId}</p>
                             <p><strong>CUIL:</strong> {selectedAlumno.cuil}</p>
                             <p><strong>Fecha de nacimiento:</strong> {new Date(selectedAlumno.fechaNacimiento).toLocaleDateString()}</p>
                             <p><strong>Teléfono:</strong> {selectedAlumno.telefono || 'No disponible'}</p>
@@ -413,12 +446,22 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                             </Form.Group>
                             <Form.Group controlId="formGenero" className="mb-3">
                                 <Form.Label>Genero</Form.Label>
-                                <Form.Control
-                                    type='text'
-                                    defaultValue={selectedAlumno.generoId}
-                                    as="select"
-                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, generoId: e.target.value })}
-                                ></Form.Control>
+                                <InputGroup>
+                                    <Form.Control
+                                        as="select"
+                                        value={genero}
+                                        onChange={(e) => setGenero(e.target.value)}
+                                        autoComplete='off'
+                                    >
+                                        <option value="">Selecciona una opción</option>
+                                        <option value="1">Masculino</option>
+                                        <option value="2">Femenino</option>
+                                        <option value="3">Otro</option>
+                                    </Form.Control>
+                                    <InputGroup.Text>
+                                        <BsChevronDown />
+                                    </InputGroup.Text>
+                                </InputGroup>
                             </Form.Group>
                             <Form.Group controlId="formCuil" className="mb-3">
                                 <Form.Label>C.U.I.L:</Form.Label>

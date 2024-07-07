@@ -72,9 +72,9 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             const alumnosFiltrados = filtrarAlumnos(curso.cursosUsuario, filtroAlumno);
 
             // Función para crear una tabla con encabezados
-            const crearTabla = (titulo: string, alumnos: User[]) => {
+            const crearTabla = (titulo: string, alumnos: User[], startY: number) => {
                 doc.setFontSize(18);
-                doc.text(titulo, 10, 70);
+                doc.text(titulo, 10, startY);
                 const head = [['Apellido', 'Nombre', ...dias.map(dia => dia.toString())]];
                 const body = alumnos.map(alumno => [
                     alumno.apellido.toUpperCase(),
@@ -82,7 +82,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                     ...dias.map(() => ' ')
                 ]);
                 autoTable(doc, {
-                    startY: 80,
+                    startY: startY + 10, // Posiciona la tabla justo debajo del título
                     head: head,
                     body: body,
                     styles: {
@@ -92,20 +92,21 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                     },
                     tableWidth: 'auto'
                 });
+                return doc.lastAutoTable.finalY; // Devuelve la posición Y donde termina la tabla
             };
 
             // Ejemplo de cómo podrías implementar el filtrado por género y crear tablas
 
+            let startY = 70;
             const alumnosGenero1 = alumnosFiltrados.filter(alumno => alumno.generoId === 1);
             const alumnosGenero2 = alumnosFiltrados.filter(alumno => alumno.generoId === 2);
 
             if (alumnosGenero1.length > 0) {
-                crearTabla('Alumnos Varones', alumnosGenero1);
+                startY = crearTabla('Alumnos Varones', alumnosGenero1, startY);
             }
 
             if (alumnosGenero2.length > 0) {
-                // Usando un título genérico para ejemplificar
-                crearTabla('Alumnos Mujeres', alumnosGenero2);
+                startY = crearTabla('Alumnos Mujeres', alumnosGenero2, startY + 20); // Añade espacio entre las tablas
             }
 
         });
