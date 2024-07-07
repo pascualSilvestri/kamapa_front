@@ -35,6 +35,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
         fechaNacimiento: '',
         telefono: '',
         email: '',
+        generoId: '',
         domicilioUsuario: {
             localidad: '',
             barrio: '',
@@ -176,6 +177,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
             fechaNacimiento: alumno.fechaNacimiento,
             telefono: alumno.telefono,
             email: alumno.email,
+            generoId: alumno.genero,
             domicilioUsuario: {
                 localidad: alumno.domicilioUsuario?.localidad || '',
                 barrio: alumno.domicilioUsuario?.barrio || '',
@@ -209,6 +211,7 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                         fechaNacimiento: editedAlumno.fechaNacimiento,
                         telefono: editedAlumno.telefono,
                         email: editedAlumno.email,
+                        generoId: editedAlumno.generoId,
                         domicilio: {
                             localidad: editedAlumno.domicilioUsuario.localidad,
                             barrio: editedAlumno.domicilioUsuario.barrio,
@@ -353,11 +356,12 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                             <p><strong>Nombre:</strong> {selectedAlumno.nombre}</p>
                             <p><strong>Apellido:</strong> {selectedAlumno.apellido}</p>
                             <p><strong>DNI:</strong> {selectedAlumno.dni}</p>
+                            <p><strong>Genero:</strong>{selectedAlumno.generoId?.nombre}</p>
                             <p><strong>CUIL:</strong> {selectedAlumno.cuil}</p>
                             <p><strong>Fecha de nacimiento:</strong> {new Date(selectedAlumno.fechaNacimiento).toLocaleDateString()}</p>
                             <p><strong>Teléfono:</strong> {selectedAlumno.telefono || 'No disponible'}</p>
                             <p><strong>Localidad:</strong> {selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.localidad : 'No disponible'}</p>
-                            <p><strong>Barrio:</strong> {selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.barrio: 'No disponible'}</p>
+                            <p><strong>Barrio:</strong> {selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.barrio : 'No disponible'}</p>
                             <p><strong>Calle:</strong> {selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.calle : 'No disponible'}</p>
                             <p><strong>Número:</strong> {selectedAlumno.domicilioUsuario ? selectedAlumno.domicilioUsuario.numero : 'No disponible'}</p>
                         </>
@@ -406,6 +410,15 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
                                     defaultValue={selectedAlumno.dni}
                                     onChange={(e) => setEditedAlumno({ ...editedAlumno, dni: e.target.value })}
                                 />
+                            </Form.Group>
+                            <Form.Group controlId="formGenero" className="mb-3">
+                                <Form.Label>Genero</Form.Label>
+                                <Form.Control
+                                    type='text'
+                                    defaultValue={selectedAlumno.generoId}
+                                    as="select"
+                                    onChange={(e) => setEditedAlumno({ ...editedAlumno, generoId: e.target.value })}
+                                ></Form.Control>
                             </Form.Group>
                             <Form.Group controlId="formCuil" className="mb-3">
                                 <Form.Label>C.U.I.L:</Form.Label>
@@ -534,4 +547,3 @@ const EditarAlumnoPage = ({ params }: { params: { id: string } }) => {
 };
 
 export default EditarAlumnoPage;
-    

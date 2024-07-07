@@ -1,5 +1,5 @@
 'use client'
-import { Curso, User } from 'model/types';
+import { Curso, User, Genero } from 'model/types';
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Table, Form, Button } from 'react-bootstrap';
 import { Environment } from '../../../../utils/EnviromenManager';
@@ -7,6 +7,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useInstitucionSelectedContext } from 'context/userContext';
+import AddAlumnoCurso from '../addAlumnoCurso/page';
 
 const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     const [cursos, setCursos] = useState<Curso[]>([]);
@@ -29,6 +30,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const data = await response.json();
+            console.log("Data fetched:", data);
             if (Array.isArray(data)) {
                 setCursos(data.sort((a, b) => a.nombre.localeCompare(b.nombre)));
             } else {
@@ -51,6 +53,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     };
 
     const exportPDF = () => {
+        console.log("Exportando a PDF...");
         const doc = new jsPDF({ orientation: 'landscape' });
         const fecha = new Date().toLocaleDateString();
         const mes = new Date().toLocaleString('default', { month: 'long' });
@@ -65,28 +68,51 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             doc.text(`Curso: ${curso.nombre}`, 10, 40);
             doc.text(`Mes: ${mes}`, 10, 50);
 
-            const head = [['Apellido', 'Nombre', ...dias.map(dia => dia.toString())]];
-            const body = filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
-                alumno.apellido.toUpperCase(),
-                alumno.nombre,
-                ...dias.map(() => ' ')
-            ]);
+            // Filtrar alumnos
+            const alumnosFiltrados = filtrarAlumnos(curso.cursosUsuario, filtroAlumno);
 
-            autoTable(doc, {
-                startY: 60,
-                head: head,
-                body: body,
-                styles: {
-                    cellWidth: 'wrap',
-                    lineWidth: 0.1,
-                    lineColor: [0, 0, 0],
-                },
-                tableWidth: 'auto'
-            });
+            // Función para crear una tabla con encabezados
+            const crearTabla = (titulo: string, alumnos: User[]) => {
+                doc.setFontSize(18);
+                doc.text(titulo, 10, 70);
+                const head = [['Apellido', 'Nombre', ...dias.map(dia => dia.toString())]];
+                const body = alumnos.map(alumno => [
+                    alumno.apellido.toUpperCase(),
+                    alumno.nombre,
+                    ...dias.map(() => ' ')
+                ]);
+                autoTable(doc, {
+                    startY: 80,
+                    head: head,
+                    body: body,
+                    styles: {
+                        cellWidth: 'wrap',
+                        lineWidth: 0.1,
+                        lineColor: [0, 0, 0],
+                    },
+                    tableWidth: 'auto'
+                });
+            };
+
+            // Ejemplo de cómo podrías implementar el filtrado por género y crear tablas
+
+            const alumnosGenero1 = alumnosFiltrados.filter(alumno => alumno.generoId === 1);
+            const alumnosGenero2 = alumnosFiltrados.filter(alumno => alumno.generoId === 2);
+
+            if (alumnosGenero1.length > 0) {
+                crearTabla('Alumnos Varones', alumnosGenero1);
+            }
+
+            if (alumnosGenero2.length > 0) {
+                // Usando un título genérico para ejemplificar
+                crearTabla('Alumnos Mujeres', alumnosGenero2);
+            }
+
         });
 
         doc.save('cursos_alumnos.pdf');
     };
+
 
     const exportExcel = () => {
         const wb = XLSX.utils.book_new();
