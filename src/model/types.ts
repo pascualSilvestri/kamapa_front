@@ -27,6 +27,8 @@ export interface User {
     notasPeriodo?: Nota[];
     genero?: Genero;
     generoId?: number;
+    curso?: Curso;
+    cursoId?: number;
 }
 
 

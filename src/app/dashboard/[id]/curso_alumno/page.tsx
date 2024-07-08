@@ -173,7 +173,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             alumnosGenero1.sort((a, b) => a.apellido.localeCompare(b.apellido));
             alumnosGenero2.sort((a, b) => a.apellido.localeCompare(b.apellido));
 
-            const head = [['Apellido', 'Nombre', 'DNI', 'Telefono']];
+            const head = [['Apellido', 'Nombre', 'CUIL', 'Telefono']];
 
             // Función para agregar tabla de alumnos
             const agregarTabla = (titulo: string, alumnos: User[], startY: number) => {
@@ -182,7 +182,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                 const body = alumnos.map(alumno => [
                     alumno.apellido.toUpperCase(),
                     alumno.nombre,
-                    alumno.dni,
+                    alumno.cuil,
                     alumno.telefono,
                 ]);
                 autoTable(doc, {

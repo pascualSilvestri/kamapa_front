@@ -24,7 +24,7 @@ export const router = {
     'due': { label: 'Due', href: '/due' },
     'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso' },
     'consultaListaAlumnoPorcurso': { label: 'Consultar Lista de Alumnos por curso', href: '/alumnosPorCurso' },
-
+    'regAlumnoCurso': { label: 'Asignar Alumnos a los Cursos', href: '/regAlumnoCurso' }
 }
 
 export const adminAutorizeRouter = [
@@ -38,6 +38,7 @@ export const directorAutorizeRouter = [
     'GestionCurso',
     'GestionAsignatura',
     'AddAsignaturaCurso',
+    'regAlumnoCurso',
     'AddAlumnoCurso',
     'CursoAlumno',
     'EditarAlumnos',
@@ -57,6 +58,7 @@ export const secretarioAutorizeRouter = [
     'RegistroUsuarios',
     'CrearCicloLectivo',
     'GestionCurso',
+    'regAlumnoCurso',
     'AddAsignaturaCurso',
     'CursoAlumno',
     'VistaUsuarios',
@@ -69,6 +71,7 @@ export const preceptorAutorizeRouter = [
     'Preceptores',
     'CursoAlumno',
     'EditarAlumnos',
+    'regAlumnoCurso',
     'Alumnos',
     'About',
     'RegistroAlumno',
