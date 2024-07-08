@@ -301,7 +301,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
                     </Link>
                 </Col>
                 <Col xs="auto">
-                    <Link href={`/dashboard/${autorizeRol(autorizeNivel(rol))}/consultaUsuario`}>
+                    <Link href={`/dashboard/${institucionSelected.id}/consultaUsuario`}>
                         <Button
                             variant="flat"
                             className="responsive-button"

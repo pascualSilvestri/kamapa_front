@@ -47,6 +47,8 @@ const RegAlumno = () => {
     const [cuil, setCuil] = useState('');
     const [fechaNacimiento, setFechaNacimiento] = useState('');
     const [email, setEmail] = useState('');
+    const [tutor, setTutor] = useState('');
+
     const [showModal, setShowModal] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
@@ -135,6 +137,7 @@ const RegAlumno = () => {
                     password: dni,
                     institucionId: institucionSelected.id,
                     generoId: generoSeleccionado,
+                    tutor: tutor,
                 },
                 rols: selectedRoleIds,
                 domicilio: {
@@ -182,17 +185,17 @@ const RegAlumno = () => {
     };
 
     const regexValidations = {
-        nombre: /^[a-zA-ZñÑ\s]+$/,
-        apellido: /^[a-zA-ZñÑ\s]+$/,
+        nombre: /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/,
+        apellido: /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/,
         dni: /^\d{8}$/,
-        cuil: /^\d{2}-\d{8}-\d{1}$/,
+        cuil: /^\d{11}$/, // Solo dígitos, sin guiones ni barras
         telefono: /^\d{10,11}$/,
         email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         legajo: /^\d+$/,
-        calle: /^[a-zA-ZñÑ\s]+$/,
-        numero: /^\d+$/,
-        barrio: /^[a-zA-ZñÑ\s]+$/,
-        localidad: /^[a-zA-ZñÑ\s]+$/,
+        calle: /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s\d]+$/, // Permite letras, espacios, números y acentos
+        barrio: /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s\d]+$/, // Permite letras, espacios, números y acentos
+        localidad: /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s\d]+$/, // Permite letras, espacios, números y acentos
+        tutor: /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+$/,
     };
 
     useEffect(() => {
@@ -204,10 +207,11 @@ const RegAlumno = () => {
         const validEmail = regexValidations.email.test(email);
         const validLegajo = regexValidations.legajo.test(legajo);
         const validCalle = regexValidations.calle.test(calle);
-        const validNumero = regexValidations.numero.test(numero);
+        // const validNumero = regexValidations.numero.test(numero);
         const validBarrio = regexValidations.barrio.test(barrio);
         const validLocalidad = regexValidations.localidad.test(localidad);
         const validRoles = roles.Alumno?.checked;
+        const validTutor = regexValidations.tutor.test(tutor);
 
         if (
             validNombre &&
@@ -218,7 +222,8 @@ const RegAlumno = () => {
             validEmail &&
             validLegajo &&
             validCalle &&
-            validNumero &&
+            // validNumero &&
+            validTutor &&
             validBarrio &&
             validLocalidad &&
             provinciaSeleccionada &&
@@ -234,6 +239,7 @@ const RegAlumno = () => {
         dni,
         cuil,
         telefono,
+        tutor,
         email,
         legajo,
         calle,
@@ -250,7 +256,8 @@ const RegAlumno = () => {
         regexValidations.email,
         regexValidations.legajo,
         regexValidations.calle,
-        regexValidations.numero,
+        regexValidations.tutor,
+        // regexValidations.numero,
         regexValidations.barrio,
         regexValidations.localidad,
         roles.Alumno?.checked,
@@ -262,6 +269,7 @@ const RegAlumno = () => {
         setDni('');
         setCalle('');
         setNumero('');
+        setTutor('');
         setBarrio('');
         setLocalidad('');
         setProvinciaSeleccionada('');
@@ -381,6 +389,21 @@ const RegAlumno = () => {
                             <h3>Datos de Contacto del Alumno</h3>
                         </Form.Group>
                         <hr />
+                        <Form.Group controlId="tutor">
+                            <Form.Label>Nombre y Apellido del adulto responsable *</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Nombre y Apellido de padre, madre o tutor"
+                                value={tutor}
+                                onChange={(e) => setTutor(e.target.value)}
+                                autoComplete='off'
+                                isInvalid={!regexValidations.tutor.test(tutor)}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un nombre y apellido válidos.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+
                         <Form.Group controlId="calle">
                             <Form.Label>Calle *</Form.Label>
                             <Form.Control
@@ -403,7 +426,7 @@ const RegAlumno = () => {
                                 value={numero}
                                 onChange={(e) => setNumero(e.target.value)}
                                 autoComplete='off'
-                                isInvalid={!regexValidations.numero.test(numero)}
+                            // isInvalid={!regexValidations.numero.test(numero)}
                             />
                             <Form.Control.Feedback type="invalid">
                                 Ingrese un número válido.
@@ -454,9 +477,6 @@ const RegAlumno = () => {
                                         </option>
                                     ))}
                                 </Form.Control>
-                                <Form.Control.Feedback type="invalid">
-                                    Seleccione una provincia.
-                                </Form.Control.Feedback>
                                 <InputGroup.Text>
                                     <BsChevronDown />
                                 </InputGroup.Text>
@@ -509,7 +529,7 @@ const RegAlumno = () => {
                                 Ingrese un legajo válido.
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group controlId="roles">
+                        {/* <Form.Group controlId="roles">
                             <Form.Label>Roles *</Form.Label>
                             <div>
                                 {Object.keys(roles).filter((key) => roles[key].name === 'Alumno').map((key) => (
@@ -534,7 +554,7 @@ const RegAlumno = () => {
                                     />
                                 ))}
                             </div>
-                        </Form.Group>
+                        </Form.Group> */}
                         <hr />
                         <Form.Group className="d-flex justify-content-center mb-5">
                             <div className='me-1'>

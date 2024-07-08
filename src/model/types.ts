@@ -29,6 +29,7 @@ export interface User {
     generoId?: number;
     curso?: Curso;
     cursoId?: number;
+    tutor: string;
 }
 
 
