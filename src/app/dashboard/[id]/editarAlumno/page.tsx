@@ -22,6 +22,7 @@ interface Alumno {
     generoId: number;
     fecha_ingreso: string;
     fecha_egreso: string | null;
+    genero: { id: number; nombre: string };
     domicilioUsuario: {
         localidad: string;
         barrio: string;
@@ -74,6 +75,32 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
     useEffect(() => {
         fetchData();
     }, [session]);
+
+
+    useEffect(() => {
+        const fectchGenero = async () => {
+            try {
+                const response = await fetch(
+                    `${Environment.getEndPoint(Environment.endPoint.getGeneros)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session?.accessToken}`,
+                    },
+                }
+                );
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log(data);
+                setGenero(data[0]);
+            } catch (error) {
+                console.error('Error al obtener generos:', error);
+            }
+        }
+    })
 
     useEffect(() => {
         const fetchRoles = async () => {
@@ -389,7 +416,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
                             <p><strong>Nombre:</strong> {selectedAlumno.nombre}</p>
                             <p><strong>Apellido:</strong> {selectedAlumno.apellido}</p>
                             <p><strong>DNI:</strong> {selectedAlumno.dni}</p>
-                            <p><strong>Genero:</strong> {selectedAlumno.generoId}</p>
+                            <p><strong>Genero:</strong> {selectedAlumno.genero.nombre}</p>
                             <p><strong>CUIL:</strong> {selectedAlumno.cuil}</p>
                             <p><strong>Fecha de nacimiento:</strong> {new Date(selectedAlumno.fechaNacimiento).toLocaleDateString()}</p>
                             <p><strong>Teléfono:</strong> {selectedAlumno.telefono || 'No disponible'}</p>
