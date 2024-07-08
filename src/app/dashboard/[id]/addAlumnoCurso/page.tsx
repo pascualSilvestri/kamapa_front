@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table, Pagination, Modal } from 'react-bootstrap';
 import { Curso, User } from 'model/types';  // Asegúrate de que 'User' y 'Curso' estén definidos en 'model/types'
 import { Environment } from 'utils/EnviromenManager';
+import { useCicloLectivo } from 'context/CicloLectivoContext';
 
 const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
     const [curso, setCurso] = useState<string>('');
@@ -15,6 +16,8 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
     const [alumnosAgregados, setAlumnosAgregados] = useState<User[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
+    
 
     useEffect(() => {
         fetchCursos();
@@ -68,6 +71,7 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
             }
 
             const data = await response.json();
+            fetchAlumnos();
             setModalMessage(data.msg);
             setShowModal(true);
             setTimeout(() => {
