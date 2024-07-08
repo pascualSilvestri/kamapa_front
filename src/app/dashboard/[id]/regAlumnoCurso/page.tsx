@@ -1,14 +1,11 @@
 'use client'
-
-// RegAlumnoCurso.tsx
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Table, Pagination, Modal } from 'react-bootstrap';
-import { Curso, User } from '../../../../model/types';  // Asegúrate de ajustar la ruta según tu estructura de archivos
-import { Environment } from '../../../../utils/EnviromenManager';
+import { Curso, User } from 'model/types';  // Asegúrate de que 'User' y 'Curso' estén definidos correctamente en 'model/types'
+import { Environment } from 'utils/EnviromenManager';
 
-const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
-    const [cursoId, setCursoId] = useState<number | undefined>();
+const RegAlumnoCurso = ({ params }: { params: { id: string } }) => {
+    const [cursoId, setCursoId] = useState<string>('');
     const [cursos, setCursos] = useState<Curso[]>([]);
     const [alumnosDisponibles, setAlumnosDisponibles] = useState<User[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -20,36 +17,34 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
 
     useEffect(() => {
         fetchCursos();
-        fetchAlumnosDisponibles();
+        fetchAlumnos();
     }, []);
 
     const fetchCursos = async () => {
         try {
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`);
             if (!response.ok) {
-                throw new Error('No se pudieron cargar los cursos');
+                throw new Error('Error fetching courses');
             }
             const data = await response.json();
-            setCursos(data);
+            setCursos(Array.isArray(data) ? data : []);
         } catch (error) {
-            console.error('Error al cargar cursos:', error);
+            console.error('Error fetching courses:', error);
+            // Handle error as needed
         }
     };
 
-    const fetchAlumnosDisponibles = async () => {
+    const fetchAlumnos = async () => {
         try {
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion)}${params.id}`);
             if (!response.ok) {
-                throw new Error('No se pudieron cargar los alumnos');
+                throw new Error('Error fetching students');
             }
             const data = await response.json();
-            const alumnosConCurso = data.alumnos.map((alumno: User) => ({
-                ...alumno,
-                curso: cursos.find(curso => curso.id === alumno.cursoId) || { id: 0, nombre: 'Sin asignar' },
-            }));
-            setAlumnosDisponibles(alumnosConCurso);
+            setAlumnosDisponibles(data.alumnos);
         } catch (error) {
-            console.error('Error al cargar alumnos disponibles:', error);
+            console.error('Error fetching students:', error);
+            // Handle error as needed
         }
     };
 
@@ -57,23 +52,18 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
         setCurrentPage(pageNumber);
     };
 
-    const handleAddAlumno = (alumnoId: number | string) => {
-        const alumnoSeleccionado = alumnosDisponibles.find(a => a.id.toString() === alumnoId.toString());
-        if (alumnoSeleccionado && !alumnosAgregados.some(a => a.id === alumnoId)) {
-            setAlumnosAgregados([...alumnosAgregados, alumnoSeleccionado]);
-            setAlumnosDisponibles(alumnosDisponibles.filter(a => a.id !== alumnoId));
+    const handleAddAlumno = (alumno: User) => {
+        if (!alumnosAgregados.some(a => a.id === alumno.id)) {
+            setAlumnosAgregados([...alumnosAgregados, alumno]);
         }
     };
 
-    const handleRemoveAlumno = (alumnoId: number | string) => {
-        const alumnoSeleccionado = alumnosAgregados.find(a => a.id === alumnoId);
-        setAlumnosAgregados(alumnosAgregados.filter(a => a.id !== alumnoId));
-        if (alumnoSeleccionado) {
-            setAlumnosDisponibles([...alumnosDisponibles, alumnoSeleccionado]);
-        }
+    const handleRemoveAlumno = (alumno: User) => {
+        setAlumnosAgregados(alumnosAgregados.filter(a => a.id !== alumno.id));
     };
 
-    const handleAsignarCursos = async () => {
+
+    const handleAssignAlumnos = async () => {
         try {
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.addAlumnoToCurso)}`, {
                 headers: {
@@ -89,7 +79,7 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.msg || 'Error al agregar alumnos al curso');
+                throw new Error(errorData.msg || 'Error adding students to course');
             }
 
             const data = await response.json();
@@ -108,6 +98,7 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
         }
     };
 
+    // Filter students based on the filter value
     const filteredAlumnos = alumnosDisponibles.filter(alumno => {
         const fullName = `${alumno.nombre} ${alumno.apellido}`.toLowerCase();
         return (
@@ -116,6 +107,7 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
         );
     });
 
+    // Logic for displaying current students
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentAlumnos = filteredAlumnos.slice(indexOfFirstItem, indexOfLastItem);
@@ -125,16 +117,21 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
         <Container>
             <Row>
                 <Col md={6}>
-                    <h1>Asignar Alumnos a Curso</h1>
+                    <h1>Registrar Alumnos en Curso</h1>
                     <Form.Group>
                         <Form.Label>Seleccionar Curso</Form.Label>
-                        <Form.Control as="select" value={cursoId || ''} onChange={(e) => setCursoId(parseInt(e.target.value))}>
+                        <Form.Control
+                            as="select"
+                            value={cursoId}
+                            onChange={(e) => setCursoId(e.target.value)}
+                        >
                             <option value="">Seleccionar curso</option>
                             {cursos.map(curso => (
                                 <option key={curso.id} value={curso.id}>{curso.nombre}</option>
                             ))}
                         </Form.Control>
                     </Form.Group>
+
                     <h2>Alumnos Disponibles</h2>
                     <Form.Group controlId="filtroAlumno">
                         <Form.Label>Filtrar Alumnos</Form.Label>
@@ -150,7 +147,7 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
                             <tr>
                                 <th>Nombre</th>
                                 <th>Apellido</th>
-                                <th>Curso Actual</th>
+                                <th>DNI</th>
                                 <th>Acción</th>
                             </tr>
                         </thead>
@@ -159,11 +156,11 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
                                 <tr key={alumno.id}>
                                     <td>{alumno.nombre}</td>
                                     <td>{alumno.apellido}</td>
-                                    <td>{alumno.curso.nombre}</td>
+                                    <td>{alumno.dni}</td>
                                     <td>
                                         <Button
                                             variant="success"
-                                            onClick={() => handleAddAlumno(alumno.id)}
+                                            onClick={() => handleAddAlumno(alumno)}
                                         >
                                             Agregar
                                         </Button>
@@ -174,7 +171,11 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
                     </Table>
                     <Pagination>
                         {Array.from({ length: totalPages }, (_, i) => (
-                            <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                            <Pagination.Item
+                                key={i + 1}
+                                active={i + 1 === currentPage}
+                                onClick={() => handlePageChange(i + 1)}
+                            >
                                 {i + 1}
                             </Pagination.Item>
                         ))}
@@ -182,43 +183,37 @@ const RegAlumnoCurso: React.FC<{ params: { id: string } }> = ({ params }) => {
                 </Col>
                 <Col md={6}>
                     <h2>Curso Seleccionado y Alumnos Agregados</h2>
-                    {cursoId && (
-                        <>
-                            <h3>{cursos.find(c => c.id === cursoId)?.nombre}</h3>
-                            <Table striped bordered hover>
-                                <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Apellido</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {alumnosAgregados.map(alumno => (
-                                        <tr key={alumno.id}>
-                                            <td>{alumno.nombre}</td>
-                                            <td>{alumno.apellido}</td>
-                                            <td>
-                                                <Button
-                                                    variant="danger"
-                                                    onClick={() => handleRemoveAlumno(alumno.id)}
-                                                >
-                                                    Eliminar
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                            <Button
-                                variant="primary"
-                                onClick={handleAsignarCursos}
-                                style={{ marginTop: '10px' }}
-                            >
-                                Asignar Cursos
-                            </Button>
-                        </>
-                    )}
+                    <h3>{cursos.find(curso => curso.id === cursoId)?.nombre}</h3>
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>DNI</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {alumnosAgregados.map(alumno => (
+                                <tr key={alumno.id}>
+                                    <td>{alumno.nombre}</td>
+                                    <td>{alumno.apellido}</td>
+                                    <td>{alumno.dni}</td>
+                                    <td>
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => handleRemoveAlumno(alumno)}
+                                        >
+                                            Eliminar
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                    <Button variant="primary" onClick={handleAssignAlumnos}>
+                        Asignar Alumnos
+                    </Button>
                 </Col>
             </Row>
 
