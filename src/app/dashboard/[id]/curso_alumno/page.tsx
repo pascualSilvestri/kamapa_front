@@ -9,6 +9,14 @@ import * as XLSX from 'xlsx';
 import { useInstitucionSelectedContext } from 'context/userContext';
 import AddAlumnoCurso from '../addAlumnoCurso/page';
 
+declare module 'jspdf' {
+    interface jsPDF {
+        lastAutoTable: {
+            finalY: number;
+        };
+    }
+}
+
 const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     const [cursos, setCursos] = useState<Curso[]>([]);
     const [filtroAlumno, setFiltroAlumno] = useState<string>('');
@@ -52,6 +60,8 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         );
     };
 
+
+
     const exportPDF = () => {
         console.log("Exportando a PDF...");
         const doc = new jsPDF({ orientation: 'landscape' });
@@ -66,7 +76,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             doc.setFontSize(12);
             doc.text(`Fecha: ${fecha}`, 10, 30);
             doc.text(`Curso: ${curso.nombre}`, 10, 40);
-            doc.text(`Mes: ${mes}`, 10, 50);
+            doc.text(`Mes: ${mes.toUpperCase()}`, 10, 50);
 
             // Filtrar alumnos
             const alumnosFiltrados = filtrarAlumnos(curso.cursosUsuario, filtroAlumno);
@@ -100,6 +110,12 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             let startY = 70;
             const alumnosGenero1 = alumnosFiltrados.filter(alumno => alumno.generoId === 1);
             const alumnosGenero2 = alumnosFiltrados.filter(alumno => alumno.generoId === 2);
+
+
+            // Ordenar alumnos alfabéticamente por apellido
+            alumnosGenero1.sort((a, b) => a.apellido.localeCompare(b.apellido));
+            alumnosGenero2.sort((a, b) => a.apellido.localeCompare(b.apellido));
+
 
             if (alumnosGenero1.length > 0) {
                 startY = crearTabla('Alumnos Varones', alumnosGenero1, startY);

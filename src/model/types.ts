@@ -26,6 +26,7 @@ export interface User {
     notas?: Nota[];
     notasPeriodo?: Nota[];
     genero?: Genero;
+    generoId?: number;
 }
 
 
@@ -77,7 +78,7 @@ export interface Institucion {
     logo: string;
     email?: string;
     contacto?: string;
-    Roles?:Roles[]
+    Roles?: Roles[]
 }
 
 
