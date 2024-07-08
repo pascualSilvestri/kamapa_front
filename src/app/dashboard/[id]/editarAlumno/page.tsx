@@ -140,7 +140,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
 
       const data = await response.json();
       console.log(data);
-      setGenero(data[0]);
+      setGenero(data.generos);
     } catch (error) {
       console.error("Error al obtener generos:", error);
     }
