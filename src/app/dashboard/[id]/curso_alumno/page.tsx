@@ -131,24 +131,24 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     };
 
 
-    const exportExcel = () => {
-        const wb = XLSX.utils.book_new();
-        cursos.forEach(curso => {
-            const wsData = [
-                [`Curso: ${curso.nombre}`],
-                ['Apellido', 'Nombre', ...Array.from({ length: 31 }, (_, i) => (i + 1).toString())],
-                ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
-                    alumno.apellido.toUpperCase(),
-                    alumno.nombre,
-                    ...Array.from({ length: 31 }, () => '')
-                ]),
-                ['']
-            ];
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, curso.nombre);
-        });
-        XLSX.writeFile(wb, 'cursos_alumnos.xlsx');
-    };
+    // const exportExcel = () => {
+    //     const wb = XLSX.utils.book_new();
+    //     cursos.forEach(curso => {
+    //         const wsData = [
+    //             [`Curso: ${curso.nombre}`],
+    //             ['Apellido', 'Nombre', ...Array.from({ length: 31 }, (_, i) => (i + 1).toString())],
+    //             ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
+    //                 alumno.apellido.toUpperCase(),
+    //                 alumno.nombre,
+    //                 ...Array.from({ length: 31 }, () => '')
+    //             ]),
+    //             ['']
+    //         ];
+    //         const ws = XLSX.utils.aoa_to_sheet(wsData);
+    //         XLSX.utils.book_append_sheet(wb, ws, curso.nombre);
+    //     });
+    //     XLSX.writeFile(wb, 'cursos_alumnos.xlsx');
+    // };
 
     const exportSimplePDF = () => {
         const doc = new jsPDF();
@@ -162,41 +162,69 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             doc.text(`Fecha: ${fecha}`, 10, 30);
             doc.text(`Curso: ${curso.nombre}`, 10, 40);
 
-            const head = [['Apellido', 'Nombre', 'DNI']];
-            const body = filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
-                alumno.apellido.toUpperCase(),
-                alumno.nombre,
-                alumno.dni
-            ]);
+            // Filtrar alumnos
+            const alumnosFiltrados = filtrarAlumnos(curso.cursosUsuario, filtroAlumno);
 
-            autoTable(doc, {
-                startY: 60,
-                head: head,
-                body: body,
-            });
+            // Separar alumnos por género
+            const alumnosGenero1 = alumnosFiltrados.filter(alumno => alumno.generoId === 1);
+            const alumnosGenero2 = alumnosFiltrados.filter(alumno => alumno.generoId === 2);
+
+            // Ordenar alfabéticamente por apellido
+            alumnosGenero1.sort((a, b) => a.apellido.localeCompare(b.apellido));
+            alumnosGenero2.sort((a, b) => a.apellido.localeCompare(b.apellido));
+
+            const head = [['Apellido', 'Nombre', 'DNI', 'Telefono']];
+
+            // Función para agregar tabla de alumnos
+            const agregarTabla = (titulo: string, alumnos: User[], startY: number) => {
+                doc.setFontSize(14);
+                doc.text(titulo, 10, startY);
+                const body = alumnos.map(alumno => [
+                    alumno.apellido.toUpperCase(),
+                    alumno.nombre,
+                    alumno.dni,
+                    alumno.telefono,
+                ]);
+                autoTable(doc, {
+                    startY: startY + 10, // Posiciona la tabla justo debajo del título
+                    head: head,
+                    body: body,
+                });
+                return doc.lastAutoTable.finalY; // Devuelve la posición Y donde termina la tabla
+            };
+
+            // Agregar tablas para cada género
+            let startY = 60;
+            if (alumnosGenero1.length > 0) {
+                startY = agregarTabla('Alumnos Varones', alumnosGenero1, startY);
+            }
+            if (alumnosGenero2.length > 0) {
+                agregarTabla('Alumnas Mujeres', alumnosGenero2, startY + 20); // Añade espacio entre las tablas
+            }
         });
 
         doc.save('cursos_alumnos_simple.pdf');
     };
 
-    const exportSimpleExcel = () => {
-        const wb = XLSX.utils.book_new();
-        cursos.forEach(curso => {
-            const wsData = [
-                [`Curso: ${curso.nombre}`],
-                ['Apellido', 'Nombre', 'DNI'],
-                ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
-                    alumno.apellido.toUpperCase(),
-                    alumno.nombre,
-                    alumno.dni
-                ]),
-                ['']
-            ];
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, curso.nombre);
-        });
-        XLSX.writeFile(wb, 'cursos_alumnos_simple.xlsx');
-    };
+
+    // const exportSimpleExcel = () => {
+    //     const wb = XLSX.utils.book_new();
+    //     cursos.forEach(curso => {
+    //         const wsData = [
+    //             [`Curso: ${curso.nombre}`],
+    //             ['Apellido', 'Nombre', 'DNI'],
+    //             ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
+    //                 alumno.apellido.toUpperCase(),
+    //                 alumno.nombre,
+    //                 alumno.dni
+    //             ]),
+    //             ['']
+    //         ];
+    //         const ws = XLSX.utils.aoa_to_sheet(wsData);
+    //         XLSX.utils.book_append_sheet(wb, ws, curso.nombre);
+    //     });
+    //     XLSX.writeFile(wb, 'cursos_alumnos_simple.xlsx');
+    // };
 
     return (
         <Container>
@@ -214,15 +242,15 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                     <Button variant="primary" onClick={exportPDF} style={{ margin: '10px' }}>
                         Generar planilla de asistencias PDF
                     </Button>
-                    <Button variant="success" onClick={exportExcel} style={{ margin: '10px' }}>
+                    {/* <Button variant="success" onClick={exportExcel} style={{ margin: '10px' }}>
                         Generar planilla de asistencias Excel
-                    </Button>
+                    </Button> */}
                     <Button variant="info" onClick={exportSimplePDF} style={{ margin: '10px' }}>
                         Lista de alumnos PDF
                     </Button>
-                    <Button variant="warning" onClick={exportSimpleExcel} style={{ margin: '10px' }}>
+                    {/* <Button variant="warning" onClick={exportSimpleExcel} style={{ margin: '10px' }}>
                         Lista de alumnos Excel
-                    </Button>
+                    </Button> */}
                     <Table striped bordered hover>
                         <thead>
                             <tr>
