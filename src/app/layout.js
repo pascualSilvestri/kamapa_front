@@ -104,7 +104,7 @@ export default function RootLayout({ children }) {
                 `}</style>
             </head>
             <body>
-                <div className='container-fluid d-flex flex-column min-vh-100 mx-0'>
+                <div >
                     <SessionAuthProvider>
                         <UserProvider>
                             <CicloLectivoProvider>
@@ -112,7 +112,7 @@ export default function RootLayout({ children }) {
                                     <DataLoading loading={loading} />
                                 ) : (
                                     <Suspense fallback={<Loading />}>
-                                        <div >
+                                        <div className='container-fluid d-flex flex-column min-vh-100 mx-0'>
                                             {children}
                                         </div>
                                     </Suspense>
@@ -120,8 +120,9 @@ export default function RootLayout({ children }) {
                             </CicloLectivoProvider>
                         </UserProvider>
                     </SessionAuthProvider>
-                    <Footer />
+                    
                 </div>
+                <Footer />
             </body>
         </html>
     );
