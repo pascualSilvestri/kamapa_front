@@ -134,24 +134,6 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     };
 
 
-    // const exportExcel = () => {
-    //     const wb = XLSX.utils.book_new();
-    //     cursos.forEach(curso => {
-    //         const wsData = [
-    //             [`Curso: ${curso.nombre}`],
-    //             ['Apellido', 'Nombre', ...Array.from({ length: 31 }, (_, i) => (i + 1).toString())],
-    //             ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
-    //                 alumno.apellido.toUpperCase(),
-    //                 alumno.nombre,
-    //                 ...Array.from({ length: 31 }, () => '')
-    //             ]),
-    //             ['']
-    //         ];
-    //         const ws = XLSX.utils.aoa_to_sheet(wsData);
-    //         XLSX.utils.book_append_sheet(wb, ws, curso.nombre);
-    //     });
-    //     XLSX.writeFile(wb, 'cursos_alumnos.xlsx');
-    // };
 
     const exportSimplePDF = () => {
         const doc = new jsPDF();
@@ -210,25 +192,6 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     };
 
 
-    // const exportSimpleExcel = () => {
-    //     const wb = XLSX.utils.book_new();
-    //     cursos.forEach(curso => {
-    //         const wsData = [
-    //             [`Curso: ${curso.nombre}`],
-    //             ['Apellido', 'Nombre', 'DNI'],
-    //             ...filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(alumno => [
-    //                 alumno.apellido.toUpperCase(),
-    //                 alumno.nombre,
-    //                 alumno.dni
-    //             ]),
-    //             ['']
-    //         ];
-    //         const ws = XLSX.utils.aoa_to_sheet(wsData);
-    //         XLSX.utils.book_append_sheet(wb, ws, curso.nombre);
-    //     });
-    //     XLSX.writeFile(wb, 'cursos_alumnos_simple.xlsx');
-    // };
-
     return (
         <Container>
             <h1>Visualizar Cursos y Alumnos</h1>
@@ -245,15 +208,11 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                     <Button variant="primary" onClick={exportPDF} style={{ margin: '10px' }}>
                         Generar planilla de asistencias PDF
                     </Button>
-                    {/* <Button variant="success" onClick={exportExcel} style={{ margin: '10px' }}>
-                        Generar planilla de asistencias Excel
-                    </Button> */}
+                 
                     <Button variant="info" onClick={exportSimplePDF} style={{ margin: '10px' }}>
                         Lista de alumnos PDF
                     </Button>
-                    {/* <Button variant="warning" onClick={exportSimpleExcel} style={{ margin: '10px' }}>
-                        Lista de alumnos Excel
-                    </Button> */}
+           
                     <Table striped bordered hover>
                         <thead>
                             <tr>
