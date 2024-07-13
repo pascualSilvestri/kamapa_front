@@ -85,16 +85,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
         doc.save(`alumnos_${nombreCursoSeleccionado}.pdf`);
     };
 
-    // const exportExcel = () => {
-    //     const ws = XLSX.utils.json_to_sheet(alumnos.map(alumno => ({
-    //         Nombre: alumno.nombre,
-    //         Apellido: alumno.apellido,
-    //         DNI: alumno.dni,
-    //     })));
-    //     const wb = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(wb, ws, `Alumnos_${nombreCursoSeleccionado}`);
-    //     XLSX.writeFile(wb, `alumnos_${nombreCursoSeleccionado}.xlsx`);
-    // };
+
 
     return (
         <Container>
@@ -123,9 +114,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                             <Button variant="primary" onClick={exportPDF} style={{ margin: '10px' }}>
                                 Exportar a PDF
                             </Button>
-                            <Button variant="success" onClick={exportExcel} style={{ margin: '10px' }}>
-                                Exportar a Excel
-                            </Button>
+  
                             <Table striped bordered hover>
                                 <thead>
                                     <tr>

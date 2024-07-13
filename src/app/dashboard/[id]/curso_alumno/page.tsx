@@ -60,7 +60,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         );
     };
 
-    const handleEliminarAlumno = (cursoId: string, alumnoId: string) => {
+    const handleEliminarAlumno = (cursoId: number, alumnoId: any) => {
         console.log(`Curso ID: ${cursoId}, Alumno ID: ${alumnoId}`);
         // Aquí puedes agregar la lógica para eliminar al alumno, como una llamada a la API
     };
