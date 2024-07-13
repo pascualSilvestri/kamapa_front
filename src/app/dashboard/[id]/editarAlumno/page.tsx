@@ -475,7 +475,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
                                 <strong>DNI:</strong> {selectedAlumno.dni}
                             </p>
                             <p>
-                                <strong>Genero:</strong> {selectedAlumno.genero.nombre}
+                                <strong>Genero:</strong> {selectedAlumno.genero ? selectedAlumno.genero.nombre : ''}
                             </p>
                             <p>
                                 <strong>CUIL:</strong> {selectedAlumno.cuil}

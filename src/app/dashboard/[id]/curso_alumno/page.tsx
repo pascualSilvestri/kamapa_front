@@ -60,7 +60,10 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         );
     };
 
-
+    const handleEliminarAlumno = (cursoId: string, alumnoId: string) => {
+        console.log(`Curso ID: ${cursoId}, Alumno ID: ${alumnoId}`);
+        // Aquí puedes agregar la lógica para eliminar al alumno, como una llamada a la API
+    };
 
     const exportPDF = () => {
         console.log("Exportando a PDF...");
@@ -256,6 +259,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                             <tr>
                                 <th>Curso</th>
                                 <th>Alumnos</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -266,7 +270,22 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                                         <ul>
                                             {filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(
                                                 (alumno, idx) => (
-                                                    <li key={idx}> <span style={{ textTransform: 'uppercase' }}>{alumno.apellido}</span>, <span>{alumno.nombre}</span></li>
+                                                    <li key={idx}>
+                                                        <span style={{ textTransform: 'uppercase' }}>{alumno.apellido}</span>, <span>{alumno.nombre}</span>
+                                                    </li>
+                                                )
+                                            )}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <ul>
+                                            {filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(
+                                                (alumno, idx) => (
+                                                    <li key={idx}>
+                                                        <Button variant="danger" size="sm" onClick={() => handleEliminarAlumno(curso.id, alumno.id)}>
+                                                            Eliminar
+                                                        </Button>
+                                                    </li>
                                                 )
                                             )}
                                         </ul>
