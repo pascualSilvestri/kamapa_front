@@ -86,14 +86,14 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
             });
             const data = await response.json();
             console.log(data);
-            console.log(data.map(a=>a.usuario));
-            setAlumnos(Array.isArray(data) ? data.map(a=>a.usuario) : []);
+            console.log(data.map(a => a.usuario));
+            setAlumnos(Array.isArray(data) ? data.map(a => a.usuario) : []);
         } catch (error) {
             console.error('Error fetching alumnos:', error);
             setAlumnos([]);  // Ensure alumnos is an array in case of error
         }
     };
-    
+
 
     const handleAddNota = async (alumnoId: number | string) => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createNota)}`, {
