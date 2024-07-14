@@ -69,6 +69,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const [genero, setGenero] = useState("");
+    const [generos, setGeneros] = useState([]);
 
     const [editedAlumno, setEditedAlumno] = useState({
         legajo: "",
@@ -121,6 +122,25 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
             console.error("Error al obtener empleados:", error);
         }
     };
+
+    useEffect(() => {
+        // Fetch géneros
+        const fetchGeneros = async () => {
+            try {
+                const response = await fetch(Environment.getEndPoint(Environment.endPoint.getGeneros), {
+                    headers: {
+                        Authorization: `Bearer ${session?.accessToken}`,
+                    },
+                });
+                const data = await response.json();
+                setGeneros(data.generos);
+            } catch (error) {
+                console.error("Error fetching géneros:", error);
+            }
+        };
+
+        fetchGeneros();
+    }, [session]);
 
     const fectchGenero = async () => {
         try {
@@ -251,7 +271,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
             fechaNacimiento: alumno.fechaNacimiento,
             telefono: alumno.telefono,
             email: alumno.email,
-            generoId: alumno.generoId.toString(),
+            generoId: alumno.genero.toString(),
             domicilioUsuario: {
                 localidad: alumno.domicilioUsuario?.localidad || "",
                 barrio: alumno.domicilioUsuario?.barrio || "",
@@ -260,7 +280,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
             },
             roles: alumno.Roles?.map((role) => role.id) || [],
         });
-        setGenero(alumno.generoId.toString());
+        setGenero(alumno.genero.toString());
         setShowEditModal(true);
     };
 
@@ -271,8 +291,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
     const handleConfirmSave = async () => {
         try {
             const response = await fetch(
-                `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedAlumno?.id
-                }`,
+                `${Environment.getEndPoint(Environment.endPoint.updateUsuarioById)}${selectedAlumno?.id}`,
                 {
                     method: "PUT",
                     headers: {
@@ -305,13 +324,11 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
 
             if (!response.ok) {
                 console.log(data);
-                throw new Error(data);
+                throw new Error(JSON.stringify(data));
             }
 
             const updatedResponse = await fetch(
-                `${Environment.getEndPoint(
-                    Environment.endPoint.getUsuariosAllByIntitucion
-                )}${institucionSelected.id}`,
+                `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${session?.accessToken}`,
@@ -325,9 +342,10 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
             setShowEditModal(false);
             setShowSaveConfirmModal(false);
         } catch (error) {
-            console.error("Error al actualizar empleado:", error);
+            console.error("Error al actualizar Alumno:", error.message || error);
         }
     };
+
 
     console.log(alumnos);
     console.log(selectedAlumno);
@@ -475,7 +493,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
                                 <strong>DNI:</strong> {selectedAlumno.dni}
                             </p>
                             <p>
-                                <strong>Genero:</strong> {selectedAlumno.genero ? selectedAlumno.genero.nombre : ''}
+                                <strong>Genero:</strong> {selectedAlumno.generoId ? selectedAlumno.genero.nombre : ''}
                             </p>
                             <p>
                                 <strong>CUIL:</strong> {selectedAlumno.cuil}
@@ -581,10 +599,11 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
                                         onChange={(e) => setGenero(e.target.value)}
                                         autoComplete="off"
                                     >
-                                        <option value="">Selecciona una opción</option>
-                                        <option value="1">Masculino</option>
-                                        <option value="2">Femenino</option>
-                                        <option value="3">Otro</option>
+                                        {generos.map((gen) => (
+                                            <option key={gen.id} value={gen.id}>
+                                                {gen.nombre}
+                                            </option>
+                                        ))}
                                     </Form.Control>
                                     <InputGroup.Text>
                                         <BsChevronDown />
