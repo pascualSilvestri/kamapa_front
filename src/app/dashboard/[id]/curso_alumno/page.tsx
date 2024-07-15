@@ -8,6 +8,7 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { useInstitucionSelectedContext } from 'context/userContext';
 import AddAlumnoCurso from '../addAlumnoCurso/page';
+import { useCicloLectivo } from 'context/CicloLectivoContext';
 
 declare module 'jspdf' {
     interface jsPDF {
@@ -21,6 +22,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     const [cursos, setCursos] = useState<Curso[]>([]);
     const [filtroAlumno, setFiltroAlumno] = useState<string>('');
     const [institucionSelected] = useInstitucionSelectedContext();
+    const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
 
     useEffect(() => {
         fetchCursosAndAlumnos();
@@ -60,8 +62,20 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         );
     };
 
-    const handleEliminarAlumno = (cursoId: number, alumnoId: any) => {
-        console.log(`Curso ID: ${cursoId}, Alumno ID: ${alumnoId}`);
+    const handleEliminarAlumno = async (cursoId: number, alumnoId: any) => {
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAlumnoDeCurso)}`,{
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                cursoId,
+                alumnoId,
+                cicloLectivoId: cicloLectivo.id,
+            }),
+        })
+        const data = await response.json();
+        console.log(data);
         // Aquí puedes agregar la lógica para eliminar al alumno, como una llamada a la API
     };
 
