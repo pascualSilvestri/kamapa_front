@@ -7,6 +7,9 @@ import { useUserContext } from 'context/userContext';
 import { useCicloLectivo } from 'context/CicloLectivoContext';
 import { useInstitucionSelectedContext, useRolesContext } from 'context/userContext';
 
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 
 const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
     const [cursoSeleccionado, setCursoSeleccionado] = useState<string>('');
@@ -135,6 +138,16 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
                 id: periodoId,
                 nombre: periodo ? periodo.nombre : `Periodo ${periodoId}`
             };
+        });
+    };
+
+    const printPDF = () => {
+        const input = document.getElementById('calificaciones-table');
+        html2canvas(input).then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF();
+            pdf.addImage(imgData, 'JPEG', 0, 0);
+            pdf.save('calificaciones.pdf');
         });
     };
 
@@ -278,7 +291,7 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
                     </tbody>
                 </Table>
             </div>
-            <Button
+            <Button className='btn-info m-1'
                 onClick={() => {
                     // Lógica para guardar todas las notas
                     Object.entries(nota).forEach(([key, value]) => {
@@ -290,6 +303,13 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
                 Guardar Todas las Notas
             </Button>
             <br />
+            <Button onClick={printPDF} className='btn-warning m-1'>
+                Imprimir en PDF
+            </Button>
+            <br />
+            <h1>OBSERVACIONES</h1>
+            <hr />
+            <h3>* Para corregir una calificación en caso de error, por favor, presente una nota escrita en persona. La solicitud debe incluir el nombre del alumno, DNI, curso y materia para la cual se solicita la corrección (una nota escrita por alumno).</h3>
             <br />
         </Container>
 
