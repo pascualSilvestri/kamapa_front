@@ -5,11 +5,10 @@ import { Curso, User, Nota, Periodo } from 'model/types';
 import { Environment } from 'utils/EnviromenManager';
 import { useUserContext } from 'context/userContext';
 import { useCicloLectivo } from 'context/CicloLectivoContext';
-import { useInstitucionSelectedContext, useRolesContext } from 'context/userContext';
+import { useInstitucionSelectedContext } from 'context/userContext';
 
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-
 
 const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
     const [cursoSeleccionado, setCursoSeleccionado] = useState<string>('');
@@ -19,10 +18,9 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
     const [alumnos, setAlumnos] = useState<User[]>([]);
     const [nota, setNota] = useState<{ [key: string]: string }>({});
     const [user, setUser] = useUserContext();
-    const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
+    const [cicloLectivo] = useCicloLectivo();
     const [periodos, setPeriodos] = useState<Periodo[]>([]);
-    const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
-
+    const [institucionSelected] = useInstitucionSelectedContext();
 
     useEffect(() => {
         fetchCursos();
@@ -91,8 +89,6 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
                 })
             });
             const data = await response.json();
-            console.log(data);
-            console.log(data.map(a => a.usuario));
             setAlumnos(Array.isArray(data) ? data.map(a => a.usuario) : []);
         } catch (error) {
             console.error('Error fetching alumnos:', error);
@@ -100,7 +96,7 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
         }
     };
 
-    const handleAddNota = async (alumnoId: number | string) => {
+    const handleAddNota = async (alumnoId: number | string, periodoId: number | string, nota: string) => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createNota)}`, {
             method: 'POST',
             headers: {
@@ -109,13 +105,12 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
             body: JSON.stringify({
                 asignaturaId: Number(asignatura),
                 alumnoId: Number(alumnoId),
-                nota: Number(nota[alumnoId]),
-                periodoId: Number(periodos),
+                nota: Number(nota),
+                periodoId: Number(periodoId),
                 institucionId: params.id,
             })
         });
-        const data = await response.json();
-        console.log(data);
+        await response.json();
         fetchAlumnos();
     };
 
@@ -128,17 +123,6 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
         return (alumno.notas || [])
             .filter(nota => nota.periodoId === periodoId)
             .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-    };
-
-    const getPeriodos = (alumno: User) => {
-        const periodosSet = new Set((alumno.notas || []).map(nota => nota.periodoId));
-        return Array.from(periodosSet).map(periodoId => {
-            const periodo = periodos.find(p => p.id === periodoId);
-            return {
-                id: periodoId,
-                nombre: periodo ? periodo.nombre : `Periodo ${periodoId}`
-            };
-        });
     };
 
     const printPDF = () => {
@@ -223,7 +207,7 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
             </Row>
 
             {/* Tabla de Calificaciones */}
-            <div className="table-responsive">
+            <div className="table-responsive" id="calificaciones-table">
                 <Table bordered hover>
                     <thead>
                         <tr>
@@ -312,7 +296,6 @@ const PlanillaCalificaciones = ({ params }: { params: { id: string } }) => {
             <h3>* Para corregir una calificación en caso de error, por favor, presente una nota escrita en persona. La solicitud debe incluir el nombre del alumno, DNI, curso y materia para la cual se solicita la corrección (una nota escrita por alumno).</h3>
             <br />
         </Container>
-
     );
 };
 
