@@ -1,5 +1,5 @@
-'use client'
-import { useEffect, useState } from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
 import { Curso, User, Nota, Periodo } from 'model/types';
 import { Environment } from 'utils/EnviromenManager';
@@ -15,8 +15,8 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     const [alumnos, setAlumnos] = useState<User[]>([]);
     const [nota, setNota] = useState<{ [key: string]: string }>({});
     const [recuperacion, setRecuperacion] = useState<{ [key: string]: string }>({});
-    const [user, setUser] = useUserContext();
-    const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
+    const [user] = useUserContext();
+    const [cicloLectivo] = useCicloLectivo();
     const [periodos, setPeriodos] = useState<Periodo[]>([]);
 
     useEffect(() => {
@@ -25,10 +25,16 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     }, []);
 
     useEffect(() => {
-        if (asignatura && cursoSeleccionado) {
+        if (cursoSeleccionado) {
+            fetchAsignaturas(cursoSeleccionado);
+        }
+    }, [cursoSeleccionado]);
+
+    useEffect(() => {
+        if (asignatura && cursoSeleccionado && periodo) {
             fetchAlumnos();
         }
-    }, [asignatura, cursoSeleccionado]);
+    }, [asignatura, cursoSeleccionado, periodo]);
 
     const fetchCursos = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosForUsuario)}`, {
@@ -83,10 +89,11 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                     asignaturaId: Number(asignatura),
                     cursoId: Number(cursoSeleccionado),
                     cicloLectivoId: Number(cicloLectivo.id),
+                    periodoId: Number(periodo)
                 })
             });
             const data = await response.json();
-            setAlumnos(Array.isArray(data) ? data.map(a => a.usuario) : []);
+            setAlumnos(Array.isArray(data) ? data.map(a => ({ ...a.usuario, notas: a.notas })) : []);
         } catch (error) {
             console.error('Error fetching alumnos:', error);
             setAlumnos([]);  // Ensure alumnos is an array in case of error
@@ -107,7 +114,8 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                 institucionId: params.id,
             })
         });
-        const data = await response.json();
+        await response.json();
+        // Update the list of students to reflect the new grade
         fetchAlumnos();
     };
 
@@ -119,18 +127,18 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     const getNotasPorPeriodo = (alumno: User, periodoId: number | string) => {
         return (alumno.notas || [])
             .filter(nota => nota.periodoId === periodoId)
-            .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+            .slice(0, 5); // Limitar a 5 notas
     };
 
-    const getPeriodos = (alumno: User) => {
-        const periodosSet = new Set((alumno.notas || []).map(nota => nota.periodoId));
-        return Array.from(periodosSet).map(periodoId => {
-            const periodo = periodos.find(p => p.id === periodoId);
-            return {
-                id: periodoId,
-                nombre: periodo ? periodo.nombre : `Periodo ${periodoId}`
-            };
-        });
+    const handleNotaChange = (alumnoId: string, value: string) => {
+        if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
+            setNota((prevNota) => ({ ...prevNota, [alumnoId]: value }));
+        }
+    };
+
+    const handlePeriodoChange = (periodoId: string) => {
+        setPeriodo(periodoId);
     };
 
     return (
@@ -147,7 +155,6 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                     value={cursoSeleccionado}
                                     onChange={(e) => {
                                         setCursoSeleccionado(e.target.value);
-                                        fetchAsignaturas(e.target.value);
                                     }}
                                 >
                                     <option value="">Seleccionar curso</option>
@@ -179,7 +186,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                 <Form.Control
                                     as="select"
                                     value={periodo}
-                                    onChange={(e) => setPeriodo(e.target.value)}
+                                    onChange={(e) => handlePeriodoChange(e.target.value)}
                                 >
                                     <option value="">Seleccionar periodo</option>
                                     {periodos.map((p) => (
@@ -205,7 +212,8 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                         </thead>
                         <tbody>
                             {Array.isArray(alumnos) && alumnos.map(alumno => {
-                                const promedio = calcularPromedio(alumno.notas || []);
+                                const notasPorPeriodo = getNotasPorPeriodo(alumno, periodo);
+                                const promedio = calcularPromedio(notasPorPeriodo);
                                 const mostrarRecuperacion = promedio < 6;
                                 return (
                                     <tr key={alumno.id}>
@@ -217,12 +225,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                                 min="0"
                                                 max="10"
                                                 value={nota[alumno.id] || ''}
-                                                onChange={(e) => {
-                                                    const value = e.target.value;
-                                                    if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
-                                                        setNota((prevNota) => ({ ...prevNota, [alumno.id]: value }));
-                                                    }
-                                                }}
+                                                onChange={(e) => handleNotaChange(alumno.id.toString(), e.target.value)}
                                                 style={{ minWidth: '60px', fontSize: '1rem' }}
                                             />
                                         </td>
@@ -234,8 +237,6 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                                     color: 'white',
                                                     padding: '0.4rem 1rem',
                                                     fontSize: '1rem',
-                                                    transition: 'all 0.3s ease',
-                                                    marginBottom: '10px',
                                                     border: '2px solid purple',
                                                     cursor: 'pointer',
                                                 }}
@@ -255,40 +256,21 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                             <Table bordered>
                                                 <thead>
                                                     <tr>
-                                                        {getPeriodos(alumno).map((periodo, index) => (
-                                                            <th key={index}>{periodo.nombre}</th>
+                                                        {notasPorPeriodo.map((_, idx) => (
+                                                            <th key={idx}>{`Nota ${idx + 1}`}</th>
                                                         ))}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        {getPeriodos(alumno).map((periodo, index) => (
-                                                            <td key={index}>
-                                                                <Table bordered>
-                                                                    <thead>
-                                                                        <tr>
-                                                                            {(getNotasPorPeriodo(alumno, periodo.id) || []).map((_, idx) => (
-                                                                                <th key={idx}>{`Nota ${idx + 1}`}</th>
-                                                                            ))}
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            {(getNotasPorPeriodo(alumno, periodo.id) || []).map((nota, idx) => (
-                                                                                <td key={idx}>{nota.nota}</td>
-                                                                            ))}
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </Table>
-                                                            </td>
+                                                        {notasPorPeriodo.map((nota, idx) => (
+                                                            <td key={idx}>{nota.nota}</td>
                                                         ))}
                                                     </tr>
                                                 </tbody>
                                             </Table>
                                         </td>
-                                        <td>
-                                            {promedio}
-                                        </td>
+                                        <td>{promedio}</td>
                                         <td className="text-center">
                                             {mostrarRecuperacion ? (
                                                 <Form.Control
