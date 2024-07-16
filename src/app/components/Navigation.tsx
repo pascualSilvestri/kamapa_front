@@ -1,18 +1,15 @@
 // Navigation.js
 'use client'
-import { Nav, Navbar, NavDropdown, Container, Offcanvas } from 'react-bootstrap';
+import { Nav, Navbar, Container, Offcanvas } from 'react-bootstrap';
 import Link from 'next/link';
 import Image from 'next/image';
 import ButtonAuth from './ButtonAuth';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { getRolesRouters } from '../../utils/router';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { formatNombre } from '../../utils/formatNombre';
-
-
-
 
 export function Navigation() {
   const { data: session } = useSession();
@@ -21,6 +18,7 @@ export function Navigation() {
   const [userRoutes, setUserRoutes] = useState([]);
   const [user, setUser] = useUserContext();
   const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
+  const [showOffcanvas, setShowOffcanvas] = useState(false);
 
   console.log(rol)
 
@@ -34,6 +32,11 @@ export function Navigation() {
   useEffect(() => {
     setUserRoutes(getRolesRouters(rol));
   }, [rol]);
+
+  // Handler para cerrar el Offcanvas cuando se hace clic en un enlace
+  const handleLinkClick = () => {
+    setShowOffcanvas(false);
+  };
 
   return (
     <header data-bs-theme='dark'>
@@ -57,8 +60,10 @@ export function Navigation() {
               {/* Aplicar ternaria para mostrar nombre formateado si está seleccionado */}
               <h2 className='ms-2 mb-0'>{institucionSelected.nombre ? formatNombre(institucionSelected.nombre) : ''}</h2>
             </Navbar.Brand>
-            <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
+            <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} onClick={() => setShowOffcanvas(true)} />
             <Navbar.Offcanvas
+              show={showOffcanvas}
+              onHide={() => setShowOffcanvas(false)}
               data-bs-theme='dark'
               id={`offcanvasNavbar-expand-${expand}`}
               aria-labelledby={`offcanvasNavbarLabel-expand-${expand}`}
@@ -83,7 +88,7 @@ export function Navigation() {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav className='justify-content-center flex-grow-1 pe-3'>
-                  <Link href='/dashboard' className='nav-link btn btn-outline-light m-2'>
+                  <Link href='/dashboard' className='nav-link btn btn-outline-light m-2' onClick={handleLinkClick}>
                     Seleccionar Escuela
                   </Link>
                   {userRoutes && userRoutes.map((route, index) => (
@@ -91,6 +96,7 @@ export function Navigation() {
                       key={index}
                       href={route.href.includes("Admin") ? `/dashboard/${route.href}` : `/dashboard/${institucionSelected.id}/${route.href}`}
                       className='nav-link btn btn-outline-light m-2'
+                      onClick={handleLinkClick}
                     >
                       {route.label}
                     </Link>

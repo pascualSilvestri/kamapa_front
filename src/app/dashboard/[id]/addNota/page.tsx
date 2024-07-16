@@ -37,45 +37,60 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     }, [asignatura, cursoSeleccionado, periodo]);
 
     const fetchCursos = async () => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosForUsuario)}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                usuarioId: user.id,
-                cicloLectivoId: cicloLectivo.id,
-            })
-        });
-        const data = await response.json();
-        setCursos(Array.isArray(data) ? data : []);
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosForUsuario)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    usuarioId: user.id,
+                    cicloLectivoId: cicloLectivo.id,
+                })
+            });
+            const data = await response.json();
+            setCursos(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error('Error fetching cursos:', error);
+            setCursos([]);  // Ensure cursos is an array in case of error
+        }
     };
 
     const fetchPeriodos = async () => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getPeriodosByCicloElectivo)}${cicloLectivo.id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        });
-        const data = await response.json();
-        setPeriodos(data);
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getPeriodosByCicloElectivo)}${cicloLectivo.id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            const data = await response.json();
+            setPeriodos(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error('Error fetching periodos:', error);
+            setPeriodos([]);  // Ensure periodos is an array in case of error
+        }
     };
 
     const fetchAsignaturas = async (cursoId: string) => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaForCursoByProfesor)}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                usuarioId: user.id,
-                institucionId: params.id,
-                cursoId: Number(cursoId),
-            })
-        });
-        const data = await response.json();
-        setAsignaturas(Array.isArray(data) ? data : []);
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAsignaturaForCursoByProfesor)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    usuarioId: user.id,
+                    institucionId: params.id,
+                    cursoId: Number(cursoId),
+                })
+            });
+            const data = await response.json();
+            setAsignaturas(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error('Error fetching asignaturas:', error);
+            setAsignaturas([]);  // Ensure asignaturas is an array in case of error
+        }
     };
 
     const fetchAlumnos = async () => {
@@ -93,7 +108,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                 })
             });
             const data = await response.json();
-            setAlumnos(Array.isArray(data) ? data.map(a => ({ ...a.usuario, notas: a.notas })) : []);
+            setAlumnos(Array.isArray(data) ? data.map(a => a.usuario) : []);
         } catch (error) {
             console.error('Error fetching alumnos:', error);
             setAlumnos([]);  // Ensure alumnos is an array in case of error
@@ -101,31 +116,26 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     };
 
     const handleAddNota = async (alumnoId: number | string) => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createNota)}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                asignaturaId: Number(asignatura),
-                alumnoId: Number(alumnoId),
-                nota: Number(nota[alumnoId]),
-                periodoId: Number(periodo),
-                institucionId: params.id,
-            })
-        });
-        await response.json();
-        // Update the list of students to reflect the new grade
-        fetchAlumnos();
-    };
-
-    const handleAddRecuperacion = (alumnoId: number | string) => {
-        console.log({
-            cicloLectivoId: cicloLectivo.id,
-            alumnoId: alumnoId,
-            asignaturaId: asignatura,
-            notaRecuperacion: recuperacion[alumnoId]
-        });
+        try {
+            const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createNota)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    asignaturaId: Number(asignatura),
+                    alumnoId: Number(alumnoId),
+                    nota: Number(nota[alumnoId]),
+                    periodoId: Number(periodo),
+                    institucionId: params.id,
+                })
+            });
+            const data = await response.json();
+            fetchAlumnos();
+        } catch (error) {
+            console.error('Error adding nota:', error);
+            // Handle error as needed
+        }
     };
 
     const calcularPromedio = (alumnoNotas: Nota[]) => {
@@ -221,14 +231,9 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                         </thead>
                         <tbody>
                             {Array.isArray(alumnos) && alumnos.map(alumno => {
-<<<<<<< HEAD
                                 const notasPorPeriodo = getNotasPorPeriodo(alumno, periodo);
                                 const promedio = calcularPromedio(notasPorPeriodo);
                                 const mostrarRecuperacion = promedio < 6;
-=======
-                                const promedio = calcularPromedio(alumno.notas || []);
-                                const mostrarRecuperacion = Number(promedio) < 6;
->>>>>>> 9ab2dc4aebd9e2893fbb9917e9f1a947dd9eeee4
                                 return (
                                     <tr key={alumno.id}>
                                         <td>{alumno.apellido}</td>
@@ -287,44 +292,19 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                         <td>{promedio}</td>
                                         <td className="text-center">
                                             {mostrarRecuperacion ? (
-                                                <>
-                                                    <Form.Control
-                                                        type="number"
-                                                        min="0"
-                                                        max="10"
-                                                        value={recuperacion[alumno.id] || ''}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
-                                                                setRecuperacion((prevRec) => ({ ...prevRec, [alumno.id]: value }));
-                                                            }
-                                                        }}
-                                                        style={{ minWidth: '60px', fontSize: '1rem' }}
-                                                    />
-                                                    <Button
-                                                        onClick={() => handleAddRecuperacion(alumno.id)}
-                                                        style={{
-                                                            backgroundColor: 'green',
-                                                            color: 'white',
-                                                            padding: '0.4rem 1rem',
-                                                            fontSize: '1rem',
-                                                            transition: 'all 0.3s ease',
-                                                            marginTop: '10px',
-                                                            border: '2px solid green',
-                                                            cursor: 'pointer',
-                                                        }}
-                                                        onMouseEnter={(e) => {
-                                                            e.currentTarget.style.backgroundColor = 'white';
-                                                            e.currentTarget.style.color = 'black';
-                                                        }}
-                                                        onMouseLeave={(e) => {
-                                                            e.currentTarget.style.backgroundColor = 'green';
-                                                            e.currentTarget.style.color = 'white';
-                                                        }}
-                                                    >
-                                                        Agregar Nota Recuperación
-                                                    </Button>
-                                                </>
+                                                <Form.Control
+                                                    type="number"
+                                                    min="0"
+                                                    max="10"
+                                                    value={recuperacion[alumno.id] || ''}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
+                                                            setRecuperacion((prevRec) => ({ ...prevRec, [alumno.id]: value }));
+                                                        }
+                                                    }}
+                                                    style={{ minWidth: '60px', fontSize: '1rem' }}
+                                                />
                                             ) : (
                                                 'N/A'
                                             )}
@@ -344,3 +324,4 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
 };
 
 export default AddNotasAlumno;
+
