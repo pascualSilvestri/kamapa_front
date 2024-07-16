@@ -14,6 +14,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     const [asignaturas, setAsignaturas] = useState<Curso[]>([]);
     const [alumnos, setAlumnos] = useState<User[]>([]);
     const [nota, setNota] = useState<{ [key: string]: string }>({});
+    const [recuperacionNota, setRecuperacionNota] = useState<{ [key: string]: string }>({});
     const [user, setUser] = useUserContext();
     const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
     const [periodos, setPeriodos] = useState<Periodo[]>([]);
@@ -117,6 +118,16 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
         fetchAlumnos();
     };
 
+    const handleAddRecuperacionNota = (alumnoId: number | string) => {
+        console.log({
+            valor: recuperacionNota[alumnoId],
+            alumnoId,
+            asignatura,
+            periodoId: periodo,
+            cursoId: cursoSeleccionado,
+        });
+    };
+
     const calcularPromedio = (alumnoNotas: Nota[]) => {
         const total = alumnoNotas.reduce((acc, nota) => acc + (nota.nota || 0), 0);
         return (total / alumnoNotas.length).toFixed(2);
@@ -196,62 +207,108 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                     <th key={idx}>{`Nota ${idx + 1}`}</th>
                                 ))}
                                 <th>Promedio</th>
+                                <th>Periodo de Recuperación</th>
+                                <th>Calificación Parcial</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {Array.isArray(alumnos) && alumnos.map(alumno => (
-                                <tr key={alumno.id}>
-                                    <td>{alumno.nombre}</td>
-                                    <td>{alumno.apellido}</td>
-                                    <td>
-                                        <Form.Control
-                                            type="number"
-                                            min="0"
-                                            max="10"
-                                            value={nota[alumno.id] || ''}
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
-                                                    setNota({ ...nota, [alumno.id]: value });
-                                                }
-                                            }}
-                                        />
-                                    </td>
-                                    <td>
-                                        <Button
-                                            onClick={() => handleAddNota(alumno.id)}
-                                            style={{
-                                                backgroundColor: 'purple',
-                                                color: 'white',
-                                                padding: '0.4rem 1rem',
-                                                fontSize: '1rem',
-                                                transition: 'all 0.3s ease',
-                                                marginBottom: '10px',
-                                                border: '2px solid purple',
-                                                cursor: 'pointer',
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.backgroundColor = 'white';
-                                                e.currentTarget.style.color = 'black';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.backgroundColor = 'purple';
-                                                e.currentTarget.style.color = 'white';
-                                            }}
-                                        >
-                                            Agregar Nota
-                                        </Button>
-                                    </td>
-                                    {Array.from({ length: 5 }).map((_, idx) => (
-                                        <td key={idx}>
-                                            {getNotasPorPeriodo(alumno)[idx] ? getNotasPorPeriodo(alumno)[idx].nota : ''}
+                            {Array.isArray(alumnos) && alumnos.map(alumno => {
+                                const promedio = calcularPromedio(getNotasPorPeriodo(alumno));
+                                return (
+                                    <tr key={alumno.id}>
+                                        <td>{alumno.nombre}</td>
+                                        <td>{alumno.apellido}</td>
+                                        <td>
+                                            <Form.Control
+                                                type="number"
+                                                min="0"
+                                                max="10"
+                                                value={nota[alumno.id] || ''}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
+                                                        setNota({ ...nota, [alumno.id]: value });
+                                                    }
+                                                }}
+                                            />
                                         </td>
-                                    ))}
-                                    <td>
-                                        {calcularPromedio(getNotasPorPeriodo(alumno))}
-                                    </td>
-                                </tr>
-                            ))}
+                                        <td>
+                                            <Button
+                                                onClick={() => handleAddNota(alumno.id)}
+                                                style={{
+                                                    backgroundColor: 'purple',
+                                                    color: 'white',
+                                                    padding: '0.4rem 1rem',
+                                                    fontSize: '1rem',
+                                                    transition: 'all 0.3s ease',
+                                                    marginBottom: '10px',
+                                                    border: '2px solid purple',
+                                                    cursor: 'pointer',
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'white';
+                                                    e.currentTarget.style.color = 'black';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.backgroundColor = 'purple';
+                                                    e.currentTarget.style.color = 'white';
+                                                }}
+                                            >
+                                                Agregar Nota
+                                            </Button>
+                                        </td>
+                                        {Array.from({ length: 5 }).map((_, idx) => (
+                                            <td key={idx}>
+                                                {getNotasPorPeriodo(alumno)[idx] ? getNotasPorPeriodo(alumno)[idx].nota : ''}
+                                            </td>
+                                        ))}
+                                        <td>{promedio}</td>
+                                        {Number(promedio) < 6 ? (
+                                            <td>
+                                                <Form.Control
+                                                    type="number"
+                                                    min="0"
+                                                    max="10"
+                                                    value={recuperacionNota[alumno.id] || ''}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
+                                                            setRecuperacionNota({ ...recuperacionNota, [alumno.id]: value });
+                                                        }
+                                                    }}
+                                                />
+                                                <Button
+                                                    onClick={() => handleAddRecuperacionNota(alumno.id)}
+                                                    style={{
+                                                        backgroundColor: 'purple',
+                                                        color: 'white',
+                                                        padding: '0.4rem 1rem',
+                                                        fontSize: '1rem',
+                                                        transition: 'all 0.3s ease',
+                                                        marginBottom: '10px',
+                                                        border: '2px solid purple',
+                                                        cursor: 'pointer',
+                                                        marginTop: '10px',
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.backgroundColor = 'white';
+                                                        e.currentTarget.style.color = 'black';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.backgroundColor = 'purple';
+                                                        e.currentTarget.style.color = 'white';
+                                                    }}
+                                                >
+                                                    Agregar Recuperación
+                                                </Button>
+                                            </td>
+                                        ) : (
+                                            <td></td>
+                                        )}
+                                        <td></td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </Table>
                 </Col>
