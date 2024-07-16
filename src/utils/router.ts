@@ -25,7 +25,7 @@ export const router = {
     'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso' },
     'consultaListaAlumnoPorcurso': { label: 'Consultar Lista de Alumnos por curso', href: '/alumnosPorCurso' },
     'regAlumnoCurso': { label: 'Asignar Alumnos a los Cursos', href: '/regAlumnoCurso' },
-    'planillaCalificaciones': { label: 'Planilla de Calificaciones', href: '/planillaCalificaciones' }
+    // 'planillaCalificaciones': { label: 'Planilla de Calificaciones', href: '/planillaCalificaciones' }
 }
 
 export const adminAutorizeRouter = [
