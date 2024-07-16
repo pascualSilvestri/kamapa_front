@@ -212,6 +212,7 @@ export interface Nota {
     usuario?: User;
     asignatura?: Asignatura;
     tipoNota?: TipoNota;
+    tipoNotaId?: number;
 }
 
 
