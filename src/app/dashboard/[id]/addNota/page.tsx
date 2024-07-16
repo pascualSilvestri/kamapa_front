@@ -29,6 +29,12 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
         }
     }, [asignatura, cursoSeleccionado]);
 
+    useEffect(() => {
+        if (periodo) {
+            fetchAlumnos();
+        }
+    }, [periodo]);
+
     const fetchCursos = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosForUsuario)}`, {
             method: 'POST',
@@ -85,15 +91,12 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                 })
             });
             const data = await response.json();
-            console.log(data);
-            console.log(data.map(a => a.usuario));
             setAlumnos(Array.isArray(data) ? data.map(a => a.usuario) : []);
         } catch (error) {
             console.error('Error fetching alumnos:', error);
             setAlumnos([]);  // Ensure alumnos is an array in case of error
         }
     };
-
 
     const handleAddNota = async (alumnoId: number | string) => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.createNota)}`, {
@@ -114,27 +117,15 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
         fetchAlumnos();
     };
 
-
     const calcularPromedio = (alumnoNotas: Nota[]) => {
         const total = alumnoNotas.reduce((acc, nota) => acc + (nota.nota || 0), 0);
         return (total / alumnoNotas.length).toFixed(2);
     };
 
-    const getNotasPorPeriodo = (alumno: User, periodoId: number | string) => {
+    const getNotasPorPeriodo = (alumno: User) => {
         return (alumno.notas || [])
-            .filter(nota => nota.periodoId === periodoId)
+            .filter(nota => nota.periodoId === Number(periodo) && nota.asignaturaId === Number(asignatura))
             .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-    };
-
-    const getPeriodos = (alumno: User) => {
-        const periodosSet = new Set((alumno.notas || []).map(nota => nota.periodoId));
-        return Array.from(periodosSet).map(periodoId => {
-            const periodo = periodos.find(p => p.id === periodoId);
-            return {
-                id: periodoId,
-                nombre: periodo ? periodo.nombre : `Periodo ${periodoId}`
-            };
-        });
     };
 
     return (
@@ -201,7 +192,9 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                 <th>Apellido</th>
                                 <th>Nota</th>
                                 <th>Acción</th>
-                                <th>Notas Agregadas (por Periodo)</th>
+                                {Array.from({ length: 5 }).map((_, idx) => (
+                                    <th key={idx}>{`Nota ${idx + 1}`}</th>
+                                ))}
                                 <th>Promedio</th>
                             </tr>
                         </thead>
@@ -249,43 +242,13 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                             Agregar Nota
                                         </Button>
                                     </td>
+                                    {Array.from({ length: 5 }).map((_, idx) => (
+                                        <td key={idx}>
+                                            {getNotasPorPeriodo(alumno)[idx] ? getNotasPorPeriodo(alumno)[idx].nota : ''}
+                                        </td>
+                                    ))}
                                     <td>
-                                        <Table bordered>
-                                            <thead>
-                                                <tr>
-                                                    {getPeriodos(alumno).map((periodo, index) => (
-                                                        <th key={index}>{periodo.nombre}</th>
-                                                    ))}
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    {getPeriodos(alumno).map((periodo, index) => (
-                                                        <td key={index}>
-                                                            <Table bordered>
-                                                                <thead>
-                                                                    <tr>
-                                                                        {(getNotasPorPeriodo(alumno, periodo.id) || []).map((_, idx) => (
-                                                                            <th key={idx}>{`Nota ${idx + 1}`}</th>
-                                                                        ))}
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr>
-                                                                        {(getNotasPorPeriodo(alumno, periodo.id) || []).map((nota, idx) => (
-                                                                            <td key={idx}>{nota.nota}</td>
-                                                                        ))}
-                                                                    </tr>
-                                                                </tbody>
-                                                            </Table>
-                                                        </td>
-                                                    ))}
-                                                </tr>
-                                            </tbody>
-                                        </Table>
-                                    </td>
-                                    <td>
-                                        {calcularPromedio(alumno.notas || [])}
+                                        {calcularPromedio(getNotasPorPeriodo(alumno))}
                                     </td>
                                 </tr>
                             ))}
