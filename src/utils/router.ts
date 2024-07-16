@@ -50,7 +50,7 @@ export const directorAutorizeRouter = [
     'AddNotaAlumno',
     'consultaAsignaturaPorCurso',
     'consultaListaAlumnoPorcurso',
-    'planillaCalificaciones'
+    // 'planillaCalificaciones'
 
 
 ]
@@ -66,7 +66,7 @@ export const secretarioAutorizeRouter = [
     'VistaUsuarios',
     'GestionAsignatura',
     'consultaAsignaturaPorCurso',
-    'planillaCalificaciones'
+    // 'planillaCalificaciones'
 ]
 
 export const preceptorAutorizeRouter = [
@@ -89,7 +89,7 @@ export const profesorAutorizeRouter = [
     'About',
     'Notas',
     "AddNotaAlumno",
-    'planillaCalificaciones'
+    // 'planillaCalificaciones'
 
 ]
 
