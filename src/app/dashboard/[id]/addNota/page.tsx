@@ -119,6 +119,15 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
         fetchAlumnos();
     };
 
+    const handleAddRecuperacion = (alumnoId: number | string) => {
+        console.log({
+            cicloLectivoId: cicloLectivo.id,
+            alumnoId: alumnoId,
+            asignaturaId: asignatura,
+            notaRecuperacion: recuperacion[alumnoId]
+        });
+    };
+
     const calcularPromedio = (alumnoNotas: Nota[]) => {
         const total = alumnoNotas.reduce((acc, nota) => acc + (nota.nota || 0), 0);
         return (total / alumnoNotas.length).toFixed(2);
@@ -212,9 +221,14 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                         </thead>
                         <tbody>
                             {Array.isArray(alumnos) && alumnos.map(alumno => {
+<<<<<<< HEAD
                                 const notasPorPeriodo = getNotasPorPeriodo(alumno, periodo);
                                 const promedio = calcularPromedio(notasPorPeriodo);
                                 const mostrarRecuperacion = promedio < 6;
+=======
+                                const promedio = calcularPromedio(alumno.notas || []);
+                                const mostrarRecuperacion = Number(promedio) < 6;
+>>>>>>> 9ab2dc4aebd9e2893fbb9917e9f1a947dd9eeee4
                                 return (
                                     <tr key={alumno.id}>
                                         <td>{alumno.apellido}</td>
@@ -273,19 +287,44 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                         <td>{promedio}</td>
                                         <td className="text-center">
                                             {mostrarRecuperacion ? (
-                                                <Form.Control
-                                                    type="number"
-                                                    min="0"
-                                                    max="10"
-                                                    value={recuperacion[alumno.id] || ''}
-                                                    onChange={(e) => {
-                                                        const value = e.target.value;
-                                                        if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
-                                                            setRecuperacion((prevRec) => ({ ...prevRec, [alumno.id]: value }));
-                                                        }
-                                                    }}
-                                                    style={{ minWidth: '60px', fontSize: '1rem' }}
-                                                />
+                                                <>
+                                                    <Form.Control
+                                                        type="number"
+                                                        min="0"
+                                                        max="10"
+                                                        value={recuperacion[alumno.id] || ''}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            if (value === '' || (Number(value) >= 0 && Number(value) <= 10)) {
+                                                                setRecuperacion((prevRec) => ({ ...prevRec, [alumno.id]: value }));
+                                                            }
+                                                        }}
+                                                        style={{ minWidth: '60px', fontSize: '1rem' }}
+                                                    />
+                                                    <Button
+                                                        onClick={() => handleAddRecuperacion(alumno.id)}
+                                                        style={{
+                                                            backgroundColor: 'green',
+                                                            color: 'white',
+                                                            padding: '0.4rem 1rem',
+                                                            fontSize: '1rem',
+                                                            transition: 'all 0.3s ease',
+                                                            marginTop: '10px',
+                                                            border: '2px solid green',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'white';
+                                                            e.currentTarget.style.color = 'black';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'green';
+                                                            e.currentTarget.style.color = 'white';
+                                                        }}
+                                                    >
+                                                        Agregar Nota Recuperación
+                                                    </Button>
+                                                </>
                                             ) : (
                                                 'N/A'
                                             )}
