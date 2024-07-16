@@ -25,7 +25,7 @@ export const router = {
     'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso' },
     'consultaListaAlumnoPorcurso': { label: 'Consultar Lista de Alumnos por curso', href: '/alumnosPorCurso' },
     'regAlumnoCurso': { label: 'Asignar Alumnos a los Cursos', href: '/regAlumnoCurso' },
-    'planillaCalificaciones': { label: 'Planilla de Calificaciones', href: '/planillaCalificaciones' }
+    // 'planillaCalificaciones': { label: 'Planilla de Calificaciones', href: '/planillaCalificaciones' }
 }
 
 export const adminAutorizeRouter = [
@@ -50,7 +50,7 @@ export const directorAutorizeRouter = [
     'AddNotaAlumno',
     'consultaAsignaturaPorCurso',
     'consultaListaAlumnoPorcurso',
-    'planillaCalificaciones'
+    // 'planillaCalificaciones'
 
 
 ]
@@ -66,7 +66,7 @@ export const secretarioAutorizeRouter = [
     'VistaUsuarios',
     'GestionAsignatura',
     'consultaAsignaturaPorCurso',
-    'planillaCalificaciones'
+    // 'planillaCalificaciones'
 ]
 
 export const preceptorAutorizeRouter = [
@@ -89,7 +89,7 @@ export const profesorAutorizeRouter = [
     'About',
     'Notas',
     "AddNotaAlumno",
-    'planillaCalificaciones'
+    // 'planillaCalificaciones'
 
 ]
 
