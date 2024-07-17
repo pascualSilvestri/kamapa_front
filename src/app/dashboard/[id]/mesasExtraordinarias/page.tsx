@@ -81,7 +81,7 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
     const fetchAlumnos = async () => {
         try {
             const response = await fetch(
-                `${Environment.getEndPoint(Environment.endPoint.getNotasByAsignatura)}`,
+                `${Environment.getEndPoint(Environment.endPoint.getNotasByAsignaturaByCiclo)}`,
                 {
                     method: "POST",
                     headers: {
@@ -95,6 +95,7 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                 }
             );
             const data = await response.json();
+            console.log(data)
             const alumnosConNotasBajas = Array.isArray(data)
                 ? data
                     .filter((a) => getCalificacionParcialPromedio(a.usuario.notas) < 6)
@@ -120,6 +121,21 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
         const promedioFinal =
             promedios.reduce((acc, promedio) => acc + promedio, 0) / promedios.length;
         return promedioFinal;
+    };
+
+    const getNotaExtraordinaria = (notas: Nota[], tipoNotaId: number) => {
+        const nota = notas.find((n) => n.tipoNotaId === tipoNotaId);
+        return nota ? nota.nota : "";
+    };
+
+    const getPromedioNotasPorPeriodo = (notas: Nota[]) => {
+        return periodos.map((periodo) => {
+            const notasPeriodo = notas.filter((nota) => nota.periodoId === periodo.id);
+            const promedioNotas = notasPeriodo.length
+                ? (notasPeriodo.reduce((acc, nota) => acc + (nota.nota || 0), 0) / notasPeriodo.length).toFixed(2)
+                : "";
+            return { periodoId: periodo.id, promedioNotas };
+        });
     };
 
     return (
@@ -173,6 +189,9 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                             <thead>
                                 <tr>
                                     <th>Apellido y Nombre</th>
+                                    {periodos.map((periodo) => (
+                                        <th key={periodo.id}>Periodo {periodo.nombre}</th>
+                                    ))}
                                     <th>Calificación Final</th>
                                     <th>Extraordinaria de DIC</th>
                                     <th>Extraordinaria de FEB</th>
@@ -183,44 +202,21 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                                 {Array.isArray(alumnos) &&
                                     alumnos.map((alumno) => {
                                         const calificacionFinal = getCalificacionParcialPromedio(alumno.notas);
+                                        const notasPorPeriodo = getPromedioNotasPorPeriodo(alumno.notas);
+                                        const extraordinariaDic = getNotaExtraordinaria(alumno.notas, 3); // reDiciembre
+                                        const extraordinariaFeb = getNotaExtraordinaria(alumno.notas, 4); // reFebrero
+                                        const calificacionDefinitiva = (Number(extraordinariaDic) + Number(extraordinariaFeb)) / 2;
+
                                         return (
                                             <tr key={alumno.id}>
                                                 <td>{`${alumno.apellido}, ${alumno.nombre}`}</td>
+                                                {notasPorPeriodo.map(({ periodoId, promedioNotas }) => (
+                                                    <td key={periodoId}>{promedioNotas}</td>
+                                                ))}
                                                 <td>{calificacionFinal.toFixed(2)}</td>
-                                                <td>
-                                                    <Form.Control
-                                                        type="number"
-                                                        min="0"
-                                                        max="10"
-                                                        value={alumno.extraordinariaDic || ""}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            if (value === "" || (Number(value) >= 0 && Number(value) <= 10)) {
-                                                                alumno.extraordinariaDic = Number(value);
-                                                            }
-                                                        }}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <Form.Control
-                                                        type="number"
-                                                        min="0"
-                                                        max="10"
-                                                        value={alumno.extraordinariaFeb || ""}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            if (value === "" || (Number(value) >= 0 && Number(value) <= 10)) {
-                                                                alumno.extraordinariaFeb = Number(value);
-                                                            }
-                                                        }}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    {(
-                                                        (Number(alumno.extraordinariaDic) + Number(alumno.extraordinariaFeb)) /
-                                                        2
-                                                    ).toFixed(2)}
-                                                </td>
+                                                <td>{extraordinariaDic}</td>
+                                                <td>{extraordinariaFeb}</td>
+                                                <td>{isNaN(calificacionDefinitiva) ? '' : calificacionDefinitiva.toFixed(2)}</td>
                                             </tr>
                                         );
                                     })}
