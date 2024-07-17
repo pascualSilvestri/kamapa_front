@@ -256,7 +256,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
             </Col>
           </Row>
           <h2>Alumnos</h2>
-          <div style={{ overflowX: "auto" }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", width: "100%", scrollbarWidth: "auto" }}>
             <Table striped bordered hover>
               <thead>
                 <tr>
@@ -287,8 +287,10 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                       <tr key={alumno.id}>
                         <td>{alumno.nombre}</td>
                         <td>{alumno.apellido}</td>
-                        <td>
+                        <td className="d-flex justify-content-center align-items-center">
                           <Form.Control
+                            className="m-3"
+                            style={{ width: '70px' }}
                             type="number"
                             min="0"
                             max="10"
