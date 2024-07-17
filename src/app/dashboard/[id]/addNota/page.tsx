@@ -416,6 +416,10 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
           </div>
         </Col>
       </Row>
+      <Row>
+        <h3>* El Valor 0 es el equivalente a AUS</h3>
+        <h3>* El valor menor a 6 en Calificación Parcial es Ad</h3>
+      </Row>
     </Container>
   );
 };
