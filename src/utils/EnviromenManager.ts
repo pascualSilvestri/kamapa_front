@@ -1,75 +1,76 @@
 enum environment {
-    dev = "http://localhost:3001/",
-    prov = `production`,
+  dev = "http://localhost:3001/",
+  prov = `production`,
 }
 
 export class Environment {
-    private static environment: environment = environment.dev;
+  private static environment: environment = environment.dev;
 
-    private static getEnvironment(env: environment): string {
-        if (env == environment.prov) {
-            return "https://kamapabackend-production.up.railway.app/";
-        } else {
-            return environment.dev;
-        }
+  private static getEnvironment(env: environment): string {
+    if (env == environment.prov) {
+      return "https://kamapabackend-production.up.railway.app/";
+    } else {
+      return environment.dev;
     }
+  }
 
-    public static getEndPoint(endPoint: string): string {
-        return `${this.getEnvironment(this.environment)}${endPoint}`;
-    }
+  public static getEndPoint(endPoint: string): string {
+    return `${this.getEnvironment(this.environment)}${endPoint}`;
+  }
 
-    public static endPoint = {
-        login: "api/auth/login/",
-        provincias: "api/provincia/",
-        roles: "api/rols/",
-        institucion: "api/institucion/",
-        getInstitucionById: "api/institucion/",
-        /*
+  public static endPoint = {
+    login: "api/auth/login/",
+    provincias: "api/provincia/",
+    roles: "api/rols/",
+    institucion: "api/institucion/",
+    getInstitucionById: "api/institucion/",
+    /*
             traer institucion por el id
             url/api/institucion/id
            */
-        getInstitucionForRolsForUser: "api/institucion/userRolsInstitucion/",
-        /*
+    getInstitucionForRolsForUser: "api/institucion/userRolsInstitucion/",
+    /*
             url/api/institucion/userRolsInstitucion/idInstitucion
             {
                 "usuarioId":1
             }
              */
-        usuario: "api/usuario/",
-        /*
+    usuario: "api/usuario/",
+    /*
             Traer a todos los usuarios
                 url/api/usuario
             */
-        getUsuariosAllByIntitucion: "api/usuario/institucion/",
-        /*
+    getUsuariosAllByIntitucion: "api/usuario/institucion/",
+    /*
             Traer a todos los usuarios
                 url/api/usuario/institucion/idInstitucion
             */
-        getUsuarioWhereRolIsAlumno: "api/usuario/alumnos/",
-        //url/api/usuario/alumnos
-        getUsuarioWhereRolIsNotAlumno: "api/usuario/empleados/",
-        //url/api/usuario/empleados
-        getUsuarioWhereRolIsAlumnoByInstitucionAndCurso: "api/usuario/getUsuarioWhereRolIsAlumnoByInstitucionAndNotIsCurso/",
-        getUsuarioWhereRolIsAlumnoByInstitucion: "api/usuario/alumno/",
-        /**
-         * @param {int} idInstitucion
-         */
-        //url/api/usuario/alumnos/idInstitucion
-        getUsuarioWhereRolIsNotAlumnoByIntitucion: "api/usuario/empleados/",
-        //url/api/usuario/empleados/idInstitucion
-        getUsuarioWhereRolIsNotAlumnoByIntitucionByUsuario: "api/usuario/empleado/",
-        getUsuarioByDni: "api/usuario/searchUsuarioById/",
-        //url/api/usuario/empleado
-        /*
+    getUsuarioWhereRolIsAlumno: "api/usuario/alumnos/",
+    //url/api/usuario/alumnos
+    getUsuarioWhereRolIsNotAlumno: "api/usuario/empleados/",
+    //url/api/usuario/empleados
+    getUsuarioWhereRolIsAlumnoByInstitucionAndCurso:
+      "api/usuario/getUsuarioWhereRolIsAlumnoByInstitucionAndNotIsCurso/",
+    getUsuarioWhereRolIsAlumnoByInstitucion: "api/usuario/alumno/",
+    /**
+     * @param {int} idInstitucion
+     */
+    //url/api/usuario/alumnos/idInstitucion
+    getUsuarioWhereRolIsNotAlumnoByIntitucion: "api/usuario/empleados/",
+    //url/api/usuario/empleados/idInstitucion
+    getUsuarioWhereRolIsNotAlumnoByIntitucionByUsuario: "api/usuario/empleado/",
+    getUsuarioByDni: "api/usuario/searchUsuarioById/",
+    //url/api/usuario/empleado
+    /*
             traer usuarion con rol que no sea alumno por el id de la institucion y id del usuario
             {
                 "idInstitucion":1,
                 "idUsuario":1
             }
             */
-        updateUsuarioById: "api/usuario/update/",
+    updateUsuarioById: "api/usuario/update/",
 
-        /** 
+    /** 
              * 
                 {
             "usuario": {
@@ -85,45 +86,45 @@ export class Environment {
             }
              */
 
-        getUsuarioWhereRolIsAlumnoByIntitucionByUsuario: "api/usuario/alumno/",
-        //url/api/usuario/alumno
-        /*
+    getUsuarioWhereRolIsAlumnoByIntitucionByUsuario: "api/usuario/alumno/",
+    //url/api/usuario/alumno
+    /*
             {
                 "idInstitucion":1,
                 "idUsuario":1
             }
             */
-        addInstitucion: "api/usuario/addInstitucion/",
-        /*
+    addInstitucion: "api/usuario/addInstitucion/",
+    /*
                 {
                     "usuarioId":4,
                     "institucionId":3,
                     "roles":[1,3,4]
                 }
             */
-        changePasswordFirst: "api/password/changePassword/",
-        /** 
+    changePasswordFirst: "api/password/changePassword/",
+    /** 
              * Cambio de contraseña por primera vez
             {
                 userId:1,
                 password:'123'
             }
             */
-        resetPassword: "api/password/resetPassword/",
-        /**
+    resetPassword: "api/password/resetPassword/",
+    /**
              * resetear la contraseña del usuario
             {
                 dni:99777333
             }
             */
-        getCicloLectivo: "api/cicloElectivo/ciclo/",
-        /**
+    getCicloLectivo: "api/cicloElectivo/ciclo/",
+    /**
              * Obtener ciclo eletivo actual por id de la institucion
              * @param {int} id
                 api/cicloElectivo/ciclo/id
             */
-        createCicloLectivo: "api/cicloElectivo/",
-        /**
+    createCicloLectivo: "api/cicloElectivo/",
+    /**
              * Crear nuevo ciclo lectivo y sus periodos
              * @body {
                         "nombre": "2025",
@@ -149,27 +150,27 @@ export class Environment {
                         ]
                     }
              */
-        getAllCicloLectivo: "api/cicloElectivo/ciclos/",
-        /**
+    getAllCicloLectivo: "api/cicloElectivo/ciclos/",
+    /**
              * Trae todos los ciclos lectivos de la institucion seleccionada
              * @param {int} idInstitucion
                 api/cicloElectivo/ciclo/idInstitucion
             */
 
-        getCursosByInstitucion: "api/cursos/institucion/",
-        /**
+    getCursosByInstitucion: "api/cursos/institucion/",
+    /**
              * Trae todos los cursos de la institucion seleccionada
              * @param {int} idInstitucion
                 api/cursos/institucion/idInstitucion
             */
-        getAsignaturaByInstitucion: "api/asignatura/institucion/",
-        /**
+    getAsignaturaByInstitucion: "api/asignatura/institucion/",
+    /**
              * Trae todas las asignaturas de la institucion seleccionada
              * @param {int} idInstitucion
                 api/asignatura/institucion/idInstitucion
             */
-        createCurso: "api/cursos/",
-        /**
+    createCurso: "api/cursos/",
+    /**
              * Crear nuevo curso
              * @body {
                 "nombre": "Curso 1",
@@ -178,34 +179,34 @@ export class Environment {
                 "institucionId": 1
                 }
             */
-        crearAsignatura: "api/asignatura/",
-        /**
+    crearAsignatura: "api/asignatura/",
+    /**
              * Crear nueva asignatura
              * @body {
                 "nombre": "Asignatura 1",
                 "institucionId": 1
                 }
              */
-        deleteCurso: "api/cursos/delete/",
-        /**
-         * Eliminar curso
-         * @param {int} cursoId
-         */
-        deleteAsignatura: "api/asignatura/delete/",
-        /**
-         * Eliminar asignatura
-         * @param {int} asignaturaId
-         */
-        updateAsignatura: "api/asignatura/update/",
-        /**
+    deleteCurso: "api/cursos/delete/",
+    /**
+     * Eliminar curso
+     * @param {int} cursoId
+     */
+    deleteAsignatura: "api/asignatura/delete/",
+    /**
+     * Eliminar asignatura
+     * @param {int} asignaturaId
+     */
+    updateAsignatura: "api/asignatura/update/",
+    /**
              * Actualizar asignatura
              * @param {int} asignaturaId
              * @body {
                 "nombre": "Asignatura 1",
                 "institucionId": 1
             */
-        updateCurso: "api/cursos/update/",
-        /**
+    updateCurso: "api/cursos/update/",
+    /**
              * Actualizar curso
              * @param {int} cursoId
              * @body {
@@ -214,48 +215,48 @@ export class Environment {
                 "division": 1,
                 "institucionId": 1
             */
-        asociarAsignaturaCurso: "api/asignatura/addAsignaturasToCurso/",
-        /**
+    asociarAsignaturaCurso: "api/asignatura/addAsignaturasToCurso/",
+    /**
              * Asociar asignaturas a un curso
              * @body {
                 "asignaturaID": 1
                 "cursoId": 1
                 "usuarioId": 1
             */
-        getCursosAndAsignaturasByInstitucion:
-            "api/cursos/cursoAndAsignaturaByInstitucion/",
-        /**
+    getCursosAndAsignaturasByInstitucion:
+      "api/cursos/cursoAndAsignaturaByInstitucion/",
+    /**
              * Trae todos los cursos y asignaturas de la institucion seleccionada
              * @param {int} idInstitucion
                api/cursos/cursoAndAsignaturaByInstitucion/idInstitucion
             */
-        getProfesoresByInstitucion: "api/usuario/getProfesoresByInstitucion/",
+    getProfesoresByInstitucion: "api/usuario/getProfesoresByInstitucion/",
 
-        addAlumnoToCurso: "api/cursos/addAlumnoToCurso/",
-        /**
+    addAlumnoToCurso: "api/cursos/addAlumnoToCurso/",
+    /**
              * Asociar alumno a un curso
              * @body {
                 "alumnosId": [1,2,3]
                 "cursoId": 1
                 "institucionId": 1
             */
-        getCursosAllAlumnosByCicloLectivoActivo:
-            "api/cursos/getCursosAllAlumnosByCicloLectivoActivo/",
-        /**
-         * Trae todos los cursos de un ciclo lectivo activo
-         *
-         */
-        getCursosForUsuario: "api/cursos/getCursosForUsuario/",
-        getAsignaturaForCursoByProfesor:
-            "api/cursos/getAsignaturaForCursoByProfesor",
-        getPeriodosByCicloElectivo: "api/cicloElectivo/periodos/",
-        /**
+    getCursosAllAlumnosByCicloLectivoActivo:
+      "api/cursos/getCursosAllAlumnosByCicloLectivoActivo/",
+    /**
+     * Trae todos los cursos de un ciclo lectivo activo
+     *
+     */
+    getCursosForUsuario: "api/cursos/getCursosForUsuario/",
+    getAsignaturaForCursoByProfesor:
+      "api/cursos/getAsignaturaForCursoByProfesor",
+    getPeriodosByCicloElectivo: "api/cicloElectivo/periodos/",
+    /**
              * Trae todos los periodos de un ciclo electivo
              * @param {int} idCicloElectivo
                 api/cicloElectivo/getPeriodosByCicloElectivo/idCicloElectivo
              */
-        createNota: "api/notas/create/",
-        /**
+    createNota: "api/notas/create/",
+    /**
              * Crea una nueva nota
              * @body {
                 "alumnoId": 1,
@@ -264,20 +265,21 @@ export class Environment {
                 "asignaturaId":1
             }
              */
-        getNotasByAsignatura: "api/notas/getNotasByAsignatura/",
-        getNotasByAsignaturaByCiclo: "api/notas/getNotasByAsignaturaByCiclo/",
-        /**
-         * Trae todas las notas de una asignatura
-         *
-         */
-        getNotasByAlumnoForCicloElectivo:
-            "api/notas/getNotasByAlumnoForCicloElectivo/",
-        /**
-         * Trae todas las notas de un alumno por ciclo
-         */
-        updatePeriodosForCicloElectivo:
-            "api/cicloElectivo/updatePeriodosByCicloElectivo",
-        /**
+    createNotaRecuperacion: "api/notas/createNotaRecuperacion",
+    getNotasByAsignatura: "api/notas/getNotasByAsignatura/",
+    getNotasByAsignaturaByCiclo: "api/notas/getNotasByAsignaturaByCiclo/",
+    /**
+     * Trae todas las notas de una asignatura
+     *
+     */
+    getNotasByAlumnoForCicloElectivo:
+      "api/notas/getNotasByAlumnoForCicloElectivo/",
+    /**
+     * Trae todas las notas de un alumno por ciclo
+     */
+    updatePeriodosForCicloElectivo:
+      "api/cicloElectivo/updatePeriodosByCicloElectivo",
+    /**
              * Actualiza los periodos de un ciclo
              * @body {
         "cicloId":11,
@@ -339,8 +341,8 @@ export class Environment {
                 
                 */
 
-        getAlumnosByCurso: 'api/notas/getAlumnosByCurso/',
-        getGeneros: 'api/genero/getGenero/',
-        deleteAlumnoDeCurso:'api/cursos/deleteAlumnoDeCurso',
-    };
+    getAlumnosByCurso: "api/notas/getAlumnosByCurso/",
+    getGeneros: "api/genero/getGenero/",
+    deleteAlumnoDeCurso: "api/cursos/deleteAlumnoDeCurso",
+  };
 }

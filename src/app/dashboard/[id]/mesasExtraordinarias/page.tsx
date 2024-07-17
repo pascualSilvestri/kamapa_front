@@ -145,7 +145,7 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
         const notaValor = tipoNotaId === 3 ? extraordinariaNota[alumnoId]?.dic : extraordinariaNota[alumnoId]?.feb;
 
         const response = await fetch(
-            `${Environment.getEndPoint(Environment.endPoint.createNota)}`,
+            `${Environment.getEndPoint(Environment.endPoint.createNotaRecuperacion)}`,
             {
                 method: "POST",
                 headers: {
@@ -155,7 +155,7 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                     asignaturaId: Number(asignatura),
                     alumnoId: Number(alumnoId),
                     nota: notaValor,
-                    periodoId: Number(cicloLectivo.id),
+                    cicloLectivoId: Number(cicloLectivo.id),
                     tipoNotaId: tipoNotaId,
                 }),
             }
@@ -187,6 +187,18 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
         const promedio2 = Number(periodo2.promedioNotas);
 
         return promedio1 < 6 && promedio2 < 6 || extraordinariaDic < 6;
+    };
+
+    const getCalificacionDefinitiva = (notasPorPeriodo: { periodoId: number, promedioNotas: string }[], extraordinariaDic: number, extraordinariaFeb: number) => {
+        if (extraordinariaFeb) {
+            return extraordinariaFeb;
+        }
+        if (extraordinariaDic >= 6) {
+            const promedio1 = Number(notasPorPeriodo.find(n => n.periodoId === 3)?.promedioNotas || 0);
+            const promedio2 = Number(notasPorPeriodo.find(n => n.periodoId === 4)?.promedioNotas || 0);
+            return (extraordinariaDic + Math.max(promedio1, promedio2)) / 2;
+        }
+        return null;
     };
 
     return (
@@ -256,7 +268,7 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                                         const notasPorPeriodo = getPromedioNotasPorPeriodo(alumno.notas);
                                         const extraordinariaDic = Number(getNotaExtraordinaria(alumno.notas, 3)); // reDiciembre
                                         const extraordinariaFeb = Number(getNotaExtraordinaria(alumno.notas, 4)); // reFebrero
-                                        const calificacionDefinitiva = (extraordinariaDic + extraordinariaFeb) / 2;
+                                        const calificacionDefinitiva = getCalificacionDefinitiva(notasPorPeriodo, extraordinariaDic, extraordinariaFeb);
 
                                         return (
                                             <tr key={alumno.id}>
@@ -327,7 +339,11 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                                                         </>
                                                     ) : ""}
                                                 </td>
-                                                <td>{isNaN(calificacionDefinitiva) ? '' : calificacionDefinitiva.toFixed(2)}</td>
+                                                <td>
+                                                    {typeof calificacionDefinitiva === "number"
+                                                        ? calificacionDefinitiva.toFixed(2)
+                                                        : ""}
+                                                </td>
                                             </tr>
                                         );
                                     })}
