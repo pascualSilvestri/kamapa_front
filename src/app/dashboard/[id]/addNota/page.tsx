@@ -144,8 +144,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   };
 
   const handleAddRecuperacionNota = async (
-    alumnoId: number | string,
-    tipo: string
+    alumnoId: number | string
   ) => {
     const notaValor = recuperacionNota[alumnoId];
 
@@ -190,7 +189,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   };
 
   const getNotaRecuperacion = (alumno: User) => {
-    const nota = alumno.notas.find((n) => n.tipoNotaId === 2);
+    const nota = alumno.notas.find((n) => n.tipoNotaId === 2 && n.periodoId === Number(periodo));
     return nota ? nota.nota : null;
   };
 
@@ -369,8 +368,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                   <Button
                                     onClick={() =>
                                       handleAddRecuperacionNota(
-                                        alumno.id,
-                                        "recuperacion"
+                                        alumno.id
                                       )
                                     }
                                     style={{
