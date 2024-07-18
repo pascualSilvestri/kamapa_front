@@ -62,7 +62,7 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
             const periodosUnicos: Periodo[] = [];
             data.forEach((item: { asignatura: Asignatura, notas: Nota[] }) => {
                 item.notas.forEach((nota: Nota) => {
-                    if (!periodosUnicos.find(periodo => periodo.id === nota.periodo.id)) {
+                    if (nota.periodo && !periodosUnicos.find(periodo => periodo.id === nota.periodo?.id)) {
                         periodosUnicos.push(nota.periodo);
                     }
                 });
@@ -75,10 +75,16 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
 
             const asignaturasConNotas = data.map((item: { asignatura: Asignatura, notas: Nota[] }) => {
                 const notasPorPeriodo: { [key: number]: Nota[] } = {};
+                const notasExtraordinarias: Nota[] = [];
                 periodosUnicos.forEach(periodo => {
-                    notasPorPeriodo[periodo.id] = item.notas.filter(nota => nota.periodo.id === periodo.id);
+                    notasPorPeriodo[periodo.id] = item.notas.filter(nota => nota.periodo?.id === periodo.id);
                 });
-                return { ...item.asignatura, notasPorPeriodo };
+                item.notas.forEach((nota) => {
+                    if (nota.tipoNota?.id === 3 || nota.tipoNota?.id === 4) {
+                        notasExtraordinarias.push(nota);
+                    }
+                });
+                return { ...item.asignatura, notasPorPeriodo, notasExtraordinarias };
             });
 
             setAsignaturas(asignaturasConNotas);
@@ -102,107 +108,47 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
         return (total / evaluaciones.length).toFixed(2);
     };
 
-    const generatePDFContent = () => {
-        const container = document.createElement('div');
-        container.style.padding = '20px';
-        container.style.border = '1px solid #000';
-
-        // Header Section
-        const header = document.createElement('div');
-        header.style.textAlign = 'center';
-        header.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <img src="${institucionSelected.logo|| '/Logo.png'}" alt="Logo" />
-            <h1 style="text-align: center;">Documento Único de Evaluación: Educación Secundaria</h1>
-            <div style="display: flex; justify-content: flex-end; align-items: flex-end; flex-direction: column;">
-            <p>LIBRO MATRIZ N°:______________</p>
-            <p>FOLIO N°:_____________________</p>
-            </div>
-        </div>
-        <div>
-            <p>Escuela: ${institucionSelected.nombre}</p>
-            <div style="display: flex; justify-content: flex-start; align-items: center; gap: 10px;">
-                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; >Alumno: ${user.apellido} ${user.nombre}</p> 
-                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; >DNI: ${user.dni}</p> 
-            </div>
-            <div style="display: flex; justify-content: flex-start; align-items: center ; gap: 10px;">
-                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; ">Año: 20${new Date().getFullYear().toString().slice(-2)}</p>
-                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; >Div: ________</p>
-                <p style="text-align: center; font-weight: bold; font-size: 14px; padding: 5px; >Ciclo Lectivo: 20${new Date().getFullYear().toString().slice(-2)}</p>
-            </div>
-        </div>
-            
-           
-        `;
-        container.appendChild(header);
-
-        // Table Section
-        const table = document.createElement('table');
-        table.style.width = '100%';
-        table.style.borderCollapse = 'collapse';
-        table.innerHTML = `
-            <thead>
-                <tr>
-                    <th style="border: 1px solid black; padding: 5px;"><p style="text-align: center;" >Espacios Curriculares</p>
-                    <p style="text-align: center;">O.F.A.E \n/ E.F.P.P \n/ F.T.P</p>
-                    </th>
-                    ${periodos.map(periodo => `<th style="border: 1px solid black; padding: 5px; text-align: center">${periodo.nombre}</th>`).join('')}
-                    <th style="border: 1px solid black; padding: 5px; text-align: center">Calificación Final</th>
-                    <th style="border: 1px solid black; padding: 5px; text-align: center">Periodo de Evaluación \n de Diciembre</th>
-                    <th style="border: 1px solid black; padding: 5px; text-align: center">Evaluación \n Ante Comisión de Febrero</th>
-                    <th style="border: 1px solid black; padding: 5px; text-align: center">Calificación Final</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${asignaturas.map(asignatura => `
-                    <tr>
-                        <td style="border: 1px solid black; padding: 5px; text-align: center">${asignatura.nombre}</td>
-                        ${periodos.map(periodo => `
-                            <td style="border: 1px solid black; padding: 5px; text-align: center">${calcularPromedioPorPeriodo(asignatura.notasPorPeriodo[periodo.id])}</td>
-                        `).join('')}
-                        <td style="border: 1px solid black; padding: 5px; text-align: center">${calcularPromedioGeneral(asignatura.notasPorPeriodo)}</td>
-                        <td style="border: 1px solid black; padding: 5px;   text-align: center"></td>
-                        <td style="border: 1px solid black; padding: 5px;   text-align: center"></td>
-                        <td style="border: 1px solid black; padding: 5px;   text-align: center"></td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        `;
-        container.appendChild(table);
-
-        return container;
+    const getNotaExtraordinaria = (notasExtraordinarias: Nota[], tipoNotaId: number) => {
+        const nota = notasExtraordinarias.find((n) => n.tipoNota.id === tipoNotaId);
+        return nota ? nota.nota : null;
     };
 
+    const calcularCalificacionFinal = (
+        notasPorPeriodo: { [key: number]: Nota[] },
+        reDiciembre: number | null,
+        reFebrero: number | null
+    ) => {
+        if (reFebrero !== null) {
+            return reFebrero.toFixed(2);
+        } else if (reDiciembre !== null) {
+            const promedios = Object.values(notasPorPeriodo)
+                .map((notas) => calcularPromedioPorPeriodo(notas))
+                .filter((promedio) => promedio !== "-")
+                .map(Number);
 
+            const maxPromedio = Math.max(...promedios);
+            const final = (reDiciembre + maxPromedio) / 2;
+            return final.toFixed(2);
+        } else {
+            return "-";
+        }
+    };
 
     const exportToPDF = async () => {
         const input = pdfRef.current;
         if (!input) return;
 
-        const canvas = await html2canvas(input);
-        const imgData = canvas.toDataURL('image/png');
+        const canvas = await html2canvas(input, {
+            scale: 2,
+            useCORS: true,
+        });
+        const imgData = canvas.toDataURL("image/png");
         const pdf = new jsPDF();
         const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('Notas.pdf');
-    };
-
-    const exportToPDFDue = async () => {
-        const pdfContent = generatePDFContent();
-        document.body.appendChild(pdfContent);
-
-        const canvas = await html2canvas(pdfContent);
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF();
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('Notas.pdf');
-
-        document.body.removeChild(pdfContent);
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save("Notas.pdf");
     };
 
     return (
@@ -251,6 +197,9 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                                             </th>
                                         ))}
                                         <th style={{ backgroundColor: 'purple', color: 'white' }}>Promedio General</th>
+                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Periodo de Evaluación de Diciembre</th>
+                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Evaluación Ante Comisión de Febrero</th>
+                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Calificación Final</th>
                                     </tr>
                                     <tr>
                                         <th></th>
@@ -264,32 +213,43 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                                             <th style={{ backgroundColor: 'lightgreen' }} key={`${periodo.id}-Promedio`}>Promedio</th>
                                         ])}
                                         <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {asignaturas.map(asignatura => (
-                                        <tr key={asignatura.id}>
-                                            <td>{asignatura.nombre}</td>
-                                            {periodos.flatMap(periodo => {
-                                                const notas = asignatura.notasPorPeriodo[periodo.id] || [];
-                                                const coloquioNota = notas.find(nota => nota.tipoNota?.id === 2);
-                                                const promedio = calcularPromedioPorPeriodo(notas);
-                                                return (
-                                                    <>
-                                                        {notas.filter(nota => nota.tipoNota?.id === 1).map((nota, idx) => (
-                                                            <td key={`${asignatura.id}-${periodo.id}-N${idx + 1}`}>{nota.nota}</td>
-                                                        ))}
-                                                        {new Array(5 - notas.filter(nota => nota.tipoNota?.id === 1).length).fill(null).map((_, idx) => (
-                                                            <td key={`${asignatura.id}-${periodo.id}-empty-${idx}`}>-</td>
-                                                        ))}
-                                                        <td key={`${asignatura.id}-${periodo.id}-Coloquio`} style={{ backgroundColor: 'red', color: 'white' }}>{coloquioNota ? coloquioNota.nota : '-'}</td>
-                                                        <td key={`${asignatura.id}-${periodo.id}-Promedio`} style={{ backgroundColor: 'lightgreen' }}>{promedio}</td>
-                                                    </>
-                                                );
-                                            })}
-                                            <td style={{ backgroundColor: 'purple', color: 'white' }}>{calcularPromedioGeneral(asignatura.notasPorPeriodo)}</td>
-                                        </tr>
-                                    ))}
+                                    {asignaturas.map(asignatura => {
+                                        const reDiciembre = getNotaExtraordinaria(asignatura.notasExtraordinarias, 3); // Nota reDiciembre
+                                        const reFebrero = getNotaExtraordinaria(asignatura.notasExtraordinarias, 4); // Nota reFebrero
+                                        const calificacionFinal = calcularCalificacionFinal(asignatura.notasPorPeriodo, reDiciembre, reFebrero);
+                                        return (
+                                            <tr key={asignatura.id}>
+                                                <td>{asignatura.nombre}</td>
+                                                {periodos.flatMap(periodo => {
+                                                    const notas = asignatura.notasPorPeriodo[periodo.id] || [];
+                                                    const coloquioNota = notas.find(nota => nota.tipoNota?.id === 2);
+                                                    const promedio = calcularPromedioPorPeriodo(notas);
+                                                    return (
+                                                        <>
+                                                            {notas.filter(nota => nota.tipoNota?.id === 1).map((nota, idx) => (
+                                                                <td key={`${asignatura.id}-${periodo.id}-N${idx + 1}`}>{nota.nota}</td>
+                                                            ))}
+                                                            {new Array(5 - notas.filter(nota => nota.tipoNota?.id === 1).length).fill(null).map((_, idx) => (
+                                                                <td key={`${asignatura.id}-${periodo.id}-empty-${idx}`}>-</td>
+                                                            ))}
+                                                            <td key={`${asignatura.id}-${periodo.id}-Coloquio`} style={{ backgroundColor: 'red', color: 'white' }}>{coloquioNota ? coloquioNota.nota : '-'}</td>
+                                                            <td key={`${asignatura.id}-${periodo.id}-Promedio`} style={{ backgroundColor: 'lightgreen' }}>{promedio}</td>
+                                                        </>
+                                                    );
+                                                })}
+                                                <td style={{ backgroundColor: 'purple', color: 'white' }}>{calcularPromedioGeneral(asignatura.notasPorPeriodo)}</td>
+                                                <td>{reDiciembre !== null ? reDiciembre.toFixed(2) : ''}</td>
+                                                <td>{reFebrero !== null ? reFebrero.toFixed(2) : ''}</td>
+                                                <td style={{ backgroundColor: 'purple', color: 'white' }}>{calificacionFinal}</td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </Table>
                         </div>
@@ -308,11 +268,17 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {asignaturas.filter(asignatura => parseFloat(calcularPromedioGeneral(asignatura.notasPorPeriodo)) < 6).map(asignatura => (
+                                    {asignaturas.filter(asignatura => {
+                                        return Object.values(asignatura.notasPorPeriodo).some(notas =>
+                                            notas.some(nota => nota.nota < 6)
+                                        );
+                                    }).map(asignatura => (
                                         <tr key={asignatura.id}>
                                             <td>{asignatura.nombre}</td>
                                             <td>{calcularPromedioGeneral(asignatura.notasPorPeriodo)}</td>
-                                            <td style={{ backgroundColor: 'purple', color: 'white', textAlign: 'center' }}>{asignatura.notasPorPeriodo[periodos[0].id]?.[0]?.nota || '-'}</td>
+                                            <td style={{ backgroundColor: 'purple', color: 'white', textAlign: 'center' }}>
+                                                {asignatura.notasPorPeriodo[periodos[0].id]?.[0]?.nota || '-'}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -327,11 +293,6 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                         Visualizar PDF Analítico Provisorio
                     </StyledButton>
                 </Col>
-                {/* <Col xs="auto">
-                    <StyledButton variant="purple" className="mx-2" onClick={exportToPDFDue}>
-                        Visualizar PDF DUE
-                    </StyledButton>
-                </Col> */}
             </Row>
         </Container>
     );
@@ -341,7 +302,7 @@ interface StyledButtonProps extends ButtonProps {
     variant: 'purple';
 }
 
-const StyledButton = styled(Button) <StyledButtonProps>`
+const StyledButton = styled(Button)<StyledButtonProps>`
     background-color: purple;
     border-color: purple;
     color: white;
