@@ -2,31 +2,30 @@ import { Roles } from "../model/types"
 import { RoleEmun } from "./const"
 import path from 'path';
 
-
 export const router = {
-    'Inicio': { label: 'Inicio', href: `/bienvenido` },
-    'EditarAlumnos': { label: 'Editar Alumnos', href: '/editarAlumno' },
-    'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo' },
-    'ModificarPeriodos': { label: 'Modificar Periodos', href: '/modificarPeriodos' },
-    'GestionCurso': { label: 'Gestion Cursos', href: '/gestionCurso' },
-    'AddAsignaturaCurso': { label: 'Agregar Asignatura a  Cursos ', href: '/addAsignaturaCurso' },
-    'GestionAsignatura': { label: 'Gestion Asignatura ', href: '/gestionAsignatura' },
-    'CursoAlumno': { label: 'Consultar Alumnos por Curso', href: '/curso_alumno' },
+    'Inicio': { label: 'Inicio', href: '/bienvenido' },
+    'EditarAlumnos': { label: 'Editar Alumnos', href: '/editarAlumno', dropdown: 'Gestión Alumnos' },
+    'RegistroAlumno': { label: 'Registro de Alumnos', href: '/consultaUsuario', dropdown: 'Gestión Alumnos' },
+    'CursoAlumno': { label: 'Consultar Alumnos por Curso', href: '/curso_alumno', dropdown: 'Gestión Alumnos' },
+    'consultaListaAlumnoPorcurso': { label: 'Consultar Lista de Alumnos por curso', href: '/alumnosPorCurso', dropdown: 'Gestión Alumnos' },
+    'regAlumnoCurso': { label: 'Asignar Alumnos a los Cursos', href: '/regAlumnoCurso', dropdown: 'Gestión Alumnos' },
+    'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo', dropdown: 'Ciclo Lectivo' },
+    'ModificarPeriodos': { label: 'Modificar Periodos', href: '/modificarPeriodos', dropdown: 'Ciclo Lectivo' },
+    'AddAsignaturaCurso': { label: 'Agregar Asignatura a Cursos', href: '/addAsignaturaCurso', dropdown: 'Asignaturas' },
+    'GestionAsignatura': { label: 'Gestion Asignatura', href: '/gestionAsignatura', dropdown: 'Asignaturas' },
+    'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso', dropdown: 'Asignaturas' },
+    'Notas': { label: 'Notas', href: '/calificar', dropdown: 'Calificaciones' },
+    'AddNotaAlumno': { label: 'Agregar nota al alumno', href: '/addNota', dropdown: 'Calificaciones' },
+    'mesasExtraordinarias': { label: 'Mesas Extraordinarias', href: '/mesasExtraordinarias', dropdown: 'Calificaciones' },
+    'Calificaciones': { label: 'Calificaciones', href: '/consultaNota', dropdown: 'Calificaciones' },
     'AulasRegistro': { label: 'Aulas', href: '/regaulas' },
     'RegistroUsuarios': { label: 'Registro de Usuarios', href: '/consultaUsuario' },
-    'RegistroAlumno': { label: 'Registro de Alumnos', href: '/consultaUsuario' },
-    'Notas': { label: 'Notas', href: '/calificar' },
-    'Calificaciones': { label: 'Calificaciones', href: '/consultaNota' },
     'VistaUsuarios': { label: 'Usuarios', href: '/vistausuarios' },
     'resetearPasswordUsuario': { label: 'Resetear contraseña a usuario', href: '/resetPassword' },
     'AddAlumnoCurso': { label: 'Asignar cursos a alumnos', href: '/addAlumnoCurso' },
-    'AddNotaAlumno': { label: 'Agregar nota al alumno', href: '/addNota' },
-    'due': { label: 'Due', href: '/due' },
-    'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso' },
-    'consultaListaAlumnoPorcurso': { label: 'Consultar Lista de Alumnos por curso', href: '/alumnosPorCurso' },
-    'regAlumnoCurso': { label: 'Asignar Alumnos a los Cursos', href: '/regAlumnoCurso' },
-    'mesasExtraordinarias': { label: 'Mesas Extraordinarias', href: '/mesasExtraordinarias' },
-}
+    'due': { label: 'Due', href: '/due' }
+};
+
 
 export const adminAutorizeRouter = [
 
@@ -34,53 +33,25 @@ export const adminAutorizeRouter = [
 
 export const directorAutorizeRouter = [
     'Inicio',
-    'CrearCicloLectivo',
-    'ModificarPeriodos',
-    'GestionCurso',
-    'GestionAsignatura',
-    'AddAsignaturaCurso',
-    'regAlumnoCurso',
-    'AddAlumnoCurso',
-    'CursoAlumno',
-    'EditarAlumnos',
+    'Alumno',
+    'CicloLectivo',
+    'Asignaturas',
+    'AulasRegistro',
     'RegistroUsuarios',
-    'RegistroAlumno',
     'VistaUsuarios',
     'resetearPasswordUsuario',
-    'AddNotaAlumno',
-    'consultaAsignaturaPorCurso',
-    'consultaListaAlumnoPorcurso',
-    'mesasExtraordinarias'
-
-
+    'AddAlumnoCurso',
+    'due'
 ]
 
 export const secretarioAutorizeRouter = [
     'Inicio',
-    'RegistroUsuarios',
-    'CrearCicloLectivo',
-    'GestionCurso',
-    'regAlumnoCurso',
-    'AddAsignaturaCurso',
-    'CursoAlumno',
-    'VistaUsuarios',
-    'GestionAsignatura',
-    'consultaAsignaturaPorCurso',
-    'mesasExtraordinarias'
+
 ]
 
 export const preceptorAutorizeRouter = [
     'Inicio',
-    'Preceptores',
-    'CursoAlumno',
-    'EditarAlumnos',
-    'regAlumnoCurso',
-    'Alumnos',
-    'About',
-    'RegistroAlumno',
-    'consultaAsignaturaPorCurso',
-    'consultaAsignaturaPorCurso',
-    'consultaListaAlumnoPorcurso'
+
 ]
 
 export const profesorAutorizeRouter = [
@@ -90,7 +61,6 @@ export const profesorAutorizeRouter = [
     'Notas',
     'AddNotaAlumno',
     'mesasExtraordinarias'
-
 ]
 
 export const alumnoAutorizeRouter = [
