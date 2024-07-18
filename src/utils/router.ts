@@ -19,7 +19,7 @@ export const router = {
     'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo', dropdown: 'Ciclo Lectivo' },
     'ModificarPeriodos': { label: 'Modificar Periodos', href: '/modificarPeriodos', dropdown: 'Ciclo Lectivo' },
     // Asignaturas
-    'AddAsignaturaCurso': { label: 'Agregar Asignatura a Cursos', href: '/addAsignaturaCurso', dropdown: 'Asignaturas' },
+    'AddAsignaturaCurso': { label: 'Asociar Docentes y Materias a los Cursos', href: '/addAsignaturaCurso', dropdown: 'Asignaturas' },
     'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso', dropdown: 'Asignaturas' },
     // Calificaciones
     'AddNotaAlumno': { label: 'Calificar al alumno', href: '/addNota', dropdown: 'Calificaciones' },
