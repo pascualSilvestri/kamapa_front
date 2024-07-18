@@ -43,8 +43,7 @@ const Due = ({ params }: { params: { id: string } }) => {
     fetchCiclosLectivos();
   }, []);
 
-
-  console.log(user)
+  console.log(user);
   useEffect(() => {
     if (selectedCicloLectivo) {
       fetchAsignaturasYNotas();
@@ -54,7 +53,8 @@ const Due = ({ params }: { params: { id: string } }) => {
   const fetchCiclosLectivos = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id
+        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${
+          params.id
         }`
       );
       const data = await response.json();
@@ -92,6 +92,7 @@ const Due = ({ params }: { params: { id: string } }) => {
       data.forEach((item: { asignatura: Asignatura; notas: Nota[] }) => {
         item.notas.forEach((nota: Nota) => {
           if (
+            nota.periodo &&
             !periodosUnicos.find((periodo) => periodo.id === nota.periodo.id)
           ) {
             periodosUnicos.push(nota.periodo);
@@ -110,12 +111,18 @@ const Due = ({ params }: { params: { id: string } }) => {
       const asignaturasConNotas = data.map(
         (item: { asignatura: Asignatura; notas: Nota[] }) => {
           const notasPorPeriodo: { [key: number]: Nota[] } = {};
+          const notasExtraordinarias: Nota[] = [];
           periodosUnicos.forEach((periodo) => {
             notasPorPeriodo[periodo.id] = item.notas.filter(
-              (nota) => nota.periodo.id === periodo.id
+              (nota) => nota.periodo?.id === periodo.id
             );
           });
-          return { ...item.asignatura, notasPorPeriodo };
+          item.notas.forEach((nota) => {
+            if (nota.tipoNota?.id === 3 || nota.tipoNota?.id === 4) {
+              notasExtraordinarias.push(nota);
+            }
+          });
+          return { ...item.asignatura, notasPorPeriodo, notasExtraordinarias };
         }
       );
 
@@ -132,7 +139,6 @@ const Due = ({ params }: { params: { id: string } }) => {
     return (total / evaluaciones.length).toFixed(2);
   };
 
-
   const calcularPromedioGeneral = (notasPorPeriodo: {
     [key: number]: Nota[];
   }) => {
@@ -144,6 +150,33 @@ const Due = ({ params }: { params: { id: string } }) => {
     const total = evaluaciones.reduce((acc, nota) => acc + nota.nota, 0);
     return (total / evaluaciones.length).toFixed(2);
   };
+
+  const getNotaExtraordinaria = (notasExtraordinarias: Nota[], tipoNotaId: number) => {
+    const nota = notasExtraordinarias.find((n) => n.tipoNota.id === tipoNotaId);
+    return nota ? nota.nota : null;
+  };
+
+  const calcularCalificacionFinal = (
+    notasPorPeriodo: { [key: number]: Nota[] },
+    reDiciembre: number | null,
+    reFebrero: number | null
+  ) => {
+    if (reFebrero !== null) {
+      return reFebrero.toFixed(2);
+    } else if (reDiciembre !== null) {
+      const promedios = Object.values(notasPorPeriodo)
+        .map((notas) => calcularPromedioPorPeriodo(notas))
+        .filter((promedio) => promedio !== "-")
+        .map(Number);
+
+      const maxPromedio = promedios.length > 0 ? Math.max(...promedios) : 0;
+      const final = (reDiciembre + maxPromedio) / 2;
+      return final.toFixed(2);
+    } else {
+      return "-";
+    }
+  };
+
   const PDFContent = React.forwardRef<HTMLDivElement, PDFContentProps>(
     ({ user, institucionSelected, asignaturas, periodos }, ref) => (
       <div ref={ref} style={{ padding: "20px", border: "1px solid #000" }}>
@@ -349,7 +382,7 @@ const Due = ({ params }: { params: { id: string } }) => {
             </div>
           </div>
         </div>
-  
+
         {/* Table Section */}
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
@@ -458,91 +491,109 @@ const Due = ({ params }: { params: { id: string } }) => {
             </tr>
           </thead>
           <tbody>
-            {asignaturas.map((asignatura) => (
-              <tr key={asignatura.id}>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                >
-                  {asignatura.nombre}
-                </td>
-                {periodos.map((periodo) => (
+            {asignaturas.map((asignatura) => {
+              const reDiciembre = getNotaExtraordinaria(
+                asignatura.notasExtraordinarias,
+                3
+              ); // Nota reDiciembre
+              const reFebrero = getNotaExtraordinaria(
+                asignatura.notasExtraordinarias,
+                4
+              ); // Nota reFebrero
+              const calificacionFinal = calcularCalificacionFinal(
+                asignatura.notasPorPeriodo,
+                reDiciembre,
+                reFebrero
+              );
+
+              return (
+                <tr key={asignatura.id}>
                   <td
-                    key={periodo.id}
                     style={{
                       border: "1px solid black",
                       padding: "5px",
                       textAlign: "center",
                     }}
                   >
-                    {calcularPromedioPorPeriodo(
-                      asignatura.notasPorPeriodo[periodo.id]
-                    )}
+                    {asignatura.nombre}
                   </td>
-                ))}
-                <td
-                  style={{
-                    border: "1px solid black",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                >
-                  {calcularPromedioGeneral(asignatura.notasPorPeriodo)}
-                </td>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                >
-                  {calcularPromedioGeneral(asignatura.notasPorPeriodo)}
-                </td>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                ></td>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                >
-                  {calcularPromedioGeneral(asignatura.notasPorPeriodo)}
-                </td>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                ></td>
-                <td
-                  style={{
-                    border: "1px solid black",
-                    padding: "5px",
-                    textAlign: "center",
-                  }}
-                ></td>
-              </tr>
-            ))}
+                  {periodos.map((periodo) => (
+                    <td
+                      key={periodo.id}
+                      style={{
+                        border: "1px solid black",
+                        padding: "5px",
+                        textAlign: "center",
+                      }}
+                    >
+                      {calcularPromedioPorPeriodo(
+                        asignatura.notasPorPeriodo[periodo.id]
+                      )}
+                    </td>
+                  ))}
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {calcularPromedioGeneral(asignatura.notasPorPeriodo)}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {reDiciembre !== null ? reDiciembre.toFixed(2) : ""}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  ></td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {reFebrero !== null ? reFebrero.toFixed(2) : ""}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  ></td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {calificacionFinal}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
     )
   );
-  
+
   const exportToPDF = async () => {
     const input = pdfRef.current;
     if (!input) return;
-  
+
     const canvas = await html2canvas(input, {
       scale: 2,
       useCORS: true,
@@ -555,8 +606,6 @@ const Due = ({ params }: { params: { id: string } }) => {
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save("Notas.pdf");
   };
-  
-
 
   return (
     <Container>
@@ -615,7 +664,7 @@ interface StyledButtonProps extends ButtonProps {
   variant: "purple";
 }
 
-const StyledButton = styled(Button) <StyledButtonProps>`
+const StyledButton = styled(Button)<StyledButtonProps>`
   background-color: purple;
   border-color: purple;
   color: white;
