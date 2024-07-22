@@ -35,11 +35,11 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     if (asignatura && cursoSeleccionado) {
       fetchAlumnos();
-      const selectedCurso = cursos.find(curso => curso.id === cursoSeleccionado);
+      const selectedCurso = cursos.find(curso => curso.id === Number(cursoSeleccionado));
       if (selectedCurso) {
         setCursoNombre(selectedCurso.nombre);
       }
-      const selectedAsignatura = asignaturas.find(asig => asig.id === asignatura);
+      const selectedAsignatura = asignaturas.find(asig => asig.id === Number(asignatura));
       if (selectedAsignatura) {
         setAsignaturaNombre(selectedAsignatura.nombre);
       }
@@ -217,7 +217,9 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
 
     // Añadir encabezado
     const header = document.createElement('div');
-    header.innerHTML = `<h3>Curso: ${cursoNombre}</h3><h3>Asignatura: ${asignaturaNombre}</h3><h3>Fecha: ${fecha}</h3>`;
+    const cursoSelectPdf = cursos.find(select => select.id === Number(cursoSeleccionado));
+    const asignaturaSelectPdf = asignaturas.find(select => select.id === Number(asignatura));
+    header.innerHTML = `<h3>Curso: ${cursoSelectPdf.nombre}</h3><h3>Asignatura: ${asignaturaSelectPdf.nombre}</h3><h3>Fecha: ${fecha}</h3>`;
     input.insertBefore(header, input.firstChild);
 
     // Generar PDF
