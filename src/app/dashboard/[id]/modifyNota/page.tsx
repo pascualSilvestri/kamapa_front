@@ -1,12 +1,12 @@
-'use client';
+"use client";
 import { useEffect, useState, useRef } from "react";
 import { Container, Row, Col, Form, Button, Table } from "react-bootstrap";
 import { Curso, User, Nota, Periodo } from "model/types"; // Asegúrate de que 'User', 'Curso' y 'Nota' estén definidos en 'model/types'
 import { Environment } from "utils/EnviromenManager";
 import { useUserContext } from "context/userContext";
 import { useCicloLectivo } from "context/CicloLectivoContext";
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   const [cursoSeleccionado, setCursoSeleccionado] = useState<string>("");
@@ -16,13 +16,21 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   const [asignaturas, setAsignaturas] = useState<Curso[]>([]);
   const [alumnos, setAlumnos] = useState<User[]>([]);
   const [nota, setNota] = useState<{ [key: string]: string }>({});
-  const [recuperacionNota, setRecuperacionNota] = useState<{ [key: string]: string; }>({});
+  const [recuperacionNota, setRecuperacionNota] = useState<{
+    [key: string]: string;
+  }>({});
   const [user, setUser] = useUserContext();
   const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
   const [periodos, setPeriodos] = useState<Periodo[]>([]);
-  const [editingNote, setEditingNote] = useState<{ [key: string]: boolean }>({});
-  const [editingValues, setEditingValues] = useState<{ [key: string]: { [key: string]: string } }>({});
-  const [editingRecuperacion, setEditingRecuperacion] = useState<{ [key: string]: string }>({});
+  const [editingNote, setEditingNote] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+  const [editingValues, setEditingValues] = useState<{
+    [key: string]: { [key: string]: string };
+  }>({});
+  const [editingRecuperacion, setEditingRecuperacion] = useState<{
+    [key: string]: string;
+  }>({});
   const pdfRef = useRef(null);
 
   const [cursoNombre, setCursoNombre] = useState<string>("");
@@ -38,11 +46,15 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     if (asignatura && cursoSeleccionado) {
       fetchAlumnos();
-      const selectedCurso = cursos.find(curso => curso.id === Number(cursoSeleccionado));
+      const selectedCurso = cursos.find(
+        (curso) => curso.id === Number(cursoSeleccionado)
+      );
       if (selectedCurso) {
         setCursoNombre(selectedCurso.nombre);
       }
-      const selectedAsignatura = asignaturas.find(asig => asig.id === Number(asignatura));
+      const selectedAsignatura = asignaturas.find(
+        (asig) => asig.id === Number(asignatura)
+      );
       if (selectedAsignatura) {
         setAsignaturaNombre(selectedAsignatura.nombre);
       }
@@ -125,11 +137,13 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
       );
       const data = await response.json();
       const alumnosOrdenados = Array.isArray(data)
-        ? data.map((a) => a.usuario).sort((a, b) => a.apellido.localeCompare(b.apellido))
+        ? data
+            .map((a) => a.usuario)
+            .sort((a, b) => a.apellido.localeCompare(b.apellido))
         : [];
       setAlumnos(alumnosOrdenados);
       const recuperacionNotas = {};
-      alumnosOrdenados.forEach(alumno => {
+      alumnosOrdenados.forEach((alumno) => {
         const notaRecup = getNotaRecuperacion(alumno);
         recuperacionNotas[alumno.id] = notaRecup ? notaRecup.toString() : "";
       });
@@ -159,7 +173,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     );
     const data = await response.json();
     console.log(data);
-    setNota({ ...nota, [alumnoId]: '' }); // Vaciar el campo de nota después de agregar la nota
+    setNota({ ...nota, [alumnoId]: "" }); // Vaciar el campo de nota después de agregar la nota
     fetchAlumnos();
   };
 
@@ -207,7 +221,9 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   };
 
   const getNotaRecuperacion = (alumno: User) => {
-    const nota = alumno.notas.find((n) => n.tipoNotaId === 2 && n.periodoId === Number(periodo));
+    const nota = alumno.notas.find(
+      (n) => n.tipoNotaId === 2 && n.periodoId === Number(periodo)
+    );
     return nota ? nota.nota : null;
   };
 
@@ -216,13 +232,19 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     if (!input) return;
 
     // Ocultar columnas de Nota y Acción
-    const accionColumn = input.querySelectorAll('.accion-column');
-    accionColumn.forEach(col => (col as HTMLElement).style.display = 'none');
+    const accionColumn = input.querySelectorAll(".accion-column");
+    accionColumn.forEach(
+      (col) => ((col as HTMLElement).style.display = "none")
+    );
 
     // Añadir encabezado
-    const header = document.createElement('div');
-    const cursoSelectPdf = cursos.find(select => select.id === Number(cursoSeleccionado));
-    const asignaturaSelectPdf = asignaturas.find(select => select.id === Number(asignatura));
+    const header = document.createElement("div");
+    const cursoSelectPdf = cursos.find(
+      (select) => select.id === Number(cursoSeleccionado)
+    );
+    const asignaturaSelectPdf = asignaturas.find(
+      (select) => select.id === Number(asignatura)
+    );
     header.innerHTML = `<h3>Curso: ${cursoSelectPdf.nombre}</h3><h3>Asignatura: ${asignaturaSelectPdf.nombre}</h3><h3>Fecha: ${fecha}</h3>`;
     input.insertBefore(header, input.firstChild);
 
@@ -240,7 +262,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     pdf.save("Notas.pdf");
 
     // Restaurar columnas
-    accionColumn.forEach(col => (col as HTMLElement).style.display = '');
+    accionColumn.forEach((col) => ((col as HTMLElement).style.display = ""));
 
     // Eliminar encabezado
     input.removeChild(header);
@@ -248,25 +270,61 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
 
   const handleEditNota = (alumnoId: string) => {
     setEditingNote({ ...editingNote, [alumnoId]: true });
-    const currentNotas = getNotasPorPeriodo(alumnos.find(a => a.id === Number(alumnoId))!);
+    const currentNotas = getNotasPorPeriodo(
+      alumnos.find((a) => a.id === Number(alumnoId))!
+    );
     const notasValues = {};
     currentNotas.forEach((nota, index) => {
       notasValues[`Nota${index + 1}`] = nota.nota || "";
     });
     setEditingValues({ ...editingValues, [alumnoId]: notasValues });
-    setEditingRecuperacion({ ...editingRecuperacion, [alumnoId]: recuperacionNota[alumnoId] || "" });
+    setEditingRecuperacion({
+      ...editingRecuperacion,
+      [alumnoId]: recuperacionNota[alumnoId] || "",
+    });
   };
 
-  const handleSaveNota = (alumnoId: string) => {
+  const handleSaveNota = async (alumnoId: string) => {
     const notas = editingValues[alumnoId];
-    const currentNotas = getNotasPorPeriodo(alumnos.find(a => a.id === Number(alumnoId))!);
-    Object.keys(notas).forEach((key, index) => {
+    const currentNotas = getNotasPorPeriodo(
+      alumnos.find((a) => a.id === Number(alumnoId))!
+    );
+    const notasArray = Object.keys(notas).map((key, index) => {
       const notaValue = notas[key];
       const currentNota = currentNotas[index];
-      console.log(`Nota ID: ${currentNota.id}, Nota Actual: ${notaValue}, Alumno ID: ${alumnoId}, Asignatura ID: ${asignatura}, Periodo ID: ${periodo}, Ciclo Lectivo ID: ${cicloLectivo.id}`);
+      return {
+        notaId: currentNota.id,
+        nota: notaValue,
+        tipoNota: currentNota.tipoNotaId,
+      };
     });
+
     const recuperacionValue = editingRecuperacion[alumnoId];
-    console.log(`Recuperación Nota: ${recuperacionValue}, Alumno ID: ${alumnoId}`);
+
+    const resultado = {
+      alumnoId: Number(alumnoId),
+      asignaturaId: Number(asignatura),
+      cicloLectivoId: Number(cicloLectivo.id),
+      periodoId: Number(periodo),
+      cursoId: Number(cursoSeleccionado),
+      notas: notasArray,
+      recuperacionNota: recuperacionValue,
+    };
+
+    const response = await fetch(
+      `${Environment.getEndPoint(Environment.endPoint.updateNotas)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(resultado),
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+    fetchAlumnos();
+
     setEditingNote({ ...editingNote, [alumnoId]: false });
   };
 
@@ -291,7 +349,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     <Container>
       <Row>
         <Col md={12}>
-          <h1>Agregar Notas a Alumnos</h1>
+          <h1>Modificar notas alumnos</h1>
           <Row>
             <Col md={6}>
               <Form.Group>
@@ -350,7 +408,15 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
             </Col>
           </Row>
           <h2>Alumnos</h2>
-          <div ref={pdfRef} style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", width: "100%", scrollbarWidth: "auto" }}>
+          <div
+            ref={pdfRef}
+            style={{
+              overflowX: "auto",
+              WebkitOverflowScrolling: "touch",
+              width: "100%",
+              scrollbarWidth: "auto",
+            }}
+          >
             <Table striped bordered hover>
               <thead>
                 <tr>
@@ -371,9 +437,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                     const promedio = calcularPromedio(
                       getNotasPorPeriodo(alumno)
                     );
-                    const notaRecuperacion = getNotaRecuperacion(
-                      alumno
-                    );
+                    const notaRecuperacion = getNotaRecuperacion(alumno);
                     const notasPorPeriodo = getNotasPorPeriodo(alumno);
                     return (
                       <tr key={alumno.id}>
@@ -382,7 +446,9 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                         <td className="accion-column">
                           {editingNote[alumno.id] ? (
                             <Button
-                              onClick={() => handleSaveNota(alumno.id.toString())}
+                              onClick={() =>
+                                handleSaveNota(alumno.id.toString())
+                              }
                               style={{
                                 backgroundColor: "purple",
                                 color: "white",
@@ -398,7 +464,8 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                 e.currentTarget.style.color = "black";
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "purple";
+                                e.currentTarget.style.backgroundColor =
+                                  "purple";
                                 e.currentTarget.style.color = "white";
                               }}
                             >
@@ -406,7 +473,9 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                             </Button>
                           ) : (
                             <Button
-                              onClick={() => handleEditNota(alumno.id.toString())}
+                              onClick={() =>
+                                handleEditNota(alumno.id.toString())
+                              }
                               style={{
                                 backgroundColor: "purple",
                                 color: "white",
@@ -422,7 +491,8 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                 e.currentTarget.style.color = "black";
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "purple";
+                                e.currentTarget.style.backgroundColor =
+                                  "purple";
                                 e.currentTarget.style.color = "white";
                               }}
                             >
@@ -437,13 +507,23 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                                 type="number"
                                 min="0"
                                 max="10"
-                                value={editingValues[alumno.id]?.[`Nota${idx + 1}`] || ""}
-                                onChange={(e) => handleNotaChange(alumno.id.toString(), `Nota${idx + 1}`, e.target.value)}
+                                value={
+                                  editingValues[alumno.id]?.[
+                                    `Nota${idx + 1}`
+                                  ] || ""
+                                }
+                                onChange={(e) =>
+                                  handleNotaChange(
+                                    alumno.id.toString(),
+                                    `Nota${idx + 1}`,
+                                    e.target.value
+                                  )
+                                }
                               />
+                            ) : notasPorPeriodo[idx] ? (
+                              notasPorPeriodo[idx].nota
                             ) : (
-                              notasPorPeriodo[idx]
-                                ? notasPorPeriodo[idx].nota
-                                : ""
+                              ""
                             )}
                           </td>
                         ))}
@@ -455,15 +535,26 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                               min="0"
                               max="10"
                               value={editingRecuperacion[alumno.id] || ""}
-                              onChange={(e) => handleRecuperacionChange(alumno.id.toString(), e.target.value)}
+                              onChange={(e) =>
+                                handleRecuperacionChange(
+                                  alumno.id.toString(),
+                                  e.target.value
+                                )
+                              }
                             />
+                          ) : notaRecuperacion !== null ? (
+                            notaRecuperacion
                           ) : (
-                            notaRecuperacion !== null ? notaRecuperacion : ""
+                            ""
                           )}
                         </td>
                         {Number(promedio) < 6 ? (
                           <>
-                            <td>{notaRecuperacion !== null ? notaRecuperacion : ""}</td>
+                            <td>
+                              {notaRecuperacion !== null
+                                ? notaRecuperacion
+                                : ""}
+                            </td>
                           </>
                         ) : (
                           <>

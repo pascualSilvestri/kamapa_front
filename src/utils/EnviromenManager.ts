@@ -344,6 +344,7 @@ export class Environment {
     getAlumnosByCurso: "api/notas/getAlumnosByCurso/",
     getGeneros: "api/genero/getGenero/",
     deleteAlumnoDeCurso: "api/cursos/deleteAlumnoDeCurso",
-    getAsignaturaByCurso:'api/cursos/asignaturas/'
+    getAsignaturaByCurso:'api/cursos/asignaturas/',
+    updateNotas:'api/notas/updateNotas/'
   };
 }
