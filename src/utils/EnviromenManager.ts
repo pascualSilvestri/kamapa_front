@@ -345,6 +345,12 @@ export class Environment {
     getGeneros: "api/genero/getGenero/",
     deleteAlumnoDeCurso: "api/cursos/deleteAlumnoDeCurso",
     getAsignaturaByCurso:'api/cursos/asignaturas/',
-    updateNotas:'api/notas/updateNotas/'
+    updateNotas:'api/notas/updateNotas/',
+    getNotasByCurso:'api/notas/getNotasByCurso'
+    /**
+     * @body ciclolectivoId
+     * @type string
+     * @description Obteniene una lista por cursos de las ntoas de cada alumnos del cursos de todas sus asignaturas
+     */
   };
 }
