@@ -1,10 +1,12 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Container, Row, Col, Form, Button, Table } from "react-bootstrap";
 import { Curso, User, Nota, Periodo } from "model/types"; // Asegúrate de que 'User', 'Curso' y 'Nota' estén definidos en 'model/types'
 import { Environment } from "utils/EnviromenManager";
 import { useUserContext } from "context/userContext";
 import { useCicloLectivo } from "context/CicloLectivoContext";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   const [cursoSeleccionado, setCursoSeleccionado] = useState<string>("");
@@ -14,21 +16,33 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   const [asignaturas, setAsignaturas] = useState<Curso[]>([]);
   const [alumnos, setAlumnos] = useState<User[]>([]);
   const [nota, setNota] = useState<{ [key: string]: string }>({});
-  const [recuperacionNota, setRecuperacionNota] = useState<{
-    [key: string]: string;
-  }>({});
+  const [recuperacionNota, setRecuperacionNota] = useState<{ [key: string]: string; }>({});
   const [user, setUser] = useUserContext();
   const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
   const [periodos, setPeriodos] = useState<Periodo[]>([]);
+  const pdfRef = useRef(null);
+
+  const [cursoNombre, setCursoNombre] = useState<string>("");
+  const [asignaturaNombre, setAsignaturaNombre] = useState<string>("");
+  const [fecha, setFecha] = useState<string>("");
 
   useEffect(() => {
     fetchCursos();
     fetchPeriodos();
+    setFecha(new Date().toLocaleDateString());
   }, []);
 
   useEffect(() => {
     if (asignatura && cursoSeleccionado) {
       fetchAlumnos();
+      const selectedCurso = cursos.find(curso => curso.id === cursoSeleccionado);
+      if (selectedCurso) {
+        setCursoNombre(selectedCurso.nombre);
+      }
+      const selectedAsignatura = asignaturas.find(asig => asig.id === asignatura);
+      if (selectedAsignatura) {
+        setAsignaturaNombre(selectedAsignatura.nombre);
+      }
     }
   }, [asignatura, cursoSeleccionado]);
 
@@ -143,9 +157,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     fetchAlumnos();
   };
 
-  const handleAddRecuperacionNota = async (
-    alumnoId: number | string
-  ) => {
+  const handleAddRecuperacionNota = async (alumnoId: number | string) => {
     const notaValor = recuperacionNota[alumnoId];
 
     const response = await fetch(
@@ -191,6 +203,42 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   const getNotaRecuperacion = (alumno: User) => {
     const nota = alumno.notas.find((n) => n.tipoNotaId === 2 && n.periodoId === Number(periodo));
     return nota ? nota.nota : null;
+  };
+
+  const exportToPDF = async () => {
+    const input = pdfRef.current;
+    if (!input) return;
+
+    // Ocultar columnas de Nota y Acción
+    const notasColumn = input.querySelectorAll('.notas-column');
+    const accionColumn = input.querySelectorAll('.accion-column');
+    notasColumn.forEach(col => (col as HTMLElement).style.display = 'none');
+    accionColumn.forEach(col => (col as HTMLElement).style.display = 'none');
+
+    // Añadir encabezado
+    const header = document.createElement('div');
+    header.innerHTML = `<h3>Curso: ${cursoNombre}</h3><h3>Asignatura: ${asignaturaNombre}</h3><h3>Fecha: ${fecha}</h3>`;
+    input.insertBefore(header, input.firstChild);
+
+    // Generar PDF
+    const canvas = await html2canvas(input, {
+      scale: 2,
+      useCORS: true,
+    });
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF();
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("Notas.pdf");
+
+    // Restaurar columnas
+    notasColumn.forEach(col => (col as HTMLElement).style.display = '');
+    accionColumn.forEach(col => (col as HTMLElement).style.display = '');
+
+    // Eliminar encabezado
+    input.removeChild(header);
   };
 
   return (
@@ -256,14 +304,14 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
             </Col>
           </Row>
           <h2>Alumnos</h2>
-          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", width: "100%", scrollbarWidth: "auto" }}>
+          <div ref={pdfRef} style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", width: "100%", scrollbarWidth: "auto" }}>
             <Table striped bordered hover>
               <thead>
                 <tr>
                   <th>Nombre</th>
                   <th>Apellido</th>
-                  <th>Nota</th>
-                  <th>Acción</th>
+                  <th className="notas-column">Nota</th>
+                  <th className="accion-column">Acción</th>
                   {Array.from({ length: 5 }).map((_, idx) => (
                     <th key={idx}>{`Nota ${idx + 1}`}</th>
                   ))}
@@ -287,7 +335,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                       <tr key={alumno.id}>
                         <td>{alumno.nombre}</td>
                         <td>{alumno.apellido}</td>
-                        <td className="d-flex justify-content-center align-items-center">
+                        <td className="notas-column">
                           <Form.Control
                             className="m-3"
                             style={{ width: '70px' }}
@@ -307,7 +355,7 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
                             disabled={notasDeshabilitadas}
                           />
                         </td>
-                        <td>
+                        <td className="accion-column">
                           <Button
                             onClick={() => handleAddNota(alumno.id)}
                             style={{
@@ -414,6 +462,35 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
               </tbody>
             </Table>
           </div>
+        </Col>
+      </Row>
+      <Row className="justify-content-center mb-4">
+        <Col xs="auto">
+          <Button
+            variant="purple"
+            className="mx-2"
+            onClick={exportToPDF}
+            style={{
+              backgroundColor: "purple",
+              color: "white",
+              padding: "0.4rem 1rem",
+              fontSize: "1rem",
+              transition: "all 0.3s ease",
+              marginBottom: "10px",
+              border: "2px solid purple",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "white";
+              e.currentTarget.style.color = "black";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "purple";
+              e.currentTarget.style.color = "white";
+            }}
+          >
+            Exportar a PDF
+          </Button>
         </Col>
       </Row>
       <Row>
