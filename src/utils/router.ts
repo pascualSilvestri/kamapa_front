@@ -2,31 +2,34 @@ import { Roles } from "../model/types"
 import { RoleEmun } from "./const"
 import path from 'path';
 
-
 export const router = {
-    'Inicio': { label: 'Inicio', href: `/bienvenido` },
-    'EditarAlumnos': { label: 'Editar Alumnos', href: '/editarAlumno' },
-    'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo' },
-    'ModificarPeriodos': { label: 'Modificar Periodos', href: '/modificarPeriodos' },
-    'GestionCurso': { label: 'Gestion Cursos', href: '/gestionCurso' },
-    'AddAsignaturaCurso': { label: 'Agregar Asignatura a  Cursos ', href: '/addAsignaturaCurso' },
-    'GestionAsignatura': { label: 'Gestion Asignatura ', href: '/gestionAsignatura' },
-    'CursoAlumno': { label: 'Consultar Alumnos por Curso', href: '/curso_alumno' },
-    'AulasRegistro': { label: 'Aulas', href: '/regaulas' },
-    'RegistroUsuarios': { label: 'Registro de Usuarios', href: '/consultaUsuario' },
-    'RegistroAlumno': { label: 'Registro de Alumnos', href: '/consultaUsuario' },
-    'Notas': { label: 'Notas', href: '/calificar' },
-    'Calificaciones': { label: 'Calificaciones', href: '/consultaNota' },
-    'VistaUsuarios': { label: 'Usuarios', href: '/vistausuarios' },
-    'resetearPasswordUsuario': { label: 'Resetear contraseña a usuario', href: '/resetPassword' },
-    'AddAlumnoCurso': { label: 'Asignar cursos a alumnos', href: '/addAlumnoCurso' },
-    'AddNotaAlumno': { label: 'Agregar nota al alumno', href: '/addNota' },
-    'due': { label: 'Due', href: '/due' },
-    'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso' },
-    'consultaListaAlumnoPorcurso': { label: 'Consultar Lista de Alumnos por curso', href: '/alumnosPorCurso' },
-    'regAlumnoCurso': { label: 'Asignar Alumnos a los Cursos', href: '/regAlumnoCurso' },
-    'mesasExtraordinarias': { label: 'Mesas Extraordinarias', href: '/mesasExtraordinarias' },
-}
+    'Inicio': { label: 'Inicio', href: '/bienvenido' },
+    // Direccion y Administracion
+    'resetearPasswordUsuario': { label: 'Resetear contraseña a usuario', href: '/resetPassword', dropdown: 'Dirección y Administracion' },
+    'RegistrarUsuarios': { label: 'Registrar Usuarios', href: '/consultaUsuario', dropdown: 'Dirección y Administracion' },
+    'VistaUsuarios': { label: 'Personal Docente y Administrativo', href: '/vistausuarios', dropdown: 'Dirección y Administracion' },
+    // Gestion Alumnos
+    'EditarAlumnos': { label: 'Alumnos', href: '/editarAlumno', dropdown: 'Gestión Alumnos' },
+    'RegistroAlumno': { label: 'Registro de Alumnos', href: '/consultaUsuario', dropdown: 'Gestión Alumnos' },
+    'CursoAlumno': { label: 'Consultar Alumnos por Curso', href: '/curso_alumno', dropdown: 'Gestión Alumnos' },
+    'regAlumnoCurso': { label: 'No se sabe que es?', href: '/alumnosPorCurso', dropdown: 'Gestión Alumnos' },
+    'MoverAlumnoPorcurso': { label: 'Mover Alumnos de Curso', href: '/regAlumnoCurso', dropdown: 'Gestión Alumnos' },
+    'AddAlumnoCurso': { label: 'Asignar Alumno a los Cursos', href: '/addAlumnoCurso', dropdown: 'Gestión Alumnos' },
+    // Ciclo Lectivo y Periodos
+    'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo', dropdown: 'Ciclo Lectivo' },
+    'ModificarPeriodos': { label: 'Modificar Periodos', href: '/modificarPeriodos', dropdown: 'Ciclo Lectivo' },
+    // Asignaturas
+    'AddAsignaturaCurso': { label: 'Asociar Docentes y Materias a los Cursos', href: '/addAsignaturaCurso', dropdown: 'Asignaturas' },
+    'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso', dropdown: 'Asignaturas' },
+    // Calificaciones
+    'AddNotaAlumno': { label: 'Calificar al alumno', href: '/addNota', dropdown: 'Calificaciones' },
+    'mesasExtraordinarias': { label: 'Mesas Extraordinarias', href: '/mesasExtraordinarias', dropdown: 'Calificaciones' },
+    'Calificaciones': { label: 'Calificaciones', href: '/consultaNota', dropdown: 'Calificaciones' },
+    'due': { label: 'D.U.E.', href: '/due', dropdown: 'Calificaciones' },
+    // 'AulasRegistro': { label: 'Aulas', href: '/regaulas' },
+
+};
+
 
 export const adminAutorizeRouter = [
 
@@ -34,53 +37,45 @@ export const adminAutorizeRouter = [
 
 export const directorAutorizeRouter = [
     'Inicio',
+    'EditarAlumnos',
+    'RegistroAlumno',
+    'CursoAlumno',
+    'AddAlumnoCurso',
+    'regAlumnoCurso',
+    'MoverAlumnoPorcurso',
     'CrearCicloLectivo',
     'ModificarPeriodos',
-    'GestionCurso',
-    'GestionAsignatura',
     'AddAsignaturaCurso',
-    'regAlumnoCurso',
-    'AddAlumnoCurso',
-    'CursoAlumno',
-    'EditarAlumnos',
-    'RegistroUsuarios',
-    'RegistroAlumno',
-    'VistaUsuarios',
-    'resetearPasswordUsuario',
-    'AddNotaAlumno',
-    'consultaAsignaturaPorCurso',
-    'consultaListaAlumnoPorcurso',
-    'mesasExtraordinarias'
+    'RegistrarUsuarios',
+    'VistaUsuarios'
 
 
 ]
 
 export const secretarioAutorizeRouter = [
     'Inicio',
-    'RegistroUsuarios',
-    'CrearCicloLectivo',
-    'GestionCurso',
-    'regAlumnoCurso',
-    'AddAsignaturaCurso',
+    'RegistroAlumno',
     'CursoAlumno',
-    'VistaUsuarios',
-    'GestionAsignatura',
+    'AddAlumnoCurso',
+    'regAlumnoCurso',
+    'MoverAlumnoPorcurso',
+    'CrearCicloLectivo',
+    'ModificarPeriodos',
+    'AddAsignaturaCurso',
     'consultaAsignaturaPorCurso',
-    'mesasExtraordinarias'
+    'RegistrarUsuarios',
+    'VistaUsuarios'
+
 ]
 
 export const preceptorAutorizeRouter = [
     'Inicio',
-    'Preceptores',
     'CursoAlumno',
-    'EditarAlumnos',
+    'AddAlumnoCurso',
     'regAlumnoCurso',
-    'Alumnos',
-    'About',
     'RegistroAlumno',
     'consultaAsignaturaPorCurso',
-    'consultaAsignaturaPorCurso',
-    'consultaListaAlumnoPorcurso'
+
 ]
 
 export const profesorAutorizeRouter = [
@@ -89,8 +84,8 @@ export const profesorAutorizeRouter = [
     'About',
     'Notas',
     'AddNotaAlumno',
-    'mesasExtraordinarias'
-
+    'mesasExtraordinarias',
+    'AddNotaAlumno'
 ]
 
 export const alumnoAutorizeRouter = [
