@@ -26,6 +26,7 @@ export const router = {
     'mesasExtraordinarias': { label: 'Mesas Extraordinarias', href: '/mesasExtraordinarias', dropdown: 'Calificaciones' },
     'Calificaciones': { label: 'Calificaciones', href: '/consultaNota', dropdown: 'Calificaciones' },
     'due': { label: 'D.U.E.', href: '/due', dropdown: 'Calificaciones' },
+    'modifyNota': { label: 'Modificar Nota', href: '/modifyNota', dropdown: 'Calificaciones'}
     // 'AulasRegistro': { label: 'Aulas', href: '/regaulas' },
 
 };
@@ -47,8 +48,8 @@ export const directorAutorizeRouter = [
     'ModificarPeriodos',
     'AddAsignaturaCurso',
     'RegistrarUsuarios',
-    'VistaUsuarios'
-
+    'VistaUsuarios',
+    'modifyNota'
 
 ]
 

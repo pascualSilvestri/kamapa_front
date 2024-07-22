@@ -52,7 +52,7 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
 
             try {
                 const response = await fetch(
-                    `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${params.id}`,
+                    `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsNotAlumnoByIntitucion)}${params.id}`,
                     {
                         method: 'GET',
                         headers: {
