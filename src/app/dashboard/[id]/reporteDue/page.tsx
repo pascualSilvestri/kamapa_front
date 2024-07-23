@@ -32,8 +32,7 @@ const DueReport = ({ params }: { params: { id: string } }) => {
 
   const fetchCiclosLectivos = async () => {
     try {
-      const response = await fetch(
-        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id}`
+      const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id}`
       );
       const data = await response.json();
       setCiclosLectivos(data);
