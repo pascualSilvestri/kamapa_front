@@ -135,10 +135,10 @@ const DueReport = ({ params }: { params: { id: string } }) => {
                   <td>{alumno.alumno.apellido}</td>
                   <td>{alumno.alumno.dni}</td>
                   <td>
-                    <Link href={`/dashboard/${params.id}/reporteDue/${alumno.alumno.id}/due`} passHref target="_blank">
+                    <Link href={`/dashboard/${params.id}/reporteDue/${alumno.alumno.id}/due`}  >
                       <Button variant="primary">DUE</Button>
                     </Link>{" "}
-                    <Link href={`/dashboard/${params.id}/reporteDue/${alumno.alumno.id}/planilla`} passHref target="_blank">
+                    <Link href={`/dashboard/${params.id}/reporteDue/${alumno.alumno.id}/planilla`}  >
                       <Button variant="secondary">Analítico Provisorio</Button>
                     </Link>
                   </td>
