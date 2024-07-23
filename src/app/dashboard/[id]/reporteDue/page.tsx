@@ -9,7 +9,14 @@ import {
     Button,
     ButtonProps,
 } from "react-bootstrap";
-import { Asignatura, Nota, Periodo, CicloLectivo, Curso, Alumno } from "model/types";
+import {
+    Asignatura,
+    Nota,
+    Periodo,
+    CicloLectivo,
+    Curso,
+    Alumno,
+} from "model/types";
 import {
     useUserContext,
     useInstitucionSelectedContext,
@@ -31,7 +38,7 @@ const reporteDue = ({ params }: { params: { id: string } }) => {
     const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
     const [periodos, setPeriodos] = useState<Periodo[]>([]);
     const [ciclosLectivos, setCiclosLectivos] = useState<CicloLectivo[]>([]);
-    const [cursos, setCursos] = useState<Curso[]>([]);
+    const [cursos, setCursos] = useState<any[]>([]);
     const [alumnos, setAlumnos] = useState<Alumno[]>([]);
     const [selectedCurso, setSelectedCurso] = useState<string>("");
     const [selectedAlumno, setSelectedAlumno] = useState<string>("");
@@ -91,6 +98,7 @@ const reporteDue = ({ params }: { params: { id: string } }) => {
             );
             const data = await response.json();
             setCursos(data.ciclosLectivo.cursos);
+            setAlumnos(data.ciclosLectivo.cursos.flatMap((curso: Curso) => curso.alumnos));
         } catch (error) {
             console.error("Error fetching cursos y alumnos:", error);
         }
@@ -128,7 +136,6 @@ const reporteDue = ({ params }: { params: { id: string } }) => {
                 });
             });
 
-            // Ordenar periodos por fecha de creación
             periodosUnicos.sort(
                 (a, b) =>
                     new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime()
@@ -245,156 +252,213 @@ const reporteDue = ({ params }: { params: { id: string } }) => {
                                 padding: "5px",
                             }}
                         >
-                            <p>Ministerio de Educación de Tucumán</p>
-                            <p>República Argentina</p>
+                            <p>La Carlota</p>
+                            <p>{institucionSelected.direccion}</p>
+                            <p>{institucionSelected.telefono}</p>
                         </div>
                     </div>
-                </div>
-                <hr style={{ border: "1px solid #000", marginBottom: "20px" }} />
-                <div style={{ textAlign: "center", marginBottom: "20px" }}>
-                    <h2 style={{ textTransform: "uppercase", fontSize: "20px" }}>
-                        {institucionSelected.nombre}
+                    <h2
+                        style={{
+                            textAlign: "center",
+                            fontWeight: "bold",
+                            fontSize: "24px",
+                            margin: "20px 0",
+                        }}
+                    >
+                        Informe de Calificaciones
                     </h2>
-                    <p style={{ fontSize: "16px" }}>{institucionSelected.direccion}</p>
-                    <p style={{ fontSize: "16px" }}>{institucionSelected.telefono}</p>
-                    <p style={{ fontSize: "16px" }}>
-                        Ciclo Lectivo: {selectedCicloLectivo}
+                </div>
+
+                {/* Student Information Section */}
+                <div style={{ textAlign: "left", marginBottom: "20px" }}>
+                    <p>
+                        <strong>Alumno:</strong> {user?.nombre} {user?.apellido}
+                    </p>
+                    <p>
+                        <strong>Curso:</strong> {user?.curso?.nombre} (
+                        {user?.curso?.division})
+                    </p>
+                    <p>
+                        <strong>Ciclo Lectivo:</strong> {selectedCicloLectivo}
                     </p>
                 </div>
-                <hr style={{ border: "1px solid #000", marginBottom: "20px" }} />
-                <div style={{ marginBottom: "20px" }}>
-                    <p style={{ fontSize: "16px" }}>Nombre del Alumno: {user?.nombre}</p>
-                    <p style={{ fontSize: "16px" }}>Curso: {user?.curso?.nombre}</p>
-                </div>
 
-                <h3 style={{ textAlign: "center", marginBottom: "20px", fontSize: "18px" }}>
-                    INFORME DE CALIFICACIONES
-                </h3>
-
-                {/* Tabla de Notas */}
+                {/* Grades Table Section */}
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                         <tr>
-                            <th style={{ border: "1px solid #000", padding: "8px" }}>
+                            <th style={{ border: "1px solid #000", padding: "5px" }}>
                                 Asignaturas
                             </th>
                             {periodos.map((periodo) => (
                                 <th
                                     key={periodo.id}
-                                    style={{ border: "1px solid #000", padding: "8px" }}
+                                    style={{ border: "1px solid #000", padding: "5px" }}
                                 >
                                     {periodo.nombre}
                                 </th>
                             ))}
-                            <th style={{ border: "1px solid #000", padding: "8px" }}>
+                            <th style={{ border: "1px solid #000", padding: "5px" }}>
                                 Promedio
                             </th>
-                            <th style={{ border: "1px solid #000", padding: "8px" }}>
-                                Recupera Diciembre
+                            <th style={{ border: "1px solid #000", padding: "5px" }}>
+                                Diciembre
                             </th>
-                            <th style={{ border: "1px solid #000", padding: "8px" }}>
-                                Recupera Febrero
+                            <th style={{ border: "1px solid #000", padding: "5px" }}>
+                                Febrero
                             </th>
-                            <th style={{ border: "1px solid #000", padding: "8px" }}>
+                            <th style={{ border: "1px solid #000", padding: "5px" }}>
                                 Calificación Final
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         {asignaturas.map((asignatura) => {
-                            const notasPorPeriodo = asignatura.notasPorPeriodo;
-                            const notasExtraordinarias = asignatura.notasExtraordinarias;
-
-                            const reDiciembre = getNotaExtraordinaria(notasExtraordinarias, 3);
-                            const reFebrero = getNotaExtraordinaria(notasExtraordinarias, 4);
-                            const calificacionFinal = calcularCalificacionFinal(
-                                notasPorPeriodo,
-                                reDiciembre,
-                                reFebrero
+                            const reDiciembre = getNotaExtraordinaria(
+                                asignatura.notasExtraordinarias,
+                                3
                             );
-
+                            const reFebrero = getNotaExtraordinaria(
+                                asignatura.notasExtraordinarias,
+                                4
+                            );
                             return (
                                 <tr key={asignatura.id}>
-                                    <td style={{ border: "1px solid #000", padding: "8px" }}>
+                                    <td
+                                        style={{
+                                            border: "1px solid #000",
+                                            padding: "5px",
+                                            textAlign: "left",
+                                        }}
+                                    >
                                         {asignatura.nombre}
                                     </td>
                                     {periodos.map((periodo) => (
                                         <td
                                             key={periodo.id}
-                                            style={{ border: "1px solid #000", padding: "8px" }}
+                                            style={{
+                                                border: "1px solid #000",
+                                                padding: "5px",
+                                                textAlign: "center",
+                                            }}
                                         >
-                                            {calcularPromedioPorPeriodo(notasPorPeriodo[periodo.id])}
+                                            {calcularPromedioPorPeriodo(
+                                                asignatura.notasPorPeriodo[periodo.id] || []
+                                            )}
                                         </td>
                                     ))}
-                                    <td style={{ border: "1px solid #000", padding: "8px" }}>
-                                        {calcularPromedioGeneral(notasPorPeriodo)}
+                                    <td
+                                        style={{
+                                            border: "1px solid #000",
+                                            padding: "5px",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        {calcularPromedioGeneral(asignatura.notasPorPeriodo)}
                                     </td>
-                                    <td style={{ border: "1px solid #000", padding: "8px" }}>
+                                    <td
+                                        style={{
+                                            border: "1px solid #000",
+                                            padding: "5px",
+                                            textAlign: "center",
+                                        }}
+                                    >
                                         {reDiciembre !== null ? reDiciembre.toFixed(2) : "-"}
                                     </td>
-                                    <td style={{ border: "1px solid #000", padding: "8px" }}>
+                                    <td
+                                        style={{
+                                            border: "1px solid #000",
+                                            padding: "5px",
+                                            textAlign: "center",
+                                        }}
+                                    >
                                         {reFebrero !== null ? reFebrero.toFixed(2) : "-"}
                                     </td>
-                                    <td style={{ border: "1px solid #000", padding: "8px" }}>
-                                        {calificacionFinal}
+                                    <td
+                                        style={{
+                                            border: "1px solid #000",
+                                            padding: "5px",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        {calcularCalificacionFinal(
+                                            asignatura.notasPorPeriodo,
+                                            reDiciembre,
+                                            reFebrero
+                                        )}
                                     </td>
                                 </tr>
                             );
                         })}
                     </tbody>
                 </table>
+
+                {/* Footer Section */}
+                <div style={{ marginTop: "20px", textAlign: "center" }}>
+                    <p>_________________________</p>
+                    <p>Firma del Director</p>
+                </div>
             </div>
         )
     );
 
     PDFContent.displayName = "PDFContent";
 
-    const generatePDF = () => {
-        const input = pdfRef.current;
-        if (!input) return;
+    const handleDownloadPDF = async () => {
+        const pdf = new jsPDF();
 
-        html2canvas(input).then((canvas) => {
+        if (pdfRef.current) {
+            const canvas = await html2canvas(pdfRef.current);
             const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF();
-            const imgProperties = pdf.getImageProperties(imgData);
+
+            const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight =
-                (imgProperties.height * pdfWidth) / imgProperties.width;
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
             pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-            pdf.save(`Informe_Calificaciones_${user?.nombre}.pdf`);
-        });
+            pdf.save("informe-calificaciones.pdf");
+        }
     };
 
     return (
         <Container>
-            <h1>Reporte de Calificaciones</h1>
+            <Row className="my-3">
+                <Col>
+                    <h1 className="text-center">Generar Informe de Calificaciones</h1>
+                </Col>
+            </Row>
+
             <Form>
-                <Row>
+                <Row className="mb-3">
                     <Col>
-                        <Form.Group controlId="formCicloLectivo">
+                        <Form.Group controlId="cicloLectivo">
                             <Form.Label>Ciclo Lectivo</Form.Label>
                             <Form.Control
                                 as="select"
                                 value={selectedCicloLectivo}
                                 onChange={(e) => setSelectedCicloLectivo(e.target.value)}
                             >
+                                <option value="">Seleccionar Ciclo Lectivo</option>
                                 {ciclosLectivos.map((ciclo) => (
                                     <option key={ciclo.id} value={ciclo.id}>
-                                        {ciclo.anio}
+                                        {ciclo.nombre}
                                     </option>
                                 ))}
                             </Form.Control>
                         </Form.Group>
                     </Col>
+                </Row>
+
+                <Row className="mb-3">
                     <Col>
-                        <Form.Group controlId="formCurso">
+                        <Form.Group controlId="curso">
                             <Form.Label>Curso</Form.Label>
                             <Form.Control
                                 as="select"
                                 value={selectedCurso}
                                 onChange={(e) => setSelectedCurso(e.target.value)}
                             >
-                                <option value="">Seleccionar curso</option>
+                                <option value="">Seleccionar Curso</option>
                                 {cursos.map((curso) => (
                                     <option key={curso.id} value={curso.id}>
                                         {curso.nombre}
@@ -403,19 +467,21 @@ const reporteDue = ({ params }: { params: { id: string } }) => {
                             </Form.Control>
                         </Form.Group>
                     </Col>
+                </Row>
+
+                <Row className="mb-3">
                     <Col>
-                        <Form.Group controlId="formAlumno">
+                        <Form.Group controlId="alumno">
                             <Form.Label>Alumno</Form.Label>
                             <Form.Control
                                 as="select"
                                 value={selectedAlumno}
                                 onChange={(e) => setSelectedAlumno(e.target.value)}
-                                disabled={!selectedCurso}
                             >
-                                <option value="">Seleccionar alumno</option>
+                                <option value="">Seleccionar Alumno</option>
                                 {alumnos.map((alumno) => (
                                     <option key={alumno.id} value={alumno.id}>
-                                        {alumno.nombre}
+                                        {alumno.nombre} {alumno.apellido}
                                     </option>
                                 ))}
                             </Form.Control>
@@ -423,16 +489,24 @@ const reporteDue = ({ params }: { params: { id: string } }) => {
                     </Col>
                 </Row>
             </Form>
-            <PDFContent
-                ref={pdfRef}
-                user={user}
-                institucionSelected={institucionSelected}
-                asignaturas={asignaturas}
-                periodos={periodos}
-            />
-            <Button variant="primary" onClick={generatePDF}>
-                Generar PDF
-            </Button>
+
+            <Row className="my-3">
+                <Col>
+                    <Button onClick={handleDownloadPDF} disabled={!user}>
+                        Descargar PDF
+                    </Button>
+                </Col>
+            </Row>
+
+            <div className="d-none">
+                <PDFContent
+                    ref={pdfRef}
+                    user={user!}
+                    institucionSelected={institucionSelected}
+                    asignaturas={asignaturas}
+                    periodos={periodos}
+                />
+            </div>
         </Container>
     );
 };
