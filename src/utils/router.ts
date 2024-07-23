@@ -27,8 +27,9 @@ export const router = {
     'Calificaciones': { label: 'Calificaciones', href: '/consultaNota', dropdown: 'Calificaciones' },
     'due': { label: 'D.U.E.', href: '/due', dropdown: 'Calificaciones' },
     'reporteReprobados': { label: 'Reporte de reprobados', href: '/reporteDeReprobados', dropdown: 'Calificaciones' },
-    'modifyNota': { label: 'Modificar Nota', href: '/modifyNota', dropdown: 'Calificaciones'}
-    // 'AulasRegistro': { label: 'Aulas', href: '/regaulas' },
+    'modifyNota': { label: 'Modificar Nota', href: '/modifyNota', dropdown: 'Calificaciones' },
+    //Gestión Reportes
+    'ReporteDUE': { label: 'Reporte D.U.E', href: '/reporteDue', dropdown: 'Reportes' },
 
 };
 
@@ -51,7 +52,8 @@ export const directorAutorizeRouter = [
     'RegistrarUsuarios',
     'VistaUsuarios',
     'modifyNota',
-    'reporteReprobados'
+    'reporteReprobados',
+    'ReporteDUE'
 
 ]
 
@@ -67,7 +69,8 @@ export const secretarioAutorizeRouter = [
     'AddAsignaturaCurso',
     'consultaAsignaturaPorCurso',
     'RegistrarUsuarios',
-    'VistaUsuarios'
+    'VistaUsuarios',
+    'ReporteDUE'
 
 ]
 
