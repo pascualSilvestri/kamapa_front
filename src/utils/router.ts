@@ -26,7 +26,7 @@ export const router = {
     'mesasExtraordinarias': { label: 'Mesas Extraordinarias', href: '/mesasExtraordinarias', dropdown: 'Calificaciones' },
     'Calificaciones': { label: 'Calificaciones', href: '/consultaNota', dropdown: 'Calificaciones' },
     'due': { label: 'D.U.E.', href: '/due', dropdown: 'Calificaciones' },
-    'reporteReprobados': { label: 'Reporte de reprobados', href: '/reporteDeReprobados', dropdown: 'Calificaciones' },
+    'reporteReprobados': { label: 'Reporte de reprobados', href: '/reporteDeReprobados', dropdown: 'Reportes' },
     'modifyNota': { label: 'Modificar Nota', href: '/modifyNota', dropdown: 'Calificaciones' },
     //Gestión Reportes
     'ReporteDUE': { label: 'Reporte D.U.E', href: '/reporteDue', dropdown: 'Reportes' },

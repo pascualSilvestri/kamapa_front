@@ -309,6 +309,11 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
                         </Button>
                     </Link>
                 </Col>
+                <Col xs="auto">
+                    <h2>
+                        Total Alumnos: {empleados.length} / 40
+                    </h2>
+                </Col>
             </Row>
 
             {/* //buscador */}

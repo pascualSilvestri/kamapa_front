@@ -389,6 +389,11 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
                         </Button>
                     </Link>
                 </Col>
+                <Col xs="auto">
+                    <h2>
+                        Total Alumnos: {alumnos.length} / 450
+                    </h2>
+                </Col>
             </Row>
 
             <Form.Group controlId="formBuscar" className="mb-3">
