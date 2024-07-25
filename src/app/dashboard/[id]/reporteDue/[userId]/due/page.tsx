@@ -256,13 +256,13 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
             <strong>Nombre:</strong> {user.nombre} {user.apellido}
           </p>
           <p style={{ margin: "2px 0", fontSize: "10px" }}>
-            <strong>Curso:</strong> {curso.nombre}
-          </p>
-          <p style={{ margin: "2px 0", fontSize: "10px" }}>
-            <strong>Ciclo Lectivo:</strong>{" "}
-            {ciclosLectivos.find(
-              (ciclo: CicloLectivo) => ciclo.id.toString() === selectedCicloLectivo
-            )?.nombre || ""}
+            AÑO: {user.cursoId || '_______'} DIVISIÓN: {user.cursoId || '_______'} MODALIDAD: _____________________________{" "}
+            <span style={{ margin: "2px 0", fontSize: "10px" }}>
+              <strong>   CICLO LECTIVO:</strong>{" "}
+              {ciclosLectivos.find(
+                (ciclo: CicloLectivo) => ciclo.id.toString() === selectedCicloLectivo
+              )?.nombre || ""}
+            </span>
           </p>
         </div>
 
