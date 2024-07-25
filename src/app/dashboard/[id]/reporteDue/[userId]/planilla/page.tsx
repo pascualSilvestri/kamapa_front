@@ -5,14 +5,14 @@ import {
   Container,
   Table,
   Button,
-  ButtonProps,
   Row,
-  Col,
+  Col
 } from "react-bootstrap";
 import { Asignatura, Nota, User } from "model/types";
 import { useInstitucionSelectedContext } from "context/userContext";
 import { useCicloLectivo } from "context/CicloLectivoContext";
-import styled from "styled-components";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import { Environment } from "utils/EnviromenManager";
 
 const Due = ({ params }: { params: { id: string; userId: string } }) => {
@@ -47,18 +47,11 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
       );
 
       const data = await response.json();
-
       setUser(data.usuarios[0]);
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error fetching user:", error.message);
-      } else {
-        console.error("Error fetching user:", error);
-      }
+      console.error("Error fetching user:", error);
     }
   };
-
-  console.log(user);
 
   const fetchAsignaturasYNotas = async () => {
     try {
@@ -77,11 +70,7 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
       const data = await response.json();
       setData(data);
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error fetching ciclos lectivos:", error.message);
-      } else {
-        console.error("Error fetching ciclos lectivos:", error);
-      }
+      console.error("Error fetching asignaturas y notas:", error);
     }
   };
 
@@ -148,12 +137,27 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
     };
   };
 
-  console.log(institucionSelected)
+  const handleDownloadPDF = async () => {
+    const input = pdfRef.current;
+    if (input) {
+      const canvas = await html2canvas(input, {
+        scale: 2,
+      });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "px",
+        format: [canvas.width, canvas.height]
+      });
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+      pdf.save("reporteDUE.pdf");
+    }
+  };
 
   return (
     <Container>
       <Row>
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center" }} ref={pdfRef}>
           <div
             style={{
               display: "flex",
@@ -179,16 +183,6 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
               >
                 {institucionSelected.nombre}
               </h1>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "flex-end",
-                flexDirection: "column",
-              }}
-            >
-          
             </div>
           </div>
           <div>
@@ -278,87 +272,71 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
                   20{new Date().getFullYear().toString().slice(-2)}
                 </span>
               </p>
-            
-            
             </div>
           </div>
+          {data.map((ciclo: any) => {
+            const periodos = Array.from(
+              new Set(
+                ciclo.asignaturas.flatMap((asignatura: any) =>
+                  asignatura.notas.map(
+                    (nota: any) => nota.periodo?.nombre || "Sin Periodo"
+                  )
+                )
+              )
+            );
+            return (
+              <div key={ciclo.cicloLectivo.id}>
+                <h2>{ciclo.cicloLectivo.nombre}</h2>
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>Asignatura</th>
+                      {periodos.map((periodoNombre: string) => (
+                        <th key={periodoNombre}>{periodoNombre}</th>
+                      ))}
+                      <th>Nota Final Parcial</th>
+                      <th>ReDiciembre</th>
+                      <th>ReFebrero</th>
+                      <th>Nota Final</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ciclo.asignaturas.map((asignatura: any) => {
+                      const finalNotas = calculateFinalNota(asignatura);
+                      return (
+                        <tr key={asignatura.asignatura.id}>
+                          <td>{asignatura.asignatura.nombre}</td>
+                          {periodos.map((periodoNombre: string) => {
+                            const notaPeriodo = finalNotas.notasEvaluacion.find(
+                              (notaEval: any) => notaEval.nombre === periodoNombre
+                            );
+                            return (
+                              <td key={periodoNombre}>
+                                {notaPeriodo ? notaPeriodo.promedio : "N/A"}
+                              </td>
+                            );
+                          })}
+                          <td>{finalNotas.notaFinalParcial}</td>
+                          <td>{finalNotas.reDiciembre}</td>
+                          <td>{finalNotas.reFebrero}</td>
+                          <td>{finalNotas.notaFinal}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </div>
+            );
+          })}
         </div>
       </Row>
-      {data.map((ciclo: any) => {
-        const periodos = Array.from(
-          new Set(
-            ciclo.asignaturas.flatMap((asignatura: any) =>
-              asignatura.notas.map(
-                (nota: any) => nota.periodo?.nombre || "Sin Periodo"
-              )
-            )
-          )
-        );
-        return (
-          <div key={ciclo.cicloLectivo.id}>
-            <h2>{ciclo.cicloLectivo.nombre}</h2>
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Asignatura</th>
-                  {periodos.map((periodoNombre: string) => (
-                    <th key={periodoNombre}>{periodoNombre}</th>
-                  ))}
-                  <th>Nota Final Parcial</th>
-                  <th>ReDiciembre</th>
-                  <th>ReFebrero</th>
-                  <th>Nota Final</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ciclo.asignaturas.map((asignatura: any) => {
-                  const finalNotas = calculateFinalNota(asignatura);
-                  return (
-                    <tr key={asignatura.asignatura.id}>
-                      <td>{asignatura.asignatura.nombre}</td>
-                      {periodos.map((periodoNombre: string) => {
-                        const notaPeriodo = finalNotas.notasEvaluacion.find(
-                          (notaEval: any) => notaEval.nombre === periodoNombre
-                        );
-                        return (
-                          <td key={periodoNombre}>
-                            {notaPeriodo ? notaPeriodo.promedio : "N/A"}
-                          </td>
-                        );
-                      })}
-                      <td>{finalNotas.notaFinalParcial}</td>
-                      <td>{finalNotas.reDiciembre}</td>
-                      <td>{finalNotas.reFebrero}</td>
-                      <td>{finalNotas.notaFinal}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
-          </div>
-        );
-      })}
+      <Row>
+        <Col>
+          <Button onClick={handleDownloadPDF}>Descargar PDF</Button>
+        </Col>
+      </Row>
     </Container>
   );
 };
-
-interface StyledButtonProps extends ButtonProps {
-  variant: "purple";
-}
-
-const StyledButton = styled(Button)<StyledButtonProps>`
-  background-color: purple;
-  border-color: purple;
-  color: white;
-  margin-top: 1rem;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: scale(1.1);
-    background-color: white;
-    color: purple;
-    border-color: purple;
-  }
-`;
 
 export default Due;
