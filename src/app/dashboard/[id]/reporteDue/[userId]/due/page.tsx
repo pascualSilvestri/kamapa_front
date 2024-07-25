@@ -339,17 +339,46 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
   const handleDownloadPDF = async () => {
     if (pdfRef.current) {
       const input = pdfRef.current;
-      const canvas = await html2canvas(input, { scale: 2 });
+
+      // Capturar el tamaño completo del contenido
+      const canvas = await html2canvas(input, {
+        scale: 2, // Escalar para mayor resolución
+        useCORS: true,
+        logging: true,
+        scrollX: 0,
+        scrollY: -window.scrollY, // Ajustar el desplazamiento vertical
+        width: input.scrollWidth, // Capturar el ancho completo
+        height: input.scrollHeight // Capturar el alto completo
+      });
+
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "landscape",
         unit: "mm",
-        format: "a4",
+        format: [canvas.width * 0.264583, canvas.height * 0.264583] // Convertir píxeles a milímetros
       });
-      pdf.addImage(imgData, "PNG", 10, 10, 277, 190);
-      pdf.save("reporte.pdf");
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      // Calcular el tamaño de la imagen para ajustarla al tamaño de la página del PDF
+      const imgWidth = canvas.width * 0.264583;
+      const imgHeight = canvas.height * 0.264583;
+      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+
+      const width = imgWidth * ratio;
+      const height = imgHeight * ratio;
+
+      const xOffset = (pageWidth - width) / 2;
+      const yOffset = (pageHeight - height) / 2;
+
+      // Añadir la imagen al PDF
+      pdf.addImage(imgData, "PNG", xOffset, yOffset, width, height);
+      pdf.save("reporteDUE.pdf");
     }
   };
+
+
 
   return (
     <Container>
