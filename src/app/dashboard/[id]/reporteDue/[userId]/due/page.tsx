@@ -41,7 +41,7 @@ const Due = ({ params }: { params: { id: string,  userId: string } }) => {
   const pdfRef = useRef(null);
 
   useEffect(() => {
-    fetchCiclosLectivos();
+    fethdata();
   }, []);
 
   
@@ -50,6 +50,11 @@ const Due = ({ params }: { params: { id: string,  userId: string } }) => {
       fetchAsignaturasYNotas();
     }
   }, [selectedCicloLectivo]);
+
+  const fethdata = async () => {
+    await fetchGetUser();
+    await fetchCiclosLectivos();
+  }
 
   const fetchCiclosLectivos = async () => {
     try {
@@ -132,6 +137,33 @@ const Due = ({ params }: { params: { id: string,  userId: string } }) => {
       console.error("Error fetching asignaturas y notas:", error);
     }
   };
+
+  const fetchGetUser = async () => {
+    try {
+      const response = await fetch(
+        `${Environment.getEndPoint(
+          Environment.endPoint.getUsuarioById
+        )}${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      setUser(data.usuarios[0]);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error fetching user:", error.message);
+      } else {
+        console.error("Error fetching user:", error);
+      }
+    }
+  };
+
 
   const calcularPromedioPorPeriodo = (notas: Nota[]) => {
     const evaluaciones = notas.filter((nota) => nota.tipoNota?.id === 1);
