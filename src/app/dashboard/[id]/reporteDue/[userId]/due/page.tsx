@@ -27,7 +27,7 @@ interface PDFContentProps {
   periodos: Periodo[];
 }
 
-const Due = ({ params }: { params: { id: string,  userId: string } }) => {
+const Due = ({ params }: { params: { id: string, userId: string } }) => {
   const { id, userId } = params;
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [periodos, setPeriodos] = useState<Periodo[]>([]);
@@ -44,7 +44,7 @@ const Due = ({ params }: { params: { id: string,  userId: string } }) => {
     fethdata();
   }, []);
 
-  
+
   useEffect(() => {
     if (selectedCicloLectivo) {
       fetchAsignaturasYNotas();
@@ -59,8 +59,7 @@ const Due = ({ params }: { params: { id: string,  userId: string } }) => {
   const fetchCiclosLectivos = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${
-          params.id
+        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id
         }`
       );
       const data = await response.json();
@@ -697,7 +696,7 @@ interface StyledButtonProps extends ButtonProps {
   variant: "purple";
 }
 
-const StyledButton = styled(Button)<StyledButtonProps>`
+const StyledButton = styled(Button) <StyledButtonProps>`
   background-color: purple;
   border-color: purple;
   color: white;
