@@ -52,7 +52,7 @@ interface EditarAlumnoPageProps {
     params: { id: string };
 }
 
-const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
+const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }: { params: { id: string } }) => {
     const [alumnos, setAlumnos] = useState<Alumno[]>([]);
     const [selectedAlumno, setSelectedAlumno] = useState<Alumno | null>(null);
     const [showModal, setShowModal] = useState(false);
@@ -125,22 +125,23 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
 
     useEffect(() => {
         // Fetch géneros
-        const fetchGeneros = async () => {
-            try {
-                const response = await fetch(Environment.getEndPoint(Environment.endPoint.getGeneros), {
-                    headers: {
-                        Authorization: `Bearer ${session?.accessToken}`,
-                    },
-                });
-                const data = await response.json();
-                setGeneros(data.generos);
-            } catch (error) {
-                console.error("Error fetching géneros:", error);
-            }
-        };
 
         fetchGeneros();
     }, [session]);
+
+    const fetchGeneros = async () => {
+        try {
+            const response = await fetch(Environment.getEndPoint(Environment.endPoint.getGeneros), {
+                headers: {
+                    Authorization: `Bearer ${session?.accessToken}`,
+                },
+            });
+            const data = await response.json();
+            setGeneros(data.generos);
+        } catch (error) {
+            console.error("Error fetching géneros:", error);
+        }
+    };
 
     const fectchGenero = async () => {
         try {
@@ -271,7 +272,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
             fechaNacimiento: alumno.fechaNacimiento,
             telefono: alumno.telefono,
             email: alumno.email,
-            generoId: alumno.genero.toString(),
+            generoId: alumno.genero.id.toString(),
             domicilioUsuario: {
                 localidad: alumno.domicilioUsuario?.localidad || "",
                 barrio: alumno.domicilioUsuario?.barrio || "",
@@ -280,7 +281,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
             },
             roles: alumno.Roles?.map((role) => role.id) || [],
         });
-        setGenero(alumno.genero.toString());
+        setGenero(alumno.genero.id.toString());
         setShowEditModal(true);
     };
 
@@ -314,7 +315,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
                             calle: editedAlumno.domicilioUsuario.calle,
                             numero: editedAlumno.domicilioUsuario.numero,
                         },
-                        institucionId: institucionSelected.id,
+                        institucionId: params.id,
                         roles: selectedRoles,
                     }),
                 }
@@ -326,18 +327,19 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
                 console.log(data);
                 throw new Error(JSON.stringify(data));
             }
+            
+            fetchData();
+            // const updatedResponse = await fetch(
+            //     `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${params.id}`,
+            //     {
+            //         headers: {
+            //             Authorization: `Bearer ${session?.accessToken}`,
+            //         },
+            //     }
+            // );
+            // const updatedData = await updatedResponse.json();
 
-            const updatedResponse = await fetch(
-                `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${session?.accessToken}`,
-                    },
-                }
-            );
-            const updatedData = await updatedResponse.json();
-
-            setAlumnos(updatedData.usuarios);
+            // setAlumnos(updatedData.usuarios);
 
             setShowEditModal(false);
             setShowSaveConfirmModal(false);
@@ -346,14 +348,13 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }) => {
         }
     };
 
-
     console.log(alumnos);
     console.log(selectedAlumno);
     return (
         <div className="p-3">
             <Row className="mb-3 justify-content-between align-items-center">
                 <Col xs="auto">
-                    <Link href={`/dashboard/${institucionSelected.id}/bienvenido`}>
+                    <Link href={`/dashboard/${params.id}/bienvenido`}>
                         <Button
                             variant="secondary"
                             className="responsive-button"

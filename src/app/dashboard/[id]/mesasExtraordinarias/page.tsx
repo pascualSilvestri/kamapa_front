@@ -126,7 +126,7 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
 
     const getNotaExtraordinaria = (notas: Nota[], tipoNotaId: number) => {
         const nota = notas.find((n) => n.tipoNotaId === tipoNotaId);
-        return nota ? nota.nota : "";
+        return nota ? nota.nota : null;
     };
 
     const getPromedioNotasPorPeriodo = (notas: Nota[]) => {
@@ -166,36 +166,36 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
     };
 
     const canAddExtraordinariaDic = (notasPorPeriodo: { periodoId: number, promedioNotas: string }[]) => {
-        const periodo1 = notasPorPeriodo.find(n => n.periodoId === 3);
-        const periodo2 = notasPorPeriodo.find(n => n.periodoId === 4);
+        const periodo1 = notasPorPeriodo.find(n => n.periodoId === 5); // periodo 1
+        const periodo2 = notasPorPeriodo.find(n => n.periodoId === 6); // periodo 2
 
         if (!periodo1 || !periodo2) return false;
 
         const promedio1 = Number(periodo1.promedioNotas);
         const promedio2 = Number(periodo2.promedioNotas);
 
-        return (promedio1 < 6 && promedio2 >= 6) || (promedio1 >= 6 && promedio2 < 6);
+        return (promedio1 < 6 || promedio2 < 6);
     };
 
     const canAddExtraordinariaFeb = (notasPorPeriodo: { periodoId: number, promedioNotas: string }[], extraordinariaDic: number) => {
-        const periodo1 = notasPorPeriodo.find(n => n.periodoId === 3);
-        const periodo2 = notasPorPeriodo.find(n => n.periodoId === 4);
+        const periodo1 = notasPorPeriodo.find(n => n.periodoId === 5); // periodo 1
+        const periodo2 = notasPorPeriodo.find(n => n.periodoId === 6); // periodo 2
 
         if (!periodo1 || !periodo2) return false;
 
         const promedio1 = Number(periodo1.promedioNotas);
         const promedio2 = Number(periodo2.promedioNotas);
 
-        return promedio1 < 6 && promedio2 < 6 || extraordinariaDic < 6;
+        return (promedio1 < 6 && promedio2 < 6) || extraordinariaDic < 6;
     };
 
     const getCalificacionDefinitiva = (notasPorPeriodo: { periodoId: number, promedioNotas: string }[], extraordinariaDic: number, extraordinariaFeb: number) => {
-        if (extraordinariaFeb) {
+        if (extraordinariaFeb != null) {
             return extraordinariaFeb;
         }
-        if (extraordinariaDic >= 6) {
-            const promedio1 = Number(notasPorPeriodo.find(n => n.periodoId === 3)?.promedioNotas || 0);
-            const promedio2 = Number(notasPorPeriodo.find(n => n.periodoId === 4)?.promedioNotas || 0);
+        if (extraordinariaDic != null && extraordinariaDic >= 6) {
+            const promedio1 = Number(notasPorPeriodo.find(n => n.periodoId === 5)?.promedioNotas || 0);
+            const promedio2 = Number(notasPorPeriodo.find(n => n.periodoId === 6)?.promedioNotas || 0);
             return (extraordinariaDic + Math.max(promedio1, promedio2)) / 2;
         }
         return null;
@@ -266,8 +266,8 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                                     alumnos.map((alumno) => {
                                         const calificacionFinal = getCalificacionParcialPromedio(alumno.notas);
                                         const notasPorPeriodo = getPromedioNotasPorPeriodo(alumno.notas);
-                                        const extraordinariaDic = Number(getNotaExtraordinaria(alumno.notas, 3)); // reDiciembre
-                                        const extraordinariaFeb = Number(getNotaExtraordinaria(alumno.notas, 4)); // reFebrero
+                                        const extraordinariaDic = getNotaExtraordinaria(alumno.notas, 3); // reDiciembre
+                                        const extraordinariaFeb = getNotaExtraordinaria(alumno.notas, 4); // reFebrero
                                         const calificacionDefinitiva = getCalificacionDefinitiva(notasPorPeriodo, extraordinariaDic, extraordinariaFeb);
 
                                         return (
@@ -278,7 +278,7 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                                                 ))}
                                                 <td>{calificacionFinal.toFixed(2)}</td>
                                                 <td>
-                                                    {extraordinariaDic ? (
+                                                    {extraordinariaDic != null ? (
                                                         extraordinariaDic
                                                     ) : canAddExtraordinariaDic(notasPorPeriodo) ? (
                                                         <>
@@ -309,7 +309,7 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                                                     ) : ""}
                                                 </td>
                                                 <td>
-                                                    {extraordinariaFeb ? (
+                                                    {extraordinariaFeb != null ? (
                                                         extraordinariaFeb
                                                     ) : canAddExtraordinariaFeb(notasPorPeriodo, extraordinariaDic) ? (
                                                         <>

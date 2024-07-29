@@ -183,7 +183,7 @@ const RegAlumnoCurso = ({ params }: { params: { id: string } }) => {
                 </Col>
                 <Col md={6}>
                     <h2>Curso Seleccionado y Alumnos Agregados</h2>
-                    <h3>{cursos.find(curso => curso.id === cursoId)?.nombre}</h3>
+                    <h3>{cursos.find(curso => curso.id === Number(cursoId))?.nombre}</h3>
                     <Table striped bordered hover>
                         <thead>
                             <tr>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Button, Table, Pagination, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Table, Pagination, Modal, Spinner, Alert } from 'react-bootstrap';
 import { Curso, User } from 'model/types';  // Asegúrate de que 'User' y 'Curso' estén definidos en 'model/types'
 import { Environment } from 'utils/EnviromenManager';
 import { useCicloLectivo } from 'context/CicloLectivoContext';
@@ -11,13 +11,13 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
     const [cursos, setCursos] = useState<Curso[]>([]);
     const [alumnosDisponibles, setAlumnosDisponibles] = useState<User[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(3);
+    const [itemsPerPage] = useState(5);
     const [filtroAlumno, setFiltroAlumno] = useState('');
     const [alumnosAgregados, setAlumnosAgregados] = useState<User[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
-    
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         fetchCursos();
@@ -25,22 +25,26 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
     }, []);
 
     const fetchCursos = async () => {
+        setLoading(true);
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${params.id}`);
         const data = await response.json();
         setCursos(Array.isArray(data) ? data : []);
+        setLoading(false);
     };
 
     const fetchAlumnos = async () => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucionAndCurso)}${params.id}`);
+        setLoading(true);
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucionAndNotIsCurso)}${params.id}`);
         const data = await response.json();
-        setAlumnosDisponibles(data.alumnos);
+        setAlumnosDisponibles(data.alumnos || []);
+        setLoading(false);
     };
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
     };
 
-    const handleAddAlumno = (alumnoId: number | string) => {
+    const handleAddAlumno = async (alumnoId: number | string) => {
         const alumnoSeleccionado = alumnosDisponibles.find(p => p.id.toString() === alumnoId.toString());
         if (alumnoSeleccionado && !alumnosAgregados.some(a => a.id === alumnoId)) {
             setAlumnosAgregados([...alumnosAgregados, alumnoSeleccionado]);
@@ -136,55 +140,65 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
                                     onChange={(e) => setFiltroAlumno(e.target.value)}
                                 />
                             </Form.Group>
-                            <Table striped bordered hover>
-                                <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Apellido</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {currentAlumnos.map(alumno => (
-                                        <tr key={alumno.id}>
-                                            <td>{alumno.nombre}</td>
-                                            <td>{alumno.apellido}</td>
-                                            <td>
-                                                <Button
-                                                    onClick={() => handleAddAlumno(alumno.id)}
-                                                    style={{
-                                                        backgroundColor: 'purple',
-                                                        color: 'white',
-                                                        padding: '0.4rem 1rem',
-                                                        fontSize: '1rem',
-                                                        transition: 'all 0.3s ease',
-                                                        marginBottom: '10px',
-                                                        border: '2px solid purple',
-                                                        cursor: 'pointer',
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        e.currentTarget.style.backgroundColor = 'white';
-                                                        e.currentTarget.style.color = 'black';
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.style.backgroundColor = 'purple';
-                                                        e.currentTarget.style.color = 'white';
-                                                    }}
-                                                >
-                                                    Agregar
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                            <Pagination>
-                                {Array.from({ length: totalPages }, (_, i) => (
-                                    <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
-                                        {i + 1}
-                                    </Pagination.Item>
-                                ))}
-                            </Pagination>
+                            {loading ? (
+                                <Spinner animation="border" />
+                            ) : (
+                                <>
+                                    {alumnosDisponibles.length === 0 ? (
+                                        <Alert variant="warning">No existen alumnos sin cursos</Alert>
+                                    ) : (
+                                        <Table striped bordered hover>
+                                            <thead>
+                                                <tr>
+                                                    <th>Nombre</th>
+                                                    <th>Apellido</th>
+                                                    <th>Acción</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {currentAlumnos.map(alumno => (
+                                                    <tr key={alumno.id}>
+                                                        <td>{alumno.nombre}</td>
+                                                        <td>{alumno.apellido}</td>
+                                                        <td>
+                                                            <Button
+                                                                onClick={() => handleAddAlumno(alumno.id)}
+                                                                style={{
+                                                                    backgroundColor: 'purple',
+                                                                    color: 'white',
+                                                                    padding: '0.4rem 1rem',
+                                                                    fontSize: '1rem',
+                                                                    transition: 'all 0.3s ease',
+                                                                    marginBottom: '10px',
+                                                                    border: '2px solid purple',
+                                                                    cursor: 'pointer',
+                                                                }}
+                                                                onMouseEnter={(e) => {
+                                                                    e.currentTarget.style.backgroundColor = 'white';
+                                                                    e.currentTarget.style.color = 'black';
+                                                                }}
+                                                                onMouseLeave={(e) => {
+                                                                    e.currentTarget.style.backgroundColor = 'purple';
+                                                                    e.currentTarget.style.color = 'white';
+                                                                }}
+                                                            >
+                                                                Agregar
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    )}
+                                    <Pagination>
+                                        {Array.from({ length: totalPages }, (_, i) => (
+                                            <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                                                {i + 1}
+                                            </Pagination.Item>
+                                        ))}
+                                    </Pagination>
+                                </>
+                            )}
                         </Col>
                     </Row>
                 </Col>
@@ -265,7 +279,7 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
 
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Mesaje</Modal.Title>
+                    <Modal.Title>Mensaje</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>{modalMessage}</Modal.Body>
             </Modal>

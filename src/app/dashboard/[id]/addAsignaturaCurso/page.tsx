@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table, Pagination } from 'react-bootstrap';
 import { Asignatura, Curso, User } from 'model/types';
@@ -76,6 +77,7 @@ const AddAsignaturaCurso = ({ params }) => {
             const cursoId = cursoAsignado.id;
             const asignaturaId = asignaturaAsignada.id;
             const profesorId = profesorAsignado.id;
+            console.log(cursoId, asignaturaId, profesorId);
 
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.asociarAsignaturaCurso)}`, {
                 method: 'POST',
@@ -91,9 +93,11 @@ const AddAsignaturaCurso = ({ params }) => {
 
             if (response.status !== 200) {
                 const data = await response.json();
+                console.log(data);
                 throw new Error('Error al asociar asignaturas, curso y profesor');
             } else {
                 const data = await response.json();
+                console.log(data);
                 cleandata();
                 fetchCursosConAsignaturas();
             }
@@ -109,6 +113,7 @@ const AddAsignaturaCurso = ({ params }) => {
     const fetchCursosConAsignaturas = async () => {
         const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosAndAsignaturasByInstitucion)}${params.id}`);
         const data = await response.json();
+        console.log(data);
         setCursosConAsignaturas(Array.isArray(data) ? data : []);
     };
 
@@ -128,6 +133,15 @@ const AddAsignaturaCurso = ({ params }) => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentProfessors = filteredProfesores.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredProfesores.length / itemsPerPage);
+
+    // Transformar los datos de la nueva estructura a la estructura antigua
+    const cursosTransformados = cursosConAsignaturas.map(curso => ({
+        ...curso,
+        asignaturas: curso.cursoAsignaturaProfesorCicloLectivo.map(cursoAsigProf => ({
+            ...cursoAsigProf.asignatura,
+            usuarioAsignatura: [cursoAsigProf.usuario]
+        }))
+    }));
 
     return (
         <Container>
@@ -342,7 +356,7 @@ const AddAsignaturaCurso = ({ params }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {cursosConAsignaturas.map((c) => (
+                            {cursosTransformados.map((c) => (
                                 <tr key={c.id}>
                                     <td>{c.nombre}</td>
                                     <td>{c.asignaturas.map(a => (
