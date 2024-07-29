@@ -3,13 +3,16 @@ import { useEffect, useState, useRef } from "react";
 import { Container, Row, Col, Form, Button, Table } from "react-bootstrap";
 import { Curso, User, Nota, Periodo } from "model/types"; // Asegúrate de que 'User', 'Curso' y 'Nota' estén definidos en 'model/types'
 import { Environment } from "utils/EnviromenManager";
-import { useUserContext } from "context/userContext";
+import { useUserContext, useInstitucionSelectedContext } from "context/userContext";
 import { useCicloLectivo } from "context/CicloLectivoContext";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
+
 const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
   const [cursoSeleccionado, setCursoSeleccionado] = useState<string>("");
+  const [institucionSelected] = useInstitucionSelectedContext();
+
   const [asignatura, setAsignatura] = useState<string>("");
   const [periodo, setPeriodo] = useState<string>("");
   const [cursos, setCursos] = useState<Curso[]>([]);
@@ -205,6 +208,8 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     return nota ? nota.nota : null;
   };
 
+
+
   const exportToPDF = async () => {
     const input = pdfRef.current;
     if (!input) return;
@@ -215,11 +220,31 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
     notasColumn.forEach(col => (col as HTMLElement).style.display = 'none');
     accionColumn.forEach(col => (col as HTMLElement).style.display = 'none');
 
-    // Añadir encabezado
+    // Añadir encabezado con el nombre y logo de la institución
     const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.alignItems = 'center';
+    header.style.marginBottom = '20px'; // Espacio entre el encabezado y el contenido
+
+    const logoContainer = document.createElement('div');
+    logoContainer.style.marginRight = '10px';
+    const logoImage = document.createElement('img');
+    logoImage.src = institucionSelected.logo;
+    logoImage.width = 50; // Ajusta el tamaño según sea necesario
+    logoImage.height = 50; // Ajusta el tamaño según sea necesario
+    logoContainer.appendChild(logoImage);
+    header.appendChild(logoContainer);
+
     const cursoSelectPdf = cursos.find(select => select.id === Number(cursoSeleccionado));
     const asignaturaSelectPdf = asignaturas.find(select => select.id === Number(asignatura));
-    header.innerHTML = `<h3>Curso: ${cursoSelectPdf.nombre}</h3><h3>Asignatura: ${asignaturaSelectPdf.nombre}</h3><h3>Fecha: ${fecha}</h3>`;
+    const headerText = document.createElement('div');
+    headerText.innerHTML = `<h2>${institucionSelected.nombre}</h2>
+                            <h3>Curso: ${cursoSelectPdf?.nombre}</h3>
+                    
+                            <h3>Asignatura: ${asignaturaSelectPdf?.nombre}</h3>
+                            <h3>Fecha: ${fecha}</h3>`;
+    header.appendChild(headerText);
+
     input.insertBefore(header, input.firstChild);
 
     // Generar PDF
@@ -228,11 +253,36 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
       useCORS: true,
     });
     const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF();
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const margin = 10; // 10 mm margin (1 cm)
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
     const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    const imgWidth = pageWidth - 2 * margin;
+    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+    let heightLeft = imgHeight;
+    let position = margin; // Start position with the margin
+
+    pdf.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight);
+    heightLeft -= pageHeight - 2 * margin;
+
+    while (heightLeft > 0) {
+      if (heightLeft < imgHeight) {
+        position = heightLeft + margin; // Adjust to start with margin
+        heightLeft -= pageHeight;
+      } else {
+        position = margin; // Reset to top margin for new page
+        heightLeft -= pageHeight - 2 * margin;
+      }
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+    }
+
     pdf.save("Notas.pdf");
 
     // Restaurar columnas

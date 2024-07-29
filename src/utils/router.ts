@@ -12,7 +12,7 @@ export const router = {
     'EditarAlumnos': { label: 'Alumnos', href: '/editarAlumno', dropdown: 'Gestión Alumnos' },
     'RegistroAlumno': { label: 'Registro de Alumnos', href: '/consultaUsuario', dropdown: 'Gestión Alumnos' },
     'CursoAlumno': { label: 'Consultar Alumnos por Curso', href: '/curso_alumno', dropdown: 'Gestión Alumnos' },
-    'regAlumnoCurso': { label: 'No se sabe que es?', href: '/alumnosPorCurso', dropdown: 'Gestión Alumnos' },
+    // 'regAlumnoCurso': { label: 'No se sabe que es?', href: '/alumnosPorCurso', dropdown: 'Gestión Alumnos' },
     'MoverAlumnoPorcurso': { label: 'Mover Alumnos de Curso', href: '/regAlumnoCurso', dropdown: 'Gestión Alumnos' },
     'AddAlumnoCurso': { label: 'Asignar Alumno a los Cursos', href: '/addAlumnoCurso', dropdown: 'Gestión Alumnos' },
     // Ciclo Lectivo y Periodos
@@ -44,7 +44,6 @@ export const directorAutorizeRouter = [
     'RegistroAlumno',
     'CursoAlumno',
     'AddAlumnoCurso',
-    'regAlumnoCurso',
     'MoverAlumnoPorcurso',
     'CrearCicloLectivo',
     'ModificarPeriodos',
@@ -62,7 +61,6 @@ export const secretarioAutorizeRouter = [
     'RegistroAlumno',
     'CursoAlumno',
     'AddAlumnoCurso',
-    'regAlumnoCurso',
     'MoverAlumnoPorcurso',
     'CrearCicloLectivo',
     'ModificarPeriodos',
@@ -78,7 +76,6 @@ export const preceptorAutorizeRouter = [
     'Inicio',
     'CursoAlumno',
     'AddAlumnoCurso',
-    'regAlumnoCurso',
     'RegistroAlumno',
     'consultaAsignaturaPorCurso',
 
