@@ -8,6 +8,7 @@ import { Roles, User } from '../../../../model/types';
 import { autorizeNivel, autorizeRol } from '../../../../utils/autorizacionPorRoles';
 import { Environment } from 'utils/EnviromenManager';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
+import { fetchData } from 'next-auth/client/_utils';
 
 const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
     const [empleados, setEmpleados] = useState([]);
@@ -48,39 +49,43 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
     // FUNCIONES PARA EL Search
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     useEffect(() => {
-        const fetchData = async () => {
-
-            try {
-                const response = await fetch(
-                    `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsNotAlumnoByIntitucion)}${params.id}`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${session.accessToken}`,
-                        },
-                    }
-                );
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                console.log('soy data ',data);
-                setEmpleados(data.usuarios);
-            } catch (error) {
-                console.error('Error al obtener empleados:', error.message);
-            }
-        };
-
+       
         fetchData();
     }, [session, institucionSelected.id]);
+
+    const fetchData = async () => {
+
+        try {
+            const response = await fetch(
+                `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsNotAlumnoByIntitucion)}${params.id}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.accessToken}`,
+                    },
+                }
+            );
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('soy data ',data);
+            setEmpleados(data.usuarios);
+        } catch (error) {
+            console.error('Error al obtener empleados:', error.message);
+        }
+    };
+
 
     const filteredEmpleados = empleados.filter(empleado =>
         empleado.dni.toLowerCase().includes(searchTerm.toLowerCase()) ||
         empleado.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         empleado.apellido.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -245,13 +250,7 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
                 throw new Error(data);
             }
 
-            const updatedResponse = await fetch(
-                `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${institucionSelected.id}`,
-            );
-            const updatedData = await updatedResponse.json();
-
-            setEmpleados(updatedData.usuarios);
-
+            fetchData();
             setShowEditModal(false);
             setShowSaveConfirmModal(false);
         } catch (error) {

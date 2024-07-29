@@ -81,7 +81,7 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
     const total = evaluacionNotas.reduce((acc, nota) => acc + nota.nota, 0);
     return evaluacionNotas.length
       ? (total / evaluacionNotas.length).toFixed(2)
-      : "N/A";
+      : "-";
   };
 
   const calculateFinalNota = (asignatura: any) => {
@@ -109,7 +109,7 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
         (acc, periodo) => acc + parseFloat(periodo.promedio),
         0
       ) / notasEvaluacion.length;
-    const notaFinalParcialRedondeada = notaFinalParcial.toFixed(2);
+    const notaFinalParcialRedondeada = isNaN(notaFinalParcial) ? "-" : notaFinalParcial.toFixed(2);
 
     const reDiciembre =
       asignatura.notas.find(
@@ -119,21 +119,33 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
       asignatura.notas.find((nota: Nota) => nota.tipoNota.tipo === "reFebrero")
         ?.nota || null;
 
-    let notaFinal = notaFinalParcialRedondeada;
-    if (notaFinalParcial < 6) {
+    let notaFinal: number | string = notaFinalParcialRedondeada;
+
+    if (reFebrero && reFebrero >= 6) {
+      notaFinal = reFebrero.toFixed(2);
+    } else if (notaFinalParcial < 6) {
       if (reDiciembre && reDiciembre >= 6) {
-        notaFinal = Math.max(notaFinalParcial, reDiciembre).toFixed(2);
-      } else if (reFebrero && reFebrero >= 6) {
-        notaFinal = reFebrero.toFixed(2);
+        const periodosConNotaMayorOIgualSeis = notasEvaluacion.filter(
+          (notaEval) => parseFloat(notaEval.promedio) >= 6
+        );
+
+        if (periodosConNotaMayorOIgualSeis.length > 0) {
+          const notaMaximaPeriodo = Math.max(
+            ...periodosConNotaMayorOIgualSeis.map((notaEval) => parseFloat(notaEval.promedio))
+          );
+          notaFinal = ((notaMaximaPeriodo + reDiciembre) / 2).toFixed(2);
+        } else {
+          notaFinal = reDiciembre.toFixed(2);
+        }
       }
     }
 
     return {
       notasEvaluacion,
       notaFinalParcial: notaFinalParcialRedondeada,
-      reDiciembre,
-      reFebrero,
-      notaFinal,
+      reDiciembre: reDiciembre !== null ? reDiciembre : "-",
+      reFebrero: reFebrero !== null ? reFebrero : "-",
+      notaFinal: isNaN(parseFloat(notaFinal as string)) ? "-" : notaFinal,
     };
   };
 
@@ -312,13 +324,13 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
                             );
                             return (
                               <td key={periodoNombre}>
-                                {notaPeriodo ? notaPeriodo.promedio : "N/A"}
+                                {notaPeriodo ? notaPeriodo.promedio : "-"}
                               </td>
                             );
                           })}
                           <td>{finalNotas.notaFinalParcial}</td>
-                          <td>{finalNotas.reDiciembre}</td>
-                          <td>{finalNotas.reFebrero}</td>
+                          <td>{finalNotas.reDiciembre !== null ? finalNotas.reDiciembre : "-"}</td>
+                          <td>{finalNotas.reFebrero !== null ? finalNotas.reFebrero : "-"}</td>
                           <td>{finalNotas.notaFinal}</td>
                         </tr>
                       );
