@@ -1,19 +1,8 @@
-"use client";
-
+'use client'
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  ButtonProps,
-} from "react-bootstrap";
+import { Container, Row, Col, Form, Button, ButtonProps } from "react-bootstrap";
 import { Asignatura, Nota, Periodo, CicloLectivo } from "model/types";
-import {
-  useUserContext,
-  useInstitucionSelectedContext,
-} from "context/userContext";
+import { useUserContext, useInstitucionSelectedContext } from "context/userContext";
 import { useCicloLectivo } from "context/CicloLectivoContext";
 import styled from "styled-components";
 import jsPDF from "jspdf";
@@ -53,9 +42,7 @@ const Due = ({ params }: { params: { id: string } }) => {
   const fetchCiclosLectivos = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${
-          params.id
-        }`
+        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id}`
       );
       const data = await response.json();
       setCiclosLectivos(data);
@@ -71,9 +58,7 @@ const Due = ({ params }: { params: { id: string } }) => {
   const fetchAsignaturasYNotas = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(
-          Environment.endPoint.getNotasByAlumnoForCicloElectivo
-        )}`,
+        `${Environment.getEndPoint(Environment.endPoint.getNotasByAlumnoForCicloElectivo)}`,
         {
           method: "POST",
           headers: {
@@ -139,9 +124,7 @@ const Due = ({ params }: { params: { id: string } }) => {
     return (total / evaluaciones.length).toFixed(2);
   };
 
-  const calcularPromedioGeneral = (notasPorPeriodo: {
-    [key: number]: Nota[];
-  }) => {
+  const calcularPromedioGeneral = (notasPorPeriodo: { [key: number]: Nota[] }) => {
     const todasLasNotas = Object.values(notasPorPeriodo).flat();
     const evaluaciones = todasLasNotas.filter(
       (nota) => nota.tipoNota?.id === 1
@@ -625,9 +608,7 @@ const Due = ({ params }: { params: { id: string } }) => {
                 const cicloId = e.target.value;
                 setSelectedCicloLectivo(cicloId);
                 const ciclo =
-                  ciclosLectivos.find(
-                    (ciclo) => ciclo.id.toString() === cicloId
-                  ) || null;
+                  ciclosLectivos.find((ciclo) => ciclo.id.toString() === cicloId) || null;
                 setCicloLectivo(ciclo);
               }}
             >

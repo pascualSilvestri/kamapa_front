@@ -54,7 +54,7 @@ export function Navigation() {
       {['xxxl'].map((expand) => (
         <Navbar key={expand} expand={expand} className='bg-body-tertiary mb-3'>
           <Container className='d-flex justify-content-between'>
-            <Navbar.Brand href='#' className='d-flex align-items-end'>
+            <Navbar.Brand href='' className='d-flex align-items-end'>
               <Image
                 src={institucionSelected.logo || '/Logo.png'}
                 alt='logo'

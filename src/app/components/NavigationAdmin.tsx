@@ -31,7 +31,7 @@ export function NavigationAdmin() {
           key={expand} expand={expand} className='bg-body-tertiary mb-3'
         >
           <Container >
-            <Navbar.Brand href='#'>
+            <Navbar.Brand href=''>
               {/* Logo de KAMAPA */}
               <Image
                 src='/Logo.png'
