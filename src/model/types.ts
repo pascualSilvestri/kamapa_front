@@ -186,6 +186,7 @@ export interface Curso {
     institucionId?: string;
     asignaturas?: Asignatura[];
     cursosUsuario?: User[];
+    cursoAsignaturaProfesorCicloLectivo?: any;
 }
 
 

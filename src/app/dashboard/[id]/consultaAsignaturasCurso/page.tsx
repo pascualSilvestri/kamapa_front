@@ -23,6 +23,7 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
         try {
             const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosAndAsignaturasByInstitucion)}${params.id}`);
             const data = await response.json();
+            console.log(data);
             setCursosConAsignaturas(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error fetching cursos con asignaturas:', error);
@@ -54,8 +55,8 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
     const exportToExcel = () => {
         const ws = XLSX.utils.json_to_sheet(cursosConAsignaturas.map(curso => ({
             Curso: curso.nombre,
-            Asignatura: curso.asignaturas.map(a => a.nombre).join(', '),
-            Profesor: curso.asignaturas.map(a => a.usuarioAsignatura ? `${a.usuarioAsignatura[0].nombre} ${a.usuarioAsignatura[0].apellido}` : 'No asignado').join(', ')
+            Asignatura: curso.cursoAsignaturaProfesorCicloLectivo.map(a => a.asignatura.nombre).join(', '),
+            Profesor: curso.cursoAsignaturaProfesorCicloLectivo.map(a => a.usuario ? `${a.usuario.nombre} ${a.usuario.apellido}` : 'No asignado').join(', ')
         })));
 
         const wb = XLSX.utils.book_new();
@@ -81,16 +82,16 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                                 <tr key={curso.id}>
                                     <td>{curso.nombre}</td>
                                     <td>
-                                        {curso.asignaturas.map((asignatura) => (
-                                            <li key={asignatura.id}>
-                                                {asignatura.nombre}
+                                        {curso.cursoAsignaturaProfesorCicloLectivo.map((asignatura) => (
+                                            <li key={asignatura.asignatura.id}>
+                                                {asignatura.asignatura.nombre}
                                             </li>
                                         ))}
                                     </td>
                                     <td>
-                                        {curso.asignaturas.map((asignatura) => (
-                                            <li key={asignatura.id}>
-                                                {asignatura.usuarioAsignatura ? `${asignatura.usuarioAsignatura[0].nombre} ${asignatura.usuarioAsignatura[0].apellido}` : 'No asignado'}
+                                        {curso.cursoAsignaturaProfesorCicloLectivo.map((asignatura) => (
+                                            <li key={asignatura.asignatura.id}>
+                                                {asignatura.usuario ? `${asignatura.usuario.nombre} ${asignatura.usuario.apellido}` : 'No asignado'}
                                             </li>
                                         ))}
                                     </td>
