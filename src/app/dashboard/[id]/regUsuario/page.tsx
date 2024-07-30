@@ -142,6 +142,7 @@ const RegUsuario = () => {
                 if (response.ok) {
                     setShowSuccessModal(true);
                     setSuccessMessage('El empleado se registró con éxito.');
+                    limpiarCampos(); // Llamar a limpiarCampos aquí
                 } else {
                     setShowErrorModal(true);
                     setErrorMessage('Hubo un problema al registrar al empleado. Por favor, inténtalo nuevamente.');
@@ -160,13 +161,13 @@ const RegUsuario = () => {
     };
 
     // Función para validar el formulario
-    useEffect(() => {
-        if (nombre && apellido && dni && provinciaSeleccionada && telefono && matriculaProfesional && legajo && cuil && fechaNacimiento && email) {
-            setFormValid(true);
-        } else {
-            setFormValid(false);
-        }
-    }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email]);
+    // useEffect(() => {
+    //     if (nombre && apellido && dni && provinciaSeleccionada && telefono && matriculaProfesional && legajo && cuil && fechaNacimiento && email) {
+    //         setFormValid(true);
+    //     } else {
+    //         setFormValid(false);
+    //     }
+    // }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email]);
 
     // Función para limpiar los campos del formulario
     const limpiarCampos = () => {
@@ -185,15 +186,45 @@ const RegUsuario = () => {
         setCuil('');
         setFechaNacimiento('');
         setEmail('');
-        setRoles({
-            admin: false,
-            director: false,
-            secretario: false,
-            preseptor: false,
-            profesor: false,
+        setRoles((prevRoles) => {
+            const newRoles = { ...prevRoles };
+            Object.keys(newRoles).forEach(key => {
+                newRoles[key] = { ...newRoles[key], checked: false };
+            });
+            return newRoles;
         });
         setSelectedRoleIds([]);
     };
+
+    // Expresiones regulares para validación
+    const nombreRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
+    const apellidoRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
+    const dniRegex = /^\d{7,8}$/;
+    const cuilRegex = /^\d{2}\d{8}\d{1}$/;
+    const telefonoRegex = /^\d{10}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const legajoRegex = /^[a-zA-Z0-9-]{1,20}$/;
+
+    // Función para validar el formulario
+    useEffect(() => {
+        if (
+            nombreRegex.test(nombre) &&
+            apellidoRegex.test(apellido) &&
+            dniRegex.test(dni) &&
+            provinciaSeleccionada &&
+            telefonoRegex.test(telefono) &&
+            (matriculaProfesional === '' || legajoRegex.test(matriculaProfesional)) &&
+            legajoRegex.test(legajo) &&
+            cuilRegex.test(cuil) &&
+            fechaNacimiento &&
+            emailRegex.test(email)
+        ) {
+            setFormValid(true);
+        } else {
+            setFormValid(false);
+        }
+    }, [nombre, apellido, dni, provinciaSeleccionada, telefono, matriculaProfesional, legajo, cuil, fechaNacimiento, email]);
+
 
     return (
         <Container>
@@ -210,7 +241,11 @@ const RegUsuario = () => {
                                 value={nombre}
                                 onChange={(e) => setNombre(e.target.value)}
                                 autoComplete='off'
+                                isInvalid={nombre !== '' && !nombreRegex.test(nombre)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un nombre válido (2-50 caracteres, solo letras y espacios).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="apellido">
                             <Form.Label>Apellido *</Form.Label>
@@ -220,7 +255,11 @@ const RegUsuario = () => {
                                 value={apellido}
                                 onChange={(e) => setApellido(e.target.value)}
                                 autoComplete='off'
+                                isInvalid={apellido !== '' && !apellidoRegex.test(apellido)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un apellido válido (2-50 caracteres, solo letras y espacios).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="dni">
                             <Form.Label>DNI *</Form.Label>
@@ -230,7 +269,11 @@ const RegUsuario = () => {
                                 value={dni}
                                 onChange={(e) => setDni(e.target.value)}
                                 autoComplete='off'
+                                isInvalid={dni !== '' && !dniRegex.test(dni)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un DNI válido (7-8 dígitos).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="cuil">
                             <Form.Label>CUIL *</Form.Label>
@@ -240,7 +283,11 @@ const RegUsuario = () => {
                                 value={cuil}
                                 onChange={(e) => setCuil(e.target.value)}
                                 autoComplete='off'
+                                isInvalid={cuil !== '' && !cuilRegex.test(cuil)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un CUIL válido (formato: XXXXXXXXXXX).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="fechaNacimiento">
                             <Form.Label>Fecha de Nacimiento *</Form.Label>
@@ -349,7 +396,11 @@ const RegUsuario = () => {
                                 value={telefono}
                                 onChange={(e) => setTelefono(e.target.value)}
                                 autoComplete='off'
+                                isInvalid={telefono !== '' && !telefonoRegex.test(telefono)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un número de teléfono válido (10 dígitos).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="email">
                             <Form.Label>Email *</Form.Label>
@@ -359,7 +410,11 @@ const RegUsuario = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 autoComplete='off'
+                                isInvalid={email !== '' && !emailRegex.test(email)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese una dirección de email válida.
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <hr />
                         <Form.Group>
@@ -373,7 +428,11 @@ const RegUsuario = () => {
                                 value={matriculaProfesional}
                                 onChange={(e) => setMatriculaProfesional(e.target.value)}
                                 autoComplete='off'
+                                isInvalid={matriculaProfesional !== '' && !legajoRegex.test(matriculaProfesional)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese una matrícula profesional válida (1-20 caracteres alfanuméricos o guiones).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="legajo">
                             <Form.Label>Legajo *</Form.Label>
@@ -383,7 +442,11 @@ const RegUsuario = () => {
                                 value={legajo}
                                 onChange={(e) => setLegajo(e.target.value)}
                                 autoComplete='off'
+                                isInvalid={legajo !== '' && !legajoRegex.test(legajo)}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                Ingrese un legajo válido (1-20 caracteres alfanuméricos o guiones).
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <hr />
                         <Form.Group>
@@ -394,10 +457,10 @@ const RegUsuario = () => {
                             {Object.keys(roles)
                                 .filter((rol) => {
                                     // Verificar si el usuario de la sesión es Admin
-                                    const isAdmin = session.user.Roles.some((role) => role.name === 'Admin');
+                                    const isAdmin = session.user.Roles.some((role) => role.name === 'Admin' && role.name === 'Alumno');
 
                                     // Filtrar los roles que se muestran en el formulario
-                                    return isAdmin || rol !== 'Admin';
+                                    return isAdmin || rol !== 'Admin' && rol !== 'Alumno';
                                 })
                                 .map((rol, index) => (
                                     <Form.Check
@@ -422,7 +485,7 @@ const RegUsuario = () => {
                         <hr />
                         <Form.Group className="d-flex justify-content-center">
                             <div className="me-1">
-                                <Link href={`/dashboard/${institucionSelected.id}/consultaUsuario`}>
+                                <Link href={`/dashboard/${institucionSelected.id}/bienvenido`}>
                                     <Button
                                         variant="secondary"
                                         style={{
