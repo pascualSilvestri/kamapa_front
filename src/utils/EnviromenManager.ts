@@ -4,7 +4,7 @@ enum environment {
 }
 
 export class Environment {
-  private static environment: environment = environment.prov;
+  private static environment: environment = environment.dev;
 
   private static getEnvironment(env: environment): string {
     if (env == environment.prov) {
@@ -345,6 +345,7 @@ export class Environment {
     getGeneros: "api/genero/getGenero/",
     deleteAlumnoDeCurso: "api/cursos/deleteAlumnoDeCurso",
     getAsignaturaByCurso: 'api/cursos/asignaturas/',
+    getAsignaturasByCursoByCiclolectivo: 'api/cursos/asignaturasByCiclo',
     updateNotas: 'api/notas/updateNotas/',
     /**
       * @body ciclolectivoId

@@ -69,19 +69,22 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
 
   const fetchCursos = async () => {
     const response = await fetch(
-      `${Environment.getEndPoint(Environment.endPoint.getCursosForUsuario)}`,
+      `${Environment.getEndPoint(Environment.endPoint.getCursosByInstitucion)}${
+        params.id
+      }`,
       {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          usuarioId: user.id,
-          cicloLectivoId: cicloLectivo.id,
-        }),
+        // body: JSON.stringify({
+        //   usuarioId: user.id,
+        //   cicloLectivoId: cicloLectivo.id,
+        // }),
       }
     );
     const data = await response.json();
+    console.log(data);
     setCursos(Array.isArray(data) ? data : []);
   };
 
@@ -103,21 +106,47 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
 
   const fetchAsignaturas = async (cursoId: string) => {
     const response = await fetch(
-      `${Environment.getEndPoint(
-        Environment.endPoint.getAsignaturaByCurso
-      )}${Number(cursoId)}`,
+      `${Environment.getEndPoint(Environment.endPoint.getAsignaturasByCursoByCiclolectivo)}`,
       {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          cursoId: Number(cursoId),
+          cicloLectivoId: Number(cicloLectivo.id),
+        }),
       }
     );
     const data = await response.json();
-    const asig = data[0].asignaturas;
+    console.log(data);
+    const asig = data.asignaturas;
+    console.log(asig);
 
     setAsignaturas(Array.isArray(asig) ? asig : []);
   };
+
+  // const fetchAsignaturas = async (cursoId: string) => {
+  //   const response = await fetch(
+  //     `${Environment.getEndPoint(
+  //       Environment.endPoint.getAsignaturaByCurso
+  //     )}${Number(cursoId)}`,
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         cursoId: Number(cursoId),
+  //         cicloLectivoId: Number(cicloLectivo.id),
+  //       })
+  //     }
+  //   );
+  //   const data = await response.json();
+  //   const asig = data[0].asignaturas;
+
+  //   setAsignaturas(Array.isArray(asig) ? asig : []);
+  // };
 
   const fetchAlumnos = async () => {
     try {

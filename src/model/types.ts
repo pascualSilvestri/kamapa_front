@@ -166,6 +166,7 @@ export interface UserFormData {
         institucion?: Institucion[];
         institucionId?: number;
         generoId?: string;
+        tutor?:any;
     };
     rols: any[];
     domicilio: {
