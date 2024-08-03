@@ -20,7 +20,7 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
   const [data, setData] = useState<any[]>([]);
   const [institucionSelected] = useInstitucionSelectedContext();
   const [cicloLectivo] = useCicloLectivo();
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User | null>(null);
   const pdfRef = useRef(null);
 
   useEffect(() => {
@@ -236,7 +236,7 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
                     borderBottom: "2px solid #000",
                   }}
                 >
-                 {user ? `${user.apellido ?? ''} ${user.nombre ?? ''}` : ''}
+                 {user ? `${user.apellido ?? ""} ${user.nombre ?? ""}` : ""}
                 </span>
               </p>
               <p
@@ -254,7 +254,7 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
                     borderBottom: "2px solid #000",
                   }}
                 >
-                  {user ? user.dni: ''}
+                  {user ? user.dni : ""}
                 </span>
               </p>
             </div>
@@ -274,7 +274,7 @@ const Due = ({ params }: { params: { id: string; userId: string } }) => {
                   padding: "5px",
                 }}
               >
-                Año:{" "}
+                A&ntilde;o:{" "}
                 <span
                   style={{
                     fontWeight: "normal",

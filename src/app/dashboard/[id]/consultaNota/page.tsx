@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Container, Row, Col, Form, Table, Button, ButtonProps } from 'react-bootstrap';
@@ -197,9 +197,9 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                                             </th>
                                         ))}
                                         <th style={{ backgroundColor: 'purple', color: 'white' }}>Promedio General</th>
-                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Periodo de Evaluación de Diciembre</th>
-                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Evaluación Ante Comisión de Febrero</th>
-                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Calificación Final</th>
+                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Periodo de Evaluaci&oacute;n de Diciembre</th>
+                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Evaluaci&oacute;n Ante Comisi&oacute;n de Febrero</th>
+                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Calificaci&oacute;n Final</th>
                                     </tr>
                                     <tr>
                                         <th></th>
@@ -290,7 +290,7 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
             <Row className="justify-content-center mb-4">
                 <Col xs="auto">
                     <StyledButton variant="purple" className="mx-2" onClick={exportToPDF}>
-                        Visualizar PDF Analítico Provisorio
+                        Visualizar PDF Anal&iacute;tico Provisorio
                     </StyledButton>
                 </Col>
             </Row>

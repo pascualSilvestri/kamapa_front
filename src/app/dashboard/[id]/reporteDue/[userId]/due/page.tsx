@@ -1,18 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-} from "react-bootstrap";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { Asignatura, Nota, Periodo, CicloLectivo, User, Curso } from "model/types";
-import {
-  useUserContext,
-  useInstitucionSelectedContext,
-} from "context/userContext";
+import { useUserContext, useInstitucionSelectedContext } from "context/userContext";
 import { useCicloLectivo } from "context/CicloLectivoContext";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -32,7 +23,7 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
   const [periodos, setPeriodos] = useState<Periodo[]>([]);
   const [ciclosLectivos, setCiclosLectivos] = useState<CicloLectivo[]>([]);
   const [user, setUser] = useState<User[]>([]);
-  const [curso, serCurso] = useState<Curso[]>([])
+  const [curso, serCurso] = useState<Curso[]>([]);
   const [institucionSelected] = useInstitucionSelectedContext();
   const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
   const [selectedCicloLectivo, setSelectedCicloLectivo] = useState<string>(
@@ -40,11 +31,11 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
   );
   const pdfRef = useRef<HTMLDivElement>(null);
 
+  console.log(user);
 
   useEffect(() => {
     fethdata();
   }, []);
-
 
   useEffect(() => {
     if (selectedCicloLectivo) {
@@ -55,13 +46,12 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
   const fethdata = async () => {
     await fetchGetUser();
     await fetchCiclosLectivos();
-  }
+  };
 
   const fetchCiclosLectivos = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id
-        }`
+        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id}`
       );
       const data = await response.json();
       setCiclosLectivos(data);
@@ -77,9 +67,7 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
   const fetchAsignaturasYNotas = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(
-          Environment.endPoint.getNotasByAlumnoForCicloElectivo
-        )}`,
+        `${Environment.getEndPoint(Environment.endPoint.getNotasByAlumnoForCicloElectivo)}`,
         {
           method: "POST",
           headers: {
@@ -141,9 +129,7 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
   const fetchGetUser = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(
-          Environment.endPoint.getUsuarioById
-        )}${userId}`,
+        `${Environment.getEndPoint(Environment.endPoint.getUsuarioById)}${userId}`,
         {
           method: "GET",
           headers: {
@@ -164,7 +150,6 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
     }
   };
 
-
   const calcularPromedioPorPeriodo = (notas: Nota[]) => {
     const evaluaciones = notas.filter((nota) => nota.tipoNota?.id === 1);
     if (evaluaciones.length === 0) return "-";
@@ -172,9 +157,7 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
     return (total / evaluaciones.length).toFixed(2);
   };
 
-  const calcularPromedioGeneral = (notasPorPeriodo: {
-    [key: number]: Nota[];
-  }) => {
+  const calcularPromedioGeneral = (notasPorPeriodo: { [key: number]: Nota[] }) => {
     const todasLasNotas = Object.values(notasPorPeriodo).flat();
     const evaluaciones = todasLasNotas.filter(
       (nota) => nota.tipoNota?.id === 1
@@ -234,8 +217,7 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
               style={{ maxWidth: "50px", height: "auto" }}
             />
             <div>
-              <h1>EDUCACIÓN SECUNDARIA
-              </h1>
+              <h1>EDUCACIÓN SECUNDARIA</h1>
             </div>
             <div>
               <p style={{ margin: "2px 0", fontSize: "10px" }}>
@@ -250,131 +232,166 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
           <h3>INFORME DE CALIFICACIONES</h3>
         </div>
         <div style={{ marginBottom: "10px" }}>
-          <p style={{ margin: "2px 0" }}>Nombre del Alumno: {user.firstName} {user.lastName}</p>
-          <p style={{ margin: "2px 0" }}>DNI: {user.dni}</p>
-          <p style={{ margin: "2px 0" }}>Ciclo Lectivo: {cicloLectivo && cicloLectivo.nombre}</p>
+          <p style={{ margin: "2px 0", fontSize: "10px" }}>
+            <strong>Nombre:</strong> {user.nombre} {user.apellido}
+          </p>
+          <p style={{ margin: "2px 0", fontSize: "10px" }}>
+            AÑO: {user.cursoId || "_______"} DIVISIÓN: {user.cursoId || "_______"} MODALIDAD: _____________________________{" "}
+            <span style={{ margin: "2px 0", fontSize: "10px" }}>
+              <strong>CICLO LECTIVO:</strong>{" "}
+              {ciclosLectivos.find(
+                (ciclo: CicloLectivo) => ciclo.id.toString() === selectedCicloLectivo
+              )?.nombre || ""}
+            </span>
+          </p>
         </div>
 
-        {/* Table Section */}
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "8px" }}>
-          <thead>
-            <tr>
-              <th style={{ border: "1px solid black", padding: "2px" }}>Asignaturas</th>
-              {periodos.map((periodo) => (
-                <th key={periodo.id} style={{ border: "1px solid black", padding: "2px" }}>
-                  {periodo.nombre}
-                </th>
-              ))}
-              <th style={{ border: "1px solid black", padding: "2px" }}>Promedio General</th>
-              <th style={{ border: "1px solid black", padding: "2px" }}>reDiciembre</th>
-              <th style={{ border: "1px solid black", padding: "2px" }}>reFebrero</th>
-              <th style={{ border: "1px solid black", padding: "2px" }}>Calificación Final</th>
-            </tr>
-          </thead>
-          <tbody>
-            {asignaturas.map((asignatura) => {
-              const notasExtraordinarias = asignatura.notasExtraordinarias || [];
-              const reDiciembre = getNotaExtraordinaria(notasExtraordinarias, 3);
-              const reFebrero = getNotaExtraordinaria(notasExtraordinarias, 4);
-              return (
+        {/* Grades Table Section */}
+        <div style={{ width: "100%", overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "10px" }}>
+            <thead>
+              <tr>
+                <th style={{ border: "1px solid black", padding: "4px" }}>Asignaturas</th>
+                {periodos.map((periodo) => (
+                  <th key={periodo.id} style={{ border: "1px solid black", padding: "4px" }}>
+                    {periodo.nombre}
+                  </th>
+                ))}
+                <th style={{ border: "1px solid black", padding: "4px" }}>Promedio Anual</th>
+                <th style={{ border: "1px solid black", padding: "4px" }}>Recu. Diciembre</th>
+                <th style={{ border: "1px solid black", padding: "4px" }}>Recu. Febrero</th>
+                <th style={{ border: "1px solid black", padding: "4px" }}>Calificación Final</th>
+              </tr>
+            </thead>
+            <tbody>
+              {asignaturas.map((asignatura) => (
                 <tr key={asignatura.id}>
-                  <td style={{ border: "1px solid black", padding: "2px" }}>{asignatura.nombre}</td>
+                  <td style={{ border: "1px solid black", padding: "4px" }}>
+                    {asignatura.nombre}
+                  </td>
                   {periodos.map((periodo) => (
                     <td
                       key={periodo.id}
-                      style={{ border: "1px solid black", padding: "2px" }}
+                      style={{
+                        border: "1px solid black",
+                        padding: "4px",
+                        textAlign: "center",
+                      }}
                     >
                       {calcularPromedioPorPeriodo(
                         asignatura.notasPorPeriodo[periodo.id] || []
                       )}
                     </td>
                   ))}
-                  <td style={{ border: "1px solid black", padding: "2px" }}>
+                  <td style={{ border: "1px solid black", padding: "4px", textAlign: "center" }}>
                     {calcularPromedioGeneral(asignatura.notasPorPeriodo)}
                   </td>
-                  <td style={{ border: "1px solid black", padding: "2px" }}>
-                    {reDiciembre !== null ? reDiciembre.toFixed(2) : "-"}
+                  <td style={{ border: "1px solid black", padding: "4px", textAlign: "center" }}>
+                    {getNotaExtraordinaria(asignatura.notasExtraordinarias, 3)}
                   </td>
-                  <td style={{ border: "1px solid black", padding: "2px" }}>
-                    {reFebrero !== null ? reFebrero.toFixed(2) : "-"}
+                  <td style={{ border: "1px solid black", padding: "4px", textAlign: "center" }}>
+                    {getNotaExtraordinaria(asignatura.notasExtraordinarias, 4)}
                   </td>
-                  <td style={{ border: "1px solid black", padding: "2px" }}>
+                  <td style={{ border: "1px solid black", padding: "4px", textAlign: "center" }}>
                     {calcularCalificacionFinal(
                       asignatura.notasPorPeriodo,
-                      reDiciembre,
-                      reFebrero
+                      getNotaExtraordinaria(asignatura.notasExtraordinarias, 3),
+                      getNotaExtraordinaria(asignatura.notasExtraordinarias, 4)
                     )}
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        {/* Footer Section */}
-        <div style={{ marginTop: "10px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <p style={{ fontSize: "10px" }}>Fecha de Emisión: {new Date().toLocaleDateString()}</p>
-            <p style={{ fontSize: "10px" }}>Firma del Director: _____________________</p>
-          </div>
+        {/* Signature Section */}
+        <div style={{ marginTop: "20px", textAlign: "right" }}>
+          <p style={{ margin: "2px 0", fontSize: "10px" }}>
+            ______________________________
+          </p>
+          <p style={{ margin: "2px 0", fontSize: "10px" }}>Firma del Director/Secretario</p>
         </div>
       </div>
     )
   );
 
-  const handleGeneratePDF = async () => {
-    if (!pdfRef.current) {
-      console.error("pdfRef.current is null or undefined");
-      return;
+  const handleDownloadPDF = async () => {
+    if (pdfRef.current) {
+      const input = pdfRef.current;
+
+      // Capturar el tamaño completo del contenido
+      const canvas = await html2canvas(input, {
+        scale: 2, // Escalar para mayor resolución
+        useCORS: true,
+        logging: true,
+        scrollX: 0,
+        scrollY: -window.scrollY, // Ajustar el desplazamiento vertical
+        width: input.scrollWidth, // Capturar el ancho completo
+        height: input.scrollHeight, // Capturar el alto completo
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: [canvas.width * 0.264583, canvas.height * 0.264583], // Convertir píxeles a milímetros
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      // Calcular el tamaño de la imagen para ajustarla al tamaño de la página del PDF
+      const imgWidth = canvas.width * 0.264583;
+      const imgHeight = canvas.height * 0.264583;
+      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+
+      const width = imgWidth * ratio;
+      const height = imgHeight * ratio;
+
+      const xOffset = (pageWidth - width) / 2;
+      const yOffset = (pageHeight - height) / 2;
+
+      // Añadir la imagen al PDF
+      pdf.addImage(imgData, "PNG", xOffset, yOffset, width, height);
+      pdf.save("reporteDUE.pdf");
     }
-
-    const input = pdfRef.current;
-    const canvas = await html2canvas(input, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF("landscape", "mm", "a4");
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save("reporte.pdf");
   };
 
   return (
     <Container>
-      <Row>
+      <Row className="mb-3">
         <Col>
-          <h1>Due Report</h1>
-          <Form.Group controlId="cicloLectivo">
-            <Form.Label>Ciclo Lectivo</Form.Label>
-            <Form.Control
-              as="select"
-              value={selectedCicloLectivo}
-              onChange={(e) => setSelectedCicloLectivo(e.target.value)}
-            >
-              {ciclosLectivos.map((ciclo) => (
-                <option key={ciclo.id} value={ciclo.id}>
-                  {ciclo.nombre}
-                </option>
-              ))}
-            </Form.Control>
-          </Form.Group>
-          <Button variant="primary" onClick={handleGeneratePDF}>
-            Generar PDF
-          </Button>
+          <Form.Label>Ciclo Lectivo</Form.Label>
+          <Form.Control
+            as="select"
+            value={selectedCicloLectivo}
+            onChange={(e) => setSelectedCicloLectivo(e.target.value)}
+          >
+            {ciclosLectivos.map((ciclo: CicloLectivo) => (
+              <option key={ciclo.id} value={ciclo.id.toString()}>
+                {ciclo.nombre}
+              </option>
+            ))}
+          </Form.Control>
         </Col>
       </Row>
       <Row>
         <Col>
-          <div style={{ overflow: "auto", height: "700px" }}>
-            <PDFContent
-              ref={pdfRef}
-              user={user}
-              institucionSelected={institucionSelected}
-              asignaturas={asignaturas}
-              periodos={periodos}
-            />
+          <Button onClick={handleDownloadPDF}>Descargar PDF</Button>
+        </Col>
+      </Row>
+      <Row>
+        <Col className="container">
+          <div style={{ maxWidth: "100%", overflowX: "auto" }}>
+            <div ref={pdfRef}>
+              <PDFContent
+                user={user}
+                institucionSelected={institucionSelected}
+                asignaturas={asignaturas}
+                periodos={periodos}
+              />
+            </div>
           </div>
         </Col>
       </Row>

@@ -1,4 +1,5 @@
-'use client';
+"use client";
+
 import React, { useEffect, useState, useRef } from "react";
 import { Container, Row, Col, Form, Button, ButtonProps } from "react-bootstrap";
 import { Asignatura, Nota, Periodo, CicloLectivo } from "model/types";
@@ -188,7 +189,7 @@ const Due = ({ params }: { params: { id: string } }) => {
                   padding: "5px",
                 }}
               >
-                Educación Secundaria
+                Educaci&oacute;n Secundaria
               </h1>
             </div>
             <div
@@ -207,7 +208,7 @@ const Due = ({ params }: { params: { id: string } }) => {
                   padding: "5px",
                 }}
               >
-                LIBRO MATRIZ N&#176;:______________
+                LIBRO MATRIZ N&deg;:______________
               </p>
               <p
                 style={{
@@ -217,7 +218,7 @@ const Due = ({ params }: { params: { id: string } }) => {
                   padding: "5px",
                 }}
               >
-                FOLIO N&#176;:_____________________
+                FOLIO N&deg;:_____________________
               </p>
             </div>
           </div>
@@ -260,7 +261,7 @@ const Due = ({ params }: { params: { id: string } }) => {
                     borderBottom: "2px solid #000",
                   }}
                 >
-                  {user.nombre} {user.apellido}
+                  {user.apellido} {user.nombre}
                 </span>
               </p>
               <p
@@ -271,232 +272,393 @@ const Due = ({ params }: { params: { id: string } }) => {
                   padding: "5px",
                 }}
               >
-                CUIL:{" "}
+                DNI:{" "}
                 <span
                   style={{
                     fontWeight: "normal",
                     borderBottom: "2px solid #000",
                   }}
                 >
-                  {user.cuil}
+                  {user.dni}
                 </span>
               </p>
             </div>
-            <p
+            <div
               style={{
-                textAlign: "center",
-                fontWeight: "bold",
-                fontSize: "14px",
-                padding: "5px",
+                display: "flex",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                gap: "10px",
               }}
             >
-              A&#241;o lectivo:{" "}
-              <span
-                style={{ fontWeight: "normal", borderBottom: "2px solid #000" }}
+              <p
+                style={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  padding: "5px",
+                }}
               >
-                {cicloLectivo?.nombre}
-              </span>
-            </p>
+                A&ntilde;o:{" "}
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    borderBottom: "2px solid #000",
+                  }}
+                >
+                  20{new Date().getFullYear().toString().slice(-2)}
+                </span>
+              </p>
+              <p
+                style={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  padding: "5px",
+                }}
+              >
+                Div:{" "}
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    borderBottom: "2px solid #000",
+                  }}
+                >
+                  Segundo
+                </span>
+              </p>
+              <p
+                style={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  padding: "5px",
+                }}
+              >
+                Modalidad:{" "}
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    borderBottom: "2px solid #000",
+                  }}
+                >
+                  Segundo
+                </span>
+              </p>
+              <p
+                style={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  padding: "5px",
+                }}
+              >
+                Ciclo Lectivo:{" "}
+                <span
+                  style={{
+                    fontWeight: "normal",
+                    borderBottom: "2px solid #000",
+                  }}
+                >
+                  20{new Date().getFullYear().toString().slice(-2)}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Table Section */}
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: "20px",
-          }}
-        >
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
               <th
                 style={{
-                  border: "1px solid #000",
+                  border: "1px solid black",
                   padding: "5px",
-                  backgroundColor: "#f2f2f2",
+                  textAlign: "center",
                 }}
+                rowSpan={2}
               >
-                Asignatura
+                Espacios Curriculares
               </th>
               {periodos.map((periodo) => (
                 <th
                   key={periodo.id}
                   style={{
-                    border: "1px solid #000",
+                    border: "1px solid black",
                     padding: "5px",
-                    backgroundColor: "#f2f2f2",
+                    textAlign: "center",
                   }}
+                  rowSpan={2}
                 >
                   {periodo.nombre}
                 </th>
               ))}
               <th
                 style={{
-                  border: "1px solid #000",
+                  border: "1px solid black",
                   padding: "5px",
-                  backgroundColor: "#f2f2f2",
+                  textAlign: "center",
                 }}
+                rowSpan={2}
               >
-                Promedio
+                Calificaci&oacute;n Final
               </th>
               <th
                 style={{
-                  border: "1px solid #000",
+                  border: "1px solid black",
                   padding: "5px",
-                  backgroundColor: "#f2f2f2",
+                  textAlign: "center",
                 }}
+                colSpan={2}
               >
-                Diciembre
+                Periodo de Evaluaci&oacute;n de Diciembre
               </th>
               <th
                 style={{
-                  border: "1px solid #000",
+                  border: "1px solid black",
                   padding: "5px",
-                  backgroundColor: "#f2f2f2",
+                  textAlign: "center",
                 }}
+                colSpan={2}
               >
-                Febrero
+                Evaluaci&oacute;n Ante Comisi&oacute;n de Febrero
               </th>
               <th
                 style={{
-                  border: "1px solid #000",
+                  border: "1px solid black",
                   padding: "5px",
-                  backgroundColor: "#f2f2f2",
+                  textAlign: "center",
+                }}
+                rowSpan={2}
+              >
+                Calificaci&oacute;n Final
+              </th>
+            </tr>
+            <tr>
+              <th
+                style={{
+                  border: "1px solid black",
+                  padding: "5px",
+                  textAlign: "center",
                 }}
               >
-                Calificaci&#243;n Final
+                Calificaciones
+              </th>
+              <th
+                style={{
+                  border: "1px solid black",
+                  padding: "5px",
+                  textAlign: "center",
+                }}
+              >
+                Firma Profesor
+              </th>
+              <th
+                style={{
+                  border: "1px solid black",
+                  padding: "5px",
+                  textAlign: "center",
+                }}
+              >
+                Calificaciones
+              </th>
+              <th
+                style={{
+                  border: "1px solid black",
+                  padding: "5px",
+                  textAlign: "center",
+                }}
+              >
+                Firma Profesor
               </th>
             </tr>
           </thead>
           <tbody>
-            {asignaturas.map((asignatura) => (
-              <tr key={asignatura.id}>
-                <td
-                  style={{
-                    border: "1px solid #000",
-                    padding: "5px",
-                  }}
-                >
-                  {asignatura.nombre}
-                </td>
-                {periodos.map((periodo) => (
+            {asignaturas.map((asignatura) => {
+              const reDiciembre = getNotaExtraordinaria(
+                asignatura.notasExtraordinarias,
+                3
+              ); // Nota reDiciembre
+              const reFebrero = getNotaExtraordinaria(
+                asignatura.notasExtraordinarias,
+                4
+              ); // Nota reFebrero
+              const calificacionFinal = calcularCalificacionFinal(
+                asignatura.notasPorPeriodo,
+                reDiciembre,
+                reFebrero
+              );
+
+              return (
+                <tr key={asignatura.id}>
                   <td
-                    key={periodo.id}
                     style={{
-                      border: "1px solid #000",
+                      border: "1px solid black",
                       padding: "5px",
+                      textAlign: "center",
                     }}
                   >
-                    {calcularPromedioPorPeriodo(
-                      asignatura.notasPorPeriodo[periodo.id]
-                    )}
+                    {asignatura.nombre}
                   </td>
-                ))}
-                <td
-                  style={{
-                    border: "1px solid #000",
-                    padding: "5px",
-                  }}
-                >
-                  {calcularPromedioGeneral(asignatura.notasPorPeriodo)}
-                </td>
-                <td
-                  style={{
-                    border: "1px solid #000",
-                    padding: "5px",
-                  }}
-                >
-                  {getNotaExtraordinaria(asignatura.notasExtraordinarias, 3) ||
-                    "-"}
-                </td>
-                <td
-                  style={{
-                    border: "1px solid #000",
-                    padding: "5px",
-                  }}
-                >
-                  {getNotaExtraordinaria(asignatura.notasExtraordinarias, 4) ||
-                    "-"}
-                </td>
-                <td
-                  style={{
-                    border: "1px solid #000",
-                    padding: "5px",
-                  }}
-                >
-                  {calcularCalificacionFinal(
-                    asignatura.notasPorPeriodo,
-                    getNotaExtraordinaria(asignatura.notasExtraordinarias, 3),
-                    getNotaExtraordinaria(asignatura.notasExtraordinarias, 4)
-                  )}
-                </td>
-              </tr>
-            ))}
+                  {periodos.map((periodo) => (
+                    <td
+                      key={periodo.id}
+                      style={{
+                        border: "1px solid black",
+                        padding: "5px",
+                        textAlign: "center",
+                      }}
+                    >
+                      {calcularPromedioPorPeriodo(
+                        asignatura.notasPorPeriodo[periodo.id]
+                      )}
+                    </td>
+                  ))}
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {calcularPromedioGeneral(asignatura.notasPorPeriodo)}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {reDiciembre !== null ? reDiciembre.toFixed(2) : ""}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  ></td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {reFebrero !== null ? reFebrero.toFixed(2) : ""}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  ></td>
+                  <td
+                    style={{
+                      border: "1px solid black",
+                      padding: "5px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {calificacionFinal}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
     )
   );
 
-  const handleDownloadPDF = () => {
-    if (pdfRef.current) {
-      html2canvas(pdfRef.current).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF();
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save("DUE.pdf");
-      });
-    }
+  const exportToPDF = async () => {
+    const input = pdfRef.current;
+    if (!input) return;
+
+    const canvas = await html2canvas(input, {
+      scale: 2,
+      useCORS: true,
+    });
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF();
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("Notas.pdf");
   };
 
   return (
     <Container>
       <Row>
         <Col>
-          <h1 className="text-center">Documentaci&#243;n Unica del Estudiante (DUE)</h1>
+          <h1>Consulta de Notas</h1>
         </Col>
       </Row>
       <Row>
-        <Col>
-          <Form.Group controlId="formCicloLectivo">
-            <Form.Label>Ciclo Lectivo</Form.Label>
+        <Col md={6}>
+          <Form.Group controlId="selectCicloLectivo">
+            <Form.Label>Seleccionar Ciclo Lectivo</Form.Label>
             <Form.Control
               as="select"
               value={selectedCicloLectivo}
-              onChange={(e) => setSelectedCicloLectivo(e.target.value)}
+              onChange={async (e) => {
+                const cicloId = e.target.value;
+                setSelectedCicloLectivo(cicloId);
+                const ciclo =
+                  ciclosLectivos.find((ciclo) => ciclo.id.toString() === cicloId) || null;
+                setCicloLectivo(ciclo);
+              }}
             >
-              {ciclosLectivos.map((ciclo) => (
-                <option key={ciclo.id} value={ciclo.id}>
-                  {ciclo.nombre}
-                </option>
-              ))}
+              {ciclosLectivos.length > 0 &&
+                ciclosLectivos.map((ciclo) => (
+                  <option key={ciclo.id} value={ciclo.id}>
+                    {ciclo.nombre}
+                  </option>
+                ))}
             </Form.Control>
           </Form.Group>
         </Col>
       </Row>
-      <Row>
-        <Col>
-          <div ref={pdfRef}>
-            <PDFContent
-              user={user}
-              institucionSelected={institucionSelected}
-              asignaturas={asignaturas}
-              periodos={periodos}
-            />
-          </div>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Button onClick={handleDownloadPDF}>Descargar PDF</Button>
+      <div ref={pdfRef}>
+        <PDFContent
+          user={user}
+          institucionSelected={institucionSelected}
+          asignaturas={asignaturas}
+          periodos={periodos}
+        />
+      </div>
+      <Row className="justify-content-center mb-4">
+        <Col xs="auto">
+          <StyledButton variant="purple" className="mx-2" onClick={exportToPDF}>
+            Generar PDF
+          </StyledButton>
         </Col>
       </Row>
     </Container>
   );
 };
+
+interface StyledButtonProps extends ButtonProps {
+  variant: "purple";
+}
+
+const StyledButton = styled(Button)<StyledButtonProps>`
+  background-color: purple;
+  border-color: purple;
+  color: white;
+  margin-top: 1rem;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    background-color: white;
+    color: purple;
+    border-color: purple;
+  }
+`;
 
 export default Due;
