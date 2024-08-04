@@ -75,8 +75,8 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             }),
         });
         const data = await response.json();
-        
-        if(data){
+
+        if (data) {
             fetchCursosAndAlumnos();
         }
 
@@ -248,8 +248,19 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                                                 <td style={{ textTransform: 'uppercase' }}>{alumno.apellido}</td>
                                                 <td>{alumno.nombre}</td>
                                                 <td>
-                                                    <Button variant="danger" size="sm" onClick={() => handleEliminarAlumno(curso.id, alumno.id)}>
-                                                        Eliminnar del curso
+                                                    <Button
+                                                        variant="danger"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            const confirmation = window.confirm(
+                                                                `¿Estás seguro que deseas eliminar al alumno ${alumno.nombre} ${alumno.apellido} del curso ${curso.nombre}?`
+                                                            );
+                                                            if (confirmation) {
+                                                                handleEliminarAlumno(curso.id, alumno.id);
+                                                            }
+                                                        }}
+                                                    >
+                                                        Eliminar del curso
                                                     </Button>
                                                 </td>
                                             </tr>
@@ -262,6 +273,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                 </Col>
             </Row>
         </Container>
+
     );
 };
 
