@@ -1,30 +1,20 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import {
-  useInstitucionSelectedContext,
-  useRolesContext,
-  useUserContext,
-} from "context/userContext";
-import { useCicloLectivo } from "context/CicloLectivoContext";
-import { Environment } from "utils/EnviromenManager";
-import {
-  CicloLectivo,
-  Asignatura,
-  Nota,
-  Periodo,
-  User,
-  Curso,
-} from "model/types";
-import { useRouter } from "next/navigation";
-import { Row, Col, Card, Spinner } from "react-bootstrap";
-import { useSession } from "next-auth/react";
-import { Bar } from "react-chartjs-2";
-import Chart from "chart.js/auto";
+import React, { useEffect, useState } from 'react';
+import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
+import { useCicloLectivo } from 'context/CicloLectivoContext';
+import { Environment } from 'utils/EnviromenManager';
+import { CicloLectivo, Asignatura, Nota, Periodo, User, Curso } from 'model/types';
+import { useRouter } from 'next/navigation';
+import { Row, Col, Card, Spinner } from 'react-bootstrap';
+import { useSession } from 'next-auth/react';
+import { Bar } from 'react-chartjs-2';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 function PageBienvenido({ params }: { params: { id: string } }) {
-  const [institucionSelected, setInstitucionSelected] =
-    useInstitucionSelectedContext();
+  const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
   const [rol, setRol] = useRolesContext();
   const [user] = useUserContext();
   const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
@@ -59,9 +49,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
   const fetchCicloLectivoActivo = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(Environment.endPoint.getCicloLectivo)}${
-          params.id
-        }`
+        `${Environment.getEndPoint(Environment.endPoint.getCicloLectivo)}${params.id}`
       );
       if (response.status !== 200) {
         if (rol.some((rol) => rol.name == "Director")) {
@@ -85,9 +73,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
     try {
       setLoading(true);
       const response = await fetch(
-        `${Environment.getEndPoint(
-          Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion
-        )}${params.id}`,
+        `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion)}${params.id}`,
         {
           method: "GET",
           headers: {
@@ -112,9 +98,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
   const fetchEmpleados = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(
-          Environment.endPoint.getUsuarioWhereRolIsNotAlumnoByIntitucion
-        )}${params.id}`,
+        `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsNotAlumnoByIntitucion)}${params.id}`,
         {
           method: "GET",
           headers: {
@@ -137,9 +121,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
   const fetchCursosAndAlumnos = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(
-          Environment.endPoint.getCursosAllAlumnosByCicloLectivoActivo
-        )}${params.id}`,
+        `${Environment.getEndPoint(Environment.endPoint.getCursosAllAlumnosByCicloLectivoActivo)}${params.id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -165,9 +147,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
   const fetchAsignaturasYNotas = async () => {
     try {
       const response = await fetch(
-        `${Environment.getEndPoint(
-          Environment.endPoint.getNotasByAlumnoForCicloElectivo
-        )}`,
+        `${Environment.getEndPoint(Environment.endPoint.getNotasByAlumnoForCicloElectivo)}`,
         {
           method: "POST",
           headers: {
@@ -184,17 +164,14 @@ function PageBienvenido({ params }: { params: { id: string } }) {
       const periodosUnicos: Periodo[] = [];
       data.forEach((item: { asignatura: Asignatura; notas: Nota[] }) => {
         item.notas.forEach((nota: Nota) => {
-          if (
-            !periodosUnicos.find((periodo) => periodo.id === nota.periodo.id)
-          ) {
+          if (!periodosUnicos.find((periodo) => periodo.id === nota.periodo.id)) {
             periodosUnicos.push(nota.periodo);
           }
         });
       });
 
       periodosUnicos.sort(
-        (a, b) =>
-          new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime()
+        (a, b) => new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime()
       );
 
       setPeriodos(periodosUnicos);
@@ -224,13 +201,9 @@ function PageBienvenido({ params }: { params: { id: string } }) {
     return (total / evaluaciones.length).toFixed(2);
   };
 
-  const calcularPromedioGeneral = (notasPorPeriodo: {
-    [key: number]: Nota[];
-  }) => {
+  const calcularPromedioGeneral = (notasPorPeriodo: { [key: number]: Nota[] }) => {
     const todasLasNotas = Object.values(notasPorPeriodo).flat();
-    const evaluaciones = todasLasNotas.filter(
-      (nota) => nota.tipoNota?.id === 1
-    );
+    const evaluaciones = todasLasNotas.filter((nota) => nota.tipoNota?.id === 1);
     if (evaluaciones.length === 0) return "-";
     const total = evaluaciones.reduce((acc, nota) => acc + nota.nota, 0);
     return (total / evaluaciones.length).toFixed(2);
@@ -294,31 +267,19 @@ function PageBienvenido({ params }: { params: { id: string } }) {
                 <Row>
                   <Col xs={12} md={4} className="mb-4">
                     <Card className="text-center shadow-sm border-0">
-                      <Card.Header className="text-lg font-bold">
-                        Curso
-                      </Card.Header>
+                      <Card.Header className="text-lg font-bold">Curso</Card.Header>
                       <Card.Body>
-                        <Card.Text className="text-xl font-semibold">
-                          {cicloLectivo.nombre}
-                        </Card.Text>
+                        <Card.Text className="text-xl font-semibold">{cicloLectivo.nombre}</Card.Text>
                       </Card.Body>
                     </Card>
                   </Col>
                   <Col xs={12} md={4} className="mb-4">
                     <Card className="text-center shadow-sm border-0">
-                      <Card.Header className="text-lg font-bold">
-                        Materias Asignadas
-                      </Card.Header>
+                      <Card.Header className="text-lg font-bold">Materias Asignadas</Card.Header>
                       <Card.Body>
                         {asignaturas.map((asignatura, index) => (
-                          <Card.Text
-                            key={index}
-                            className="text-md font-medium"
-                          >
-                            {asignatura.nombre} - Promedio:{" "}
-                            {calcularPromedioGeneral(
-                              asignatura.notasPorPeriodo
-                            )}
+                          <Card.Text key={index} className="text-md font-medium">
+                            {asignatura.nombre} - Promedio: {calcularPromedioGeneral(asignatura.notasPorPeriodo)}
                           </Card.Text>
                         ))}
                       </Card.Body>
@@ -326,13 +287,9 @@ function PageBienvenido({ params }: { params: { id: string } }) {
                   </Col>
                   <Col xs={12} md={4} className="mb-4">
                     <Card className="text-center shadow-sm border-0">
-                      <Card.Header className="text-lg font-bold">
-                        Aula Asignada
-                      </Card.Header>
+                      <Card.Header className="text-lg font-bold">Aula Asignada</Card.Header>
                       <Card.Body>
-                        <Card.Text className="text-xl font-semibold">
-                          Aula 101
-                        </Card.Text>
+                        <Card.Text className="text-xl font-semibold">Aula 101</Card.Text>
                       </Card.Body>
                     </Card>
                   </Col>
@@ -343,18 +300,10 @@ function PageBienvenido({ params }: { params: { id: string } }) {
                 <Row>
                   <Col xs={12} className="mb-4">
                     <Card className="text-center shadow-sm border-0">
-                      <Card.Header className="text-lg font-bold">
-                        Información Adicional
-                      </Card.Header>
+                      <Card.Header className="text-lg font-bold">Información Adicional</Card.Header>
                       <Card.Body>
-                        <Card.Text className="text-md font-medium">
-                          Cantidad de alumnos en la institución:{" "}
-                          {alumnos.length}
-                        </Card.Text>
-                        <Card.Text className="text-md font-medium">
-                          Cantidad de personal en la institución:{" "}
-                          {empleados.length}
-                        </Card.Text>
+                        <Card.Text className="text-md font-medium">Cantidad de alumnos en la institución: {alumnos.length}</Card.Text>
+                        <Card.Text className="text-md font-medium">Cantidad de personal en la institución: {empleados.length}</Card.Text>
                       </Card.Body>
                     </Card>
                   </Col>
@@ -362,9 +311,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
                 <Row>
                   <Col xs={12}>
                     <Card className="shadow-sm border-0">
-                      <Card.Header className="text-lg font-bold">
-                        Alumnos por Curso
-                      </Card.Header>
+                      <Card.Header className="text-lg font-bold">Alumnos por Curso</Card.Header>
                       <Card.Body>
                         <Bar data={getChartData()} options={chartOptions} />
                       </Card.Body>
