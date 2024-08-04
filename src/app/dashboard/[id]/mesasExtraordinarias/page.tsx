@@ -6,12 +6,17 @@ import { Environment } from "utils/EnviromenManager";
 import { useUserContext } from "context/userContext";
 import { useCicloLectivo } from "context/CicloLectivoContext";
 
+type UserWithGrades = User & {
+    calificacionFinal: number;
+    notasPorPeriodo: { periodoId: number; promedioNotas: string }[];
+};
+
 const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
     const [cursoSeleccionado, setCursoSeleccionado] = useState<string>("");
     const [asignatura, setAsignatura] = useState<string>("");
     const [cursos, setCursos] = useState<Curso[]>([]);
     const [asignaturas, setAsignaturas] = useState<Curso[]>([]);
-    const [alumnos, setAlumnos] = useState<User[]>([]);
+    const [alumnos, setAlumnos] = useState<UserWithGrades[]>([]);
     const [user, setUser] = useUserContext();
     const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
     const [periodos, setPeriodos] = useState<Periodo[]>([]);
@@ -96,11 +101,18 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                 }
             );
             const data = await response.json();
-            console.log(data);
-            const alumnosConNotasBajas = Array.isArray(data)
+            const alumnosConNotasBajas: UserWithGrades[] = Array.isArray(data)
                 ? data
-                    .filter((a) => getCalificacionParcialPromedio(a.usuario.notas) < 6)
-                    .map((a) => a.usuario)
+                    .map((a) => {
+                        const notasPorPeriodo = getPromedioNotasPorPeriodo(a.usuario.notas);
+                        const calificacionFinal = getCalificacionFinal(notasPorPeriodo);
+                        return {
+                            ...a.usuario,
+                            calificacionFinal,
+                            notasPorPeriodo,
+                        };
+                    })
+                    .filter((alumno) => alumno.calificacionFinal < 6)
                     .sort((a, b) => a.apellido.localeCompare(b.apellido))
                 : [];
             setAlumnos(alumnosConNotasBajas);
@@ -108,20 +120,6 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
             console.error("Error fetching alumnos:", error);
             setAlumnos([]);
         }
-    };
-
-    const getCalificacionParcialPromedio = (notas: Nota[]) => {
-        const notasPorPeriodo = periodos.map((periodo) =>
-            notas.filter((nota) => nota.periodoId === periodo.id)
-        );
-        const promedios = notasPorPeriodo.map(
-            (notasPeriodo) =>
-                notasPeriodo.reduce((acc, nota) => acc + (nota.nota || 0), 0) /
-                (notasPeriodo.length || 1)
-        );
-        const promedioFinal =
-            promedios.reduce((acc, promedio) => acc + promedio, 0) / promedios.length;
-        return promedioFinal;
     };
 
     const getNotaExtraordinaria = (notas: Nota[], tipoNotaId: number) => {
@@ -133,10 +131,10 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
         return periodos.map((periodo) => {
             const notasPeriodo = notas.filter((nota) => nota.periodoId === periodo.id);
             const recuperatorio = notasPeriodo.find(nota => nota.tipoNotaId === 2); // recuperatorio
-            const promedioNotas = recuperatorio ? recuperatorio.nota.toFixed(2) : 
+            const promedioNotas = recuperatorio ? recuperatorio.nota.toFixed(2) :
                 notasPeriodo.length
-                ? (notasPeriodo.reduce((acc, nota) => acc + (nota.nota || 0), 0) / notasPeriodo.length).toFixed(2)
-                : "";
+                    ? (notasPeriodo.reduce((acc, nota) => acc + (nota.nota || 0), 0) / notasPeriodo.length).toFixed(2)
+                    : "";
             return { periodoId: periodo.id, promedioNotas };
         });
     };
@@ -160,33 +158,15 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                 }),
             }
         );
-        const data = await response.json();
-        console.log(data);
         fetchAlumnos();
     };
 
-    const canAddExtraordinariaDic = (notasPorPeriodo: { periodoId: number, promedioNotas: string }[]) => {
-        const periodo1 = notasPorPeriodo.find(n => n.periodoId === 5); // periodo 1
-        const periodo2 = notasPorPeriodo.find(n => n.periodoId === 6); // periodo 2
-
-        if (!periodo1 || !periodo2) return false;
-
-        const promedio1 = Number(periodo1.promedioNotas);
-        const promedio2 = Number(periodo2.promedioNotas);
-
-        return (promedio1 < 6 || promedio2 < 6);
+    const canAddExtraordinariaDic = (calificacionFinal: number) => {
+        return calificacionFinal < 6;
     };
 
-    const canAddExtraordinariaFeb = (notasPorPeriodo: { periodoId: number, promedioNotas: string }[], extraordinariaDic: number) => {
-        const periodo1 = notasPorPeriodo.find(n => n.periodoId === 5); // periodo 1
-        const periodo2 = notasPorPeriodo.find(n => n.periodoId === 6); // periodo 2
-
-        if (!periodo1 || !periodo2) return false;
-
-        const promedio1 = Number(periodo1.promedioNotas);
-        const promedio2 = Number(periodo2.promedioNotas);
-
-        return (promedio1 < 6 && promedio2 < 6) || extraordinariaDic < 6;
+    const canAddExtraordinariaFeb = (extraordinariaDic: number) => {
+        return extraordinariaDic < 6;
     };
 
     const getCalificacionDefinitiva = (notasPorPeriodo: { periodoId: number, promedioNotas: string }[], extraordinariaDic: number, extraordinariaFeb: number) => {
@@ -194,11 +174,17 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
             return extraordinariaFeb;
         }
         if (extraordinariaDic != null && extraordinariaDic >= 6) {
-            const promedio1 = Number(notasPorPeriodo.find(n => n.periodoId === 5)?.promedioNotas || 0);
-            const promedio2 = Number(notasPorPeriodo.find(n => n.periodoId === 6)?.promedioNotas || 0);
+            const promedio1 = Number(notasPorPeriodo.find(n => n.periodoId === 1)?.promedioNotas || 0);
+            const promedio2 = Number(notasPorPeriodo.find(n => n.periodoId === 2)?.promedioNotas || 0);
             return (extraordinariaDic + Math.max(promedio1, promedio2)) / 2;
         }
         return null;
+    };
+
+    const getCalificacionFinal = (notasPorPeriodo: { periodoId: number, promedioNotas: string }[]) => {
+        const promedio1 = Number(notasPorPeriodo.find(n => n.periodoId === 1)?.promedioNotas || 0);
+        const promedio2 = Number(notasPorPeriodo.find(n => n.periodoId === 2)?.promedioNotas || 0);
+        return (promedio1 + promedio2) / 2;
     };
 
     return (
@@ -262,91 +248,88 @@ const MesasExtraordinarias = ({ params }: { params: { id: string } }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Array.isArray(alumnos) &&
-                                    alumnos.map((alumno) => {
-                                        const calificacionFinal = getCalificacionParcialPromedio(alumno.notas);
-                                        const notasPorPeriodo = getPromedioNotasPorPeriodo(alumno.notas);
-                                        const extraordinariaDic = getNotaExtraordinaria(alumno.notas, 3); // reDiciembre
-                                        const extraordinariaFeb = getNotaExtraordinaria(alumno.notas, 4); // reFebrero
-                                        const calificacionDefinitiva = getCalificacionDefinitiva(notasPorPeriodo, extraordinariaDic, extraordinariaFeb);
+                                {alumnos.map((alumno) => {
+                                    const extraordinariaDic = getNotaExtraordinaria(alumno.notas, 3); // reDiciembre
+                                    const extraordinariaFeb = getNotaExtraordinaria(alumno.notas, 4); // reFebrero
+                                    const calificacionDefinitiva = getCalificacionDefinitiva(alumno.notasPorPeriodo, extraordinariaDic, extraordinariaFeb);
 
-                                        return (
-                                            <tr key={alumno.id}>
-                                                <td>{`${alumno.apellido}, ${alumno.nombre}`}</td>
-                                                {notasPorPeriodo.map(({ periodoId, promedioNotas }) => (
-                                                    <td key={periodoId}>{promedioNotas}</td>
-                                                ))}
-                                                <td>{calificacionFinal.toFixed(2)}</td>
-                                                <td>
-                                                    {extraordinariaDic != null ? (
-                                                        extraordinariaDic
-                                                    ) : canAddExtraordinariaDic(notasPorPeriodo) ? (
-                                                        <>
-                                                            <Form.Control
-                                                                type="number"
-                                                                min="0"
-                                                                max="10"
-                                                                value={extraordinariaNota[alumno.id]?.dic || ""}
-                                                                onChange={(e) => {
-                                                                    const value = e.target.value;
-                                                                    if (value === "" || (Number(value) >= 0 && Number(value) <= 10)) {
-                                                                        setExtraordinariaNota({
-                                                                            ...extraordinariaNota,
-                                                                            [alumno.id]: {
-                                                                                ...extraordinariaNota[alumno.id],
-                                                                                dic: value,
-                                                                            },
-                                                                        });
-                                                                    }
-                                                                }}
-                                                            />
-                                                            <Button
-                                                                onClick={() => handleAddNotaExtraordinaria(alumno.id, 3)}
-                                                            >
-                                                                Agregar Nota
-                                                            </Button>
-                                                        </>
-                                                    ) : ""}
-                                                </td>
-                                                <td>
-                                                    {extraordinariaFeb != null ? (
-                                                        extraordinariaFeb
-                                                    ) : canAddExtraordinariaFeb(notasPorPeriodo, extraordinariaDic) ? (
-                                                        <>
-                                                            <Form.Control
-                                                                type="number"
-                                                                min="0"
-                                                                max="10"
-                                                                value={extraordinariaNota[alumno.id]?.feb || ""}
-                                                                onChange={(e) => {
-                                                                    const value = e.target.value;
-                                                                    if (value === "" || (Number(value) >= 0 && Number(value) <= 10)) {
-                                                                        setExtraordinariaNota({
-                                                                            ...extraordinariaNota,
-                                                                            [alumno.id]: {
-                                                                                ...extraordinariaNota[alumno.id],
-                                                                                feb: value,
-                                                                            },
-                                                                        });
-                                                                    }
-                                                                }}
-                                                            />
-                                                            <Button
-                                                                onClick={() => handleAddNotaExtraordinaria(alumno.id, 4)}
-                                                            >
-                                                                Agregar Nota
-                                                            </Button>
-                                                        </>
-                                                    ) : ""}
-                                                </td>
-                                                <td>
-                                                    {typeof calificacionDefinitiva === "number"
-                                                        ? calificacionDefinitiva.toFixed(2)
-                                                        : ""}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
+                                    return (
+                                        <tr key={alumno.id}>
+                                            <td>{`${alumno.apellido}, ${alumno.nombre}`}</td>
+                                            {alumno.notasPorPeriodo.map(({ periodoId, promedioNotas }) => (
+                                                <td key={periodoId}>{promedioNotas}</td>
+                                            ))}
+                                            <td>{alumno.calificacionFinal.toFixed(2)}</td>
+                                            <td>
+                                                {extraordinariaDic != null ? (
+                                                    extraordinariaDic
+                                                ) : canAddExtraordinariaDic(alumno.calificacionFinal) ? (
+                                                    <>
+                                                        <Form.Control
+                                                            type="number"
+                                                            min="0"
+                                                            max="10"
+                                                            value={extraordinariaNota[alumno.id]?.dic || ""}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                if (value === "" || (Number(value) >= 0 && Number(value) <= 10)) {
+                                                                    setExtraordinariaNota({
+                                                                        ...extraordinariaNota,
+                                                                        [alumno.id]: {
+                                                                            ...extraordinariaNota[alumno.id],
+                                                                            dic: value,
+                                                                        },
+                                                                    });
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Button
+                                                            onClick={() => handleAddNotaExtraordinaria(alumno.id, 3)}
+                                                        >
+                                                            Agregar Nota
+                                                        </Button>
+                                                    </>
+                                                ) : ""}
+                                            </td>
+                                            <td>
+                                                {extraordinariaFeb != null ? (
+                                                    extraordinariaFeb
+                                                ) : canAddExtraordinariaFeb(extraordinariaDic) ? (
+                                                    <>
+                                                        <Form.Control
+                                                            type="number"
+                                                            min="0"
+                                                            max="10"
+                                                            value={extraordinariaNota[alumno.id]?.feb || ""}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                if (value === "" || (Number(value) >= 0 && Number(value) <= 10)) {
+                                                                    setExtraordinariaNota({
+                                                                        ...extraordinariaNota,
+                                                                        [alumno.id]: {
+                                                                            ...extraordinariaNota[alumno.id],
+                                                                            feb: value,
+                                                                        },
+                                                                    });
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Button
+                                                            onClick={() => handleAddNotaExtraordinaria(alumno.id, 4)}
+                                                        >
+                                                            Agregar Nota
+                                                        </Button>
+                                                    </>
+                                                ) : ""}
+                                            </td>
+                                            <td>
+                                                {typeof calificacionDefinitiva === "number"
+                                                    ? calificacionDefinitiva.toFixed(2)
+                                                    : ""}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </Table>
                     </div>
