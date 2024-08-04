@@ -1,11 +1,15 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import { useInstitucionSelectedContext, useRolesContext, useUserContext } from 'context/userContext';
 import { useCicloLectivo } from 'context/CicloLectivoContext';
 import { Environment } from 'utils/EnviromenManager';
-import { CicloLectivo, Asignatura, Nota, Periodo } from 'model/types';
+import { CicloLectivo, Asignatura, Nota, Periodo, User, Curso } from 'model/types';
 import { useRouter } from 'next/navigation';
-import { Row, Col, Card, Spinner, Table } from 'react-bootstrap';
+import { Row, Col, Card, Spinner } from 'react-bootstrap';
+import { useSession } from 'next-auth/react';
+import { Bar } from 'react-chartjs-2';
+import Chart from 'chart.js/auto';
 
 function PageBienvenido({ params }: { params: { id: string } }) {
   const [institucionSelected, setInstitucionSelected] = useInstitucionSelectedContext();
@@ -16,11 +20,18 @@ function PageBienvenido({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true);
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [periodos, setPeriodos] = useState<Periodo[]>([]);
+  const [alumnos, setAlumnos] = useState<User[]>([]);
+  const [empleados, setEmpleados] = useState<User[]>([]);
+  const [cursos, setCursos] = useState<Curso[]>([]);
+  const { data: session, status } = useSession();
 
-  console.log(institucionSelected)
+  console.log(institucionSelected);
 
   useEffect(() => {
     fetchCicloLectivoActivo();
+    fetchAlumnos();
+    fetchEmpleados();
+    fetchCursosAndAlumnos();
   }, []);
 
   useEffect(() => {
@@ -46,6 +57,78 @@ function PageBienvenido({ params }: { params: { id: string } }) {
       console.error('Error al obtener el ciclo lectivo:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAlumnos = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsAlumnoByInstitucion)}${params.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+      const data = await response.json();
+      console.log(data);
+      setAlumnos(data.alumnos);
+    } catch (error) {
+      console.error("Error al obtener alumnos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchEmpleados = async () => {
+    try {
+      const response = await fetch(
+        `${Environment.getEndPoint(Environment.endPoint.getUsuarioWhereRolIsNotAlumnoByIntitucion)}${params.id}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.accessToken}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+      const data = await response.json();
+      console.log('Empleados:', data);
+      setEmpleados(data.usuarios);
+    } catch (error) {
+      console.error('Error al obtener empleados:', error.message);
+    }
+  };
+
+  const fetchCursosAndAlumnos = async () => {
+    try {
+      const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.getCursosAllAlumnosByCicloLectivoActivo)}${params.id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Data fetched:", data);
+      if (Array.isArray(data)) {
+        setCursos(data.sort((a, b) => a.id - b.id)); // Ordenar por id
+      } else {
+        console.error("Error: Data received is not an array");
+      }
+    } catch (error) {
+      console.error("Error fetching courses and students:", error);
     }
   };
 
@@ -105,6 +188,33 @@ function PageBienvenido({ params }: { params: { id: string } }) {
     return (total / evaluaciones.length).toFixed(2);
   };
 
+  const getChartData = () => {
+    const labels = cursos.map(curso => curso.nombre);
+    const data = cursos.map(curso => curso.cursosUsuario.length);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Cantidad de alumnos',
+          data,
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1,
+        },
+      ],
+    };
+  };
+
+  const chartOptions = {
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -162,17 +272,29 @@ function PageBienvenido({ params }: { params: { id: string } }) {
                 </Row>
               </>
             ) : (
-              <Row>
-                <Col xs={12} className="mb-4">
-                  <Card className="text-center shadow-sm border-0">
-                    <Card.Header className="text-lg font-bold">Información Adicional</Card.Header>
-                    <Card.Body>
-                      <Card.Text className="text-md font-medium">Cantidad de usuarios en la institución: 150</Card.Text>
-                      <Card.Text className="text-md font-medium">Cantidad de cursos: 10</Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
+              <>
+                <Row>
+                  <Col xs={12} className="mb-4">
+                    <Card className="text-center shadow-sm border-0">
+                      <Card.Header className="text-lg font-bold">Información Adicional</Card.Header>
+                      <Card.Body>
+                        <Card.Text className="text-md font-medium">Cantidad de alumnos en la institución: {alumnos.length}</Card.Text>
+                        <Card.Text className="text-md font-medium">Cantidad de personal en la institución: {empleados.length}</Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col xs={12}>
+                    <Card className="shadow-sm border-0">
+                      <Card.Header className="text-lg font-bold">Alumnos por Curso</Card.Header>
+                      <Card.Body>
+                        <Bar data={getChartData()} options={chartOptions} />
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+              </>
             )}
           </div>
         </div>
