@@ -49,7 +49,7 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
     // FUNCIONES PARA EL Search
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     useEffect(() => {
-       
+
         fetchData();
     }, [session, institucionSelected.id]);
 
@@ -71,7 +71,7 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
             }
 
             const data = await response.json();
-            console.log('soy data ',data);
+            console.log('soy data ', data);
             setEmpleados(data.usuarios);
         } catch (error) {
             console.error('Error al obtener empleados:', error.message);
@@ -326,10 +326,7 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
             </Form.Group>
 
 
-            <Table
-                striped
-                bordered
-                hover>
+            <Table striped bordered hover>
                 <thead>
                     <tr>
                         <th>Legajo</th>
@@ -339,49 +336,45 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
                         <th>Acciones</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {Array.isArray(filteredEmpleados) && filteredEmpleados.length > 0 ? (
-                        filteredEmpleados.map((empleado) => (
-                            <tr key={empleado.id}>
-                                <td>{empleado?.legajo}</td>
-                                <td>
-                                    {empleado?.nombre} {empleado?.apellido}
-                                </td>
-                                <td>
-                                    {empleado?.dni}
-                                </td>
-                                <td>
-                                    {empleado?.telefono}
-                                </td>
-                                <td>
-                                    <Button
-                                        variant='link'
-                                        onClick={() => handleConsultar(empleado)}
-                                        title='Consultar Empleado'>
-                                        <BsEye />
-                                    </Button>
+                        filteredEmpleados
+                            .filter(empleado => empleado.rol !== 'admin' && empleado.rol !== 'alumno')
+                            .map((empleado) => (
+                                <tr key={empleado.id}>
+                                    <td>{empleado?.legajo}</td>
+                                    <td>
+                                        {empleado?.nombre} {empleado?.apellido}
+                                    </td>
+                                    <td>{empleado?.dni}</td>
+                                    <td>{empleado?.telefono}</td>
+                                    <td>
+                                        <Button
+                                            variant='link'
+                                            onClick={() => handleConsultar(empleado)}
+                                            title='Consultar Empleado'>
+                                            <BsEye />
+                                        </Button>
 
-                                    <Button
-                                        variant='link'
-                                        onClick={() => handleModificar(empleado)}
-                                        title='Modificar Empleado'>
-                                        <BsPencil />
-                                    </Button>
+                                        <Button
+                                            variant='link'
+                                            onClick={() => handleModificar(empleado)}
+                                            title='Modificar Empleado'>
+                                            <BsPencil />
+                                        </Button>
 
-                                    <Button
-                                        variant='link'
-                                        onClick={() => handleEliminar(empleado)}
-                                        title='Eliminar Empleado'>
-                                        <BsTrash />
-                                    </Button>
-
-                                </td>
-                            </tr>
-                        ))
+                                        <Button
+                                            variant='link'
+                                            onClick={() => handleEliminar(empleado)}
+                                            title='Eliminar Empleado'>
+                                            <BsTrash />
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))
                     ) : (
                         <tr>
-                            <td colSpan={4}>No hay empleados disponibles</td>
+                            <td colSpan={5}>No hay empleados disponibles</td>
                         </tr>
                     )}
                 </tbody>
