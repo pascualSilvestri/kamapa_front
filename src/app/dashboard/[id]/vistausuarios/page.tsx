@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import React, { useState, useEffect } from 'react';
 import { Button, Table, Modal, Form, Row, Col } from 'react-bootstrap';
 import { BsEye, BsPencil, BsTrash } from 'react-icons/bs';
@@ -603,7 +603,7 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
 
                             <Form.Group controlId='formRoles'>
                                 <Form.Label>Roles</Form.Label>
-                                {roles.map((rol) => {
+                                {roles.filter(rol => rol.name !== "Admin" && rol.name !== "Alumno").map((rol) => {
                                     const isChecked = selectedEmpleado?.Roles?.some((r) => r.id === rol.id);
                                     return (
                                         <Form.Check
@@ -692,4 +692,3 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
 };
 
 export default VistaEmpleadosPage;
-
