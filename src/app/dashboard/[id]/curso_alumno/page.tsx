@@ -76,7 +76,6 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         });
         const data = await response.json();
         
-
         if(data){
             fetchCursosAndAlumnos();
         }
@@ -133,11 +132,9 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             const alumnosGenero1 = alumnosFiltrados.filter(alumno => alumno.generoId === 1);
             const alumnosGenero2 = alumnosFiltrados.filter(alumno => alumno.generoId === 2);
 
-
             // Ordenar alumnos alfabéticamente por apellido
             alumnosGenero1.sort((a, b) => a.apellido.localeCompare(b.apellido));
             alumnosGenero2.sort((a, b) => a.apellido.localeCompare(b.apellido));
-
 
             if (alumnosGenero1.length > 0) {
                 startY = crearTabla('Alumnos Varones', alumnosGenero1, startY);
@@ -231,40 +228,35 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                         <thead>
                             <tr>
                                 <th>Curso</th>
-                                <th>Alumnos</th>
+                                <th>Apellido</th>
+                                <th>Nombre</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {cursos.sort((a, b) => a.id - b.id).map((curso, index) => ( // Ordenar por id
-                                <tr key={index}>
-                                    <td>{curso.nombre}</td>
-                                    <td>
-                                        <ul>
-                                            {filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(
-                                                (alumno, idx) => (
-                                                    <li key={idx}>
-                                                        <span style={{ textTransform: 'uppercase' }}>{alumno.apellido}</span>, <span>{alumno.nombre}</span>
-                                                    </li>
-                                                )
-                                            )}
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        <ul>
-                                            {filtrarAlumnos(curso.cursosUsuario, filtroAlumno).map(
-                                                (alumno, idx) => (
-                                                    <li key={idx}>
-                                                        <Button variant="danger" size="sm" onClick={() => handleEliminarAlumno(curso.id, alumno.id)}>
-                                                            Eliminar
-                                                        </Button>
-                                                    </li>
-                                                )
-                                            )}
-                                        </ul>
-                                    </td>
-                                </tr>
-                            ))}
+                            {cursos.sort((a, b) => a.id - b.id).map((curso, index) => {
+                                const alumnosFiltrados = filtrarAlumnos(curso.cursosUsuario, filtroAlumno);
+                                return (
+                                    <>
+                                        {alumnosFiltrados.map((alumno, idx) => (
+                                            <tr key={`${curso.id}-${alumno.id}`}>
+                                                {idx === 0 && (
+                                                    <td rowSpan={alumnosFiltrados.length}>
+                                                        {curso.nombre}
+                                                    </td>
+                                                )}
+                                                <td style={{ textTransform: 'uppercase' }}>{alumno.apellido}</td>
+                                                <td>{alumno.nombre}</td>
+                                                <td>
+                                                    <Button variant="danger" size="sm" onClick={() => handleEliminarAlumno(curso.id, alumno.id)}>
+                                                        Eliminnar del curso
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </>
+                                );
+                            })}
                         </tbody>
                     </Table>
                 </Col>
