@@ -136,9 +136,9 @@ const RegAlumno = () => {
                     update_for: session.user.nombre + ' ' + session.user.apellido,
                     password: dni,
                     institucionId: institucionSelected.id,
-                    generoId: generoSeleccionado,
                     tutor: tutor,
                 },
+                generoId: generoSeleccionado,
                 rols: selectedRoleIds,
                 domicilio: {
                     calle: calle,
