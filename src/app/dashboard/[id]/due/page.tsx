@@ -29,17 +29,6 @@ const Due = ({ params }: { params: { id: string } }) => {
   );
   const pdfRef = useRef(null);
 
-  useEffect(() => {
-    fetchCiclosLectivos();
-  }, []);
-
-  console.log(user);
-  useEffect(() => {
-    if (selectedCicloLectivo) {
-      fetchAsignaturasYNotas();
-    }
-  }, [selectedCicloLectivo]);
-
   const fetchCiclosLectivos = async () => {
     try {
       const response = await fetch(
@@ -117,6 +106,16 @@ const Due = ({ params }: { params: { id: string } }) => {
       console.error("Error fetching asignaturas y notas:", error);
     }
   };
+
+  useEffect(() => {
+    fetchCiclosLectivos();
+  }, [fetchCiclosLectivos]); // Incluye la dependencia fetchCiclosLectivos
+
+  useEffect(() => {
+    if (selectedCicloLectivo) {
+      fetchAsignaturasYNotas();
+    }
+  }, [selectedCicloLectivo, fetchAsignaturasYNotas]); // Incluye la dependencia fetchAsignaturasYNotas
 
   const calcularPromedioPorPeriodo = (notas: Nota[]) => {
     const evaluaciones = notas.filter((nota) => nota.tipoNota?.id === 1);
@@ -501,7 +500,7 @@ const Due = ({ params }: { params: { id: string } }) => {
                   >
                     {asignatura.nombre}
                   </td>
-                  {periodos.map((periodo) => (
+                  {periodos.flatMap((periodo) => (
                     <td
                       key={periodo.id}
                       style={{
@@ -573,6 +572,8 @@ const Due = ({ params }: { params: { id: string } }) => {
       </div>
     )
   );
+
+  PDFContent.displayName = "PDFContent"; // Añade el nombre de visualización
 
   const exportToPDF = async () => {
     const input = pdfRef.current;
