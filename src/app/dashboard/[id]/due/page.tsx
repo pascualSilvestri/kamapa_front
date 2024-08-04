@@ -109,13 +109,13 @@ const Due = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     fetchCiclosLectivos();
-  }, [fetchCiclosLectivos]); // Incluye la dependencia fetchCiclosLectivos
+  }, [fetchCiclosLectivos]);
 
   useEffect(() => {
     if (selectedCicloLectivo) {
       fetchAsignaturasYNotas();
     }
-  }, [selectedCicloLectivo, fetchAsignaturasYNotas]); // Incluye la dependencia fetchAsignaturasYNotas
+  }, [selectedCicloLectivo, fetchAsignaturasYNotas]);
 
   const calcularPromedioPorPeriodo = (notas: Nota[]) => {
     const evaluaciones = notas.filter((nota) => nota.tipoNota?.id === 1);
@@ -573,7 +573,7 @@ const Due = ({ params }: { params: { id: string } }) => {
     )
   );
 
-  PDFContent.displayName = "PDFContent"; // Añade el nombre de visualización
+  PDFContent.displayName = "PDFContent";
 
   const exportToPDF = async () => {
     const input = pdfRef.current;
