@@ -88,7 +88,7 @@ const Dashboard = () => {
                                             e.currentTarget.style.color = 'white';
                                         }}
                                         onClick={async (e) => {
-                                            console.log(`InstiSelected: ${JSON.stringify(institucion)}`);
+                                            
                                             const insti: Institucion = {
 
                                                 id: institucion.id,
