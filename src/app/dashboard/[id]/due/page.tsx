@@ -29,21 +29,18 @@ const Due = ({ params }: { params: { id: string } }) => {
   );
   const pdfRef = useRef(null);
 
-  const fetchCiclosLectivos = async () => {
-    try {
-      const response = await fetch(
-        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id}`
-      );
-      const data = await response.json();
-      setCiclosLectivos(data);
-      const activeCiclo = data.find((ciclo: CicloLectivo) => ciclo.isActive);
-      if (activeCiclo) {
-        setSelectedCicloLectivo(activeCiclo.id.toString());
-      }
-    } catch (error) {
-      console.error("Error fetching ciclos lectivos:", error);
+
+
+  useEffect(() => {
+    fetchCiclosLectivos();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCicloLectivo) {
+      fetchAsignaturasYNotas();
     }
-  };
+  }, []);
+
 
   const fetchAsignaturasYNotas = async () => {
     try {
@@ -107,15 +104,21 @@ const Due = ({ params }: { params: { id: string } }) => {
     }
   };
 
-  useEffect(() => {
-    fetchCiclosLectivos();
-  }, [fetchCiclosLectivos]);
-
-  useEffect(() => {
-    if (selectedCicloLectivo) {
-      fetchAsignaturasYNotas();
+  const fetchCiclosLectivos = async () => {
+    try {
+      const response = await fetch(
+        `${Environment.getEndPoint(Environment.endPoint.getAllCicloLectivo)}${params.id}`
+      );
+      const data = await response.json();
+      setCiclosLectivos(data);
+      const activeCiclo = data.find((ciclo: CicloLectivo) => ciclo.isActive);
+      if (activeCiclo) {
+        setSelectedCicloLectivo(activeCiclo.id.toString());
+      }
+    } catch (error) {
+      console.error("Error fetching ciclos lectivos:", error);
     }
-  }, [selectedCicloLectivo, fetchAsignaturasYNotas]);
+  };
 
   const calcularPromedioPorPeriodo = (notas: Nota[]) => {
     const evaluaciones = notas.filter((nota) => nota.tipoNota?.id === 1);
