@@ -78,6 +78,7 @@ const AddAlumnoCurso = ({ params }: { params: { id: string } }) => {
             fetchAlumnos();
             setModalMessage(data.msg);
             setShowModal(true);
+            setAlumnosAgregados([]);  // Limpiar la tabla de alumnos agregados
             setTimeout(() => {
                 setShowModal(false);
             }, 3000);
