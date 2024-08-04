@@ -19,8 +19,14 @@ export const router = {
     'CrearCicloLectivo': { label: 'Crear Ciclo Lectivo', href: '/newciclolectivo', dropdown: 'Ciclo Lectivo' },
     'ModificarPeriodos': { label: 'Modificar Periodos', href: '/modificarPeriodos', dropdown: 'Ciclo Lectivo' },
     // Asignaturas
-    'AddAsignaturaCurso': { label: 'Asociar Docentes y Materias a los Cursos', href: '/addAsignaturaCurso', dropdown: 'Asignaturas' },
-    'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso', dropdown: 'Asignaturas' },
+    'GestionAsignatura': { label: 'Gestionar Asignaturas', href: '/gestionAsignatura', dropdown: 'Asignaturas y Cursos' },
+    'GestionCurso': { label: 'Gestionar Cursos', href: '/gestionCurso', dropdown: 'Asignaturas y Cursos' },
+    'AddAsignaturaCurso': { label: 'Asociar Docentes y Materias a los Cursos', href: '/addAsignaturaCurso', dropdown: 'Asignaturas y Cursos' },
+    'consultaAsignaturaPorCurso': { label: 'Consultar Asignatura por curso', href: '/consultaAsignaturasCurso', dropdown: 'Asignaturas y Cursos' },
+
+
+
+
     // Calificaciones
     'AddNotaAlumno': { label: 'Calificar al alumno', href: '/addNota', dropdown: 'Calificaciones' },
     'mesasExtraordinarias': { label: 'Mesas Extraordinarias', href: '/mesasExtraordinarias', dropdown: 'Calificaciones' },
@@ -47,6 +53,8 @@ export const directorAutorizeRouter = [
     'MoverAlumnoPorcurso',
     'CrearCicloLectivo',
     'ModificarPeriodos',
+    'GestionAsignatura',
+    'GestionCurso',
     'AddAsignaturaCurso',
     'RegistrarUsuarios',
     'VistaUsuarios',
@@ -63,6 +71,8 @@ export const secretarioAutorizeRouter = [
     'AddAlumnoCurso',
     'MoverAlumnoPorcurso',
     'CrearCicloLectivo',
+    'GestionAsignatura',
+    'GestionCurso',
     'ModificarPeriodos',
     'AddAsignaturaCurso',
     'consultaAsignaturaPorCurso',
