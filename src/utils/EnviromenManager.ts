@@ -4,7 +4,7 @@ enum environment {
 }
 
 export class Environment {
-  private static environment: environment = environment.prov;
+  private static environment: environment = environment.dev;
 
   private static getEnvironment(env: environment): string {
     if (env == environment.prov) {

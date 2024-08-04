@@ -401,12 +401,12 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
                             <p>
                                 Fecha de ingreso:{' '}
                                 {new Date(
-                                    selectedEmpleado?.fecha_ingreso,
+                                    selectedEmpleado?.fechaIngreso,
                                 ).toLocaleDateString()}
                             </p>
                             <p>
                                 Fecha de egreso:{' '}
-                                {selectedEmpleado?.fecha_egreso
+                                {selectedEmpleado?.fechaEgreso
                                     ? new Date(
                                         selectedEmpleado?.fecha_egreso,
                                     ).toLocaleDateString()
@@ -424,12 +424,12 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
                             </p>
                             <p>Teléfono: {selectedEmpleado?.telefono}</p>
                             <p>Teléfono: {selectedEmpleado?.telefono ?? 'No disponible'}</p>
-                            <p>Provincia: {selectedEmpleado?.domocilioUsuario?.provincia ?? 'No disponible'}</p>
-                            <p>Domicilio: {selectedEmpleado?.domocilioUsuario?.domicilio ?? 'No disponible'}</p>
-                            <p>Localidad: {selectedEmpleado?.domocilioUsuario?.localidad ?? 'No disponible'}</p>
-                            <p>Barrio: {selectedEmpleado?.domocilioUsuario?.barrio ?? 'No disponible'}</p>
-                            <p>Calle: {selectedEmpleado?.domocilioUsuario?.calle ?? 'No disponible'}</p>
-                            <p>Número: {selectedEmpleado?.domocilioUsuario?.numero ?? 'No disponible'}</p>
+                            {/* <p>Provincia: {selectedEmpleado?.domicilioUsuario?.provincia ?? 'No disponible'}</p>
+                            <p>Domicilio: {selectedEmpleado?.domicilioUsuario?.domicilio ?? 'No disponible'}</p> */}
+                            <p>Localidad: {selectedEmpleado?.domicilioUsuario?.localidad ?? 'No disponible'}</p>
+                            <p>Barrio: {selectedEmpleado?.domicilioUsuario?.barrio ?? 'No disponible'}</p>
+                            <p>Calle: {selectedEmpleado?.domicilioUsuario?.calle ?? 'No disponible'}</p>
+                            <p>Número: {selectedEmpleado?.domicilioUsuario?.numero ?? 'No disponible'}</p>
                             <p>
                                 Estado:{' '}
                                 {selectedEmpleado?.is_active

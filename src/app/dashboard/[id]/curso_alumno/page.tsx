@@ -42,7 +42,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
             const data = await response.json();
             console.log("Data fetched:", data);
             if (Array.isArray(data)) {
-                setCursos(data.sort((a, b) => a.nombre.localeCompare(b.nombre)));
+                setCursos(data.sort((a, b) => a.id - b.id)); // Ordenar por id
             } else {
                 console.error("Error: Data received is not an array");
             }
@@ -63,7 +63,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
     };
 
     const handleEliminarAlumno = async (cursoId: number, alumnoId: any) => {
-        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAlumnoDeCurso)}`,{
+        const response = await fetch(`${Environment.getEndPoint(Environment.endPoint.deleteAlumnoDeCurso)}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -73,9 +73,14 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                 alumnoId,
                 cicloLectivoId: cicloLectivo.id,
             }),
-        })
+        });
         const data = await response.json();
-        console.log(data);
+        
+
+        if(data){
+            fetchCursosAndAlumnos();
+        }
+
         // Aquí puedes agregar la lógica para eliminar al alumno, como una llamada a la API
     };
 
@@ -147,8 +152,6 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         doc.save('cursos_alumnos.pdf');
     };
 
-
-
     const exportSimplePDF = () => {
         const doc = new jsPDF();
         const fecha = new Date().toLocaleDateString();
@@ -205,7 +208,6 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
         doc.save('cursos_alumnos_simple.pdf');
     };
 
-
     return (
         <Container>
             <h1>Visualizar Cursos y Alumnos</h1>
@@ -222,11 +224,9 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                     <Button variant="primary" onClick={exportPDF} style={{ margin: '10px' }}>
                         Generar planilla de asistencias PDF
                     </Button>
-                 
                     <Button variant="info" onClick={exportSimplePDF} style={{ margin: '10px' }}>
                         Lista de alumnos PDF
                     </Button>
-           
                     <Table striped bordered hover>
                         <thead>
                             <tr>
@@ -236,7 +236,7 @@ const CursosAlumnos = ({ params }: { params: { id: string } }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {cursos.map((curso, index) => (
+                            {cursos.sort((a, b) => a.id - b.id).map((curso, index) => ( // Ordenar por id
                                 <tr key={index}>
                                     <td>{curso.nombre}</td>
                                     <td>
