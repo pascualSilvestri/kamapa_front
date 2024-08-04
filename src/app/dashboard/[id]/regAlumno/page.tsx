@@ -207,13 +207,12 @@ const RegAlumno = () => {
         const validEmail = regexValidations.email.test(email);
         const validLegajo = regexValidations.legajo.test(legajo);
         const validCalle = regexValidations.calle.test(calle);
-        // const validNumero = regexValidations.numero.test(numero);
         const validBarrio = regexValidations.barrio.test(barrio);
         const validLocalidad = regexValidations.localidad.test(localidad);
-        const validRoles = roles.Alumno?.checked;
         const validTutor = regexValidations.tutor.test(tutor);
+        const validRoles = roles.Alumno?.checked;
 
-        if (
+        setFormValid(
             validNombre &&
             validApellido &&
             validDni &&
@@ -222,46 +221,18 @@ const RegAlumno = () => {
             validEmail &&
             validLegajo &&
             validCalle &&
-            // validNumero &&
             validTutor &&
             validBarrio &&
             validLocalidad &&
             provinciaSeleccionada &&
             validRoles
-        ) {
-            setFormValid(true);
-        } else {
-            setFormValid(false);
-        }
+        );
     }, [
-        nombre,
-        apellido,
-        dni,
-        cuil,
-        telefono,
-        tutor,
-        email,
-        legajo,
-        calle,
-        numero,
-        barrio,
-        localidad,
-        provinciaSeleccionada,
-        roles,
-        regexValidations.nombre,
-        regexValidations.apellido,
-        regexValidations.dni,
-        regexValidations.cuil,
-        regexValidations.telefono,
-        regexValidations.email,
-        regexValidations.legajo,
-        regexValidations.calle,
-        regexValidations.tutor,
-        // regexValidations.numero,
-        regexValidations.barrio,
-        regexValidations.localidad,
-        roles.Alumno?.checked,
+        nombre, apellido, dni, cuil, telefono, tutor, email,
+        legajo, calle, numero, barrio, localidad, provinciaSeleccionada,
+        roles
     ]);
+
 
     const limpiarCampos = () => {
         setNombre('');
