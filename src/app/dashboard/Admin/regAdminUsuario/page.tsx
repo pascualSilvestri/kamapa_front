@@ -114,7 +114,7 @@ const RegAdminUsuario = () => {
                     update_for: session.user.nombre + ' ' + session.user.apellido, // Puedes ajustar esto según tus necesidades
                     password: dni, // Puedes ajustar esto según tus necesidades
                     institucionId: parseInt(institucionSeleccionada), // Cambiado para usar el id de la institución seleccionada
-                    generoId: parseInt(genero), // Añadido para enviar el género
+                    generoId: genero, // Añadido para enviar el género
                 },
                 rols: selectedRoleIds,
                 domicilio: {
