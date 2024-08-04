@@ -8,7 +8,6 @@ import { useCicloLectivo } from "context/CicloLectivoContext";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { Environment } from "utils/EnviromenManager";
-import CursosAlumnos from "app/dashboard/[id]/curso_alumno/page";
 
 interface PDFContentProps {
   user: any;
@@ -22,16 +21,13 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [periodos, setPeriodos] = useState<Periodo[]>([]);
   const [ciclosLectivos, setCiclosLectivos] = useState<CicloLectivo[]>([]);
-  const [user, setUser] = useState<User[]>([]);
-  const [curso, serCurso] = useState<Curso[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const [institucionSelected] = useInstitucionSelectedContext();
   const [cicloLectivo, setCicloLectivo] = useCicloLectivo();
   const [selectedCicloLectivo, setSelectedCicloLectivo] = useState<string>(
     cicloLectivo ? cicloLectivo.id.toString() : ""
   );
   const pdfRef = useRef<HTMLDivElement>(null);
-
-  console.log(user);
 
   useEffect(() => {
     fethdata();
@@ -315,6 +311,8 @@ const Due = ({ params }: { params: { id: string, userId: string } }) => {
       </div>
     )
   );
+
+  PDFContent.displayName = "PDFContent";
 
   const handleDownloadPDF = async () => {
     if (pdfRef.current) {
