@@ -168,6 +168,7 @@ export interface UserFormData {
         generoId?: string;
         tutor?:any;
     };
+    generoId?: any,
     rols: any[];
     domicilio: {
         calle: string;

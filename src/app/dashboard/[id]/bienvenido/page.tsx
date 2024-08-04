@@ -36,7 +36,7 @@ function PageBienvenido({ params }: { params: { id: string } }) {
         if (rol.some(rol => rol.name == 'Director')) {
           router.push(`/dashboard/${params.id}/newciclolectivo`);
         } else {
-          router.push(`/dashboard/${params.id}/panel`);
+          router.push(`/dashboard/${params.id}/bienvenido`);
         }
         return;
       }
