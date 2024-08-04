@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Asignatura, Curso } from 'model/types';
 import React, { useEffect, useState } from 'react';
@@ -64,7 +64,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
 
             await res.json();
             fetchAsignaturas();
-            setSuccessMessage(`La asignatura "${nombre}" se creó con éxito.`);
+            setSuccessMessage(`La asignatura &quot;${nombre}&quot; se creó con éxito.`);
             setShowSuccessAlert(true);
         } catch (error) {
             console.error('Error creating asignatura:', error);
@@ -130,7 +130,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
             fetchAsignaturas();
             setShowFinalDeleteConfirm(false);
             setShowDeleteConfirm(false);
-            setSuccessMessage(`La asignatura "${asignaturaToDelete.nombre}" se eliminó con éxito.`);
+            setSuccessMessage(`La asignatura &quot;${asignaturaToDelete.nombre}&quot; se eliminó con éxito.`);
             setShowSuccessAlert(true);
             setAsignaturaToDelete(null);
         } catch (error) {
@@ -276,7 +276,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                 </Modal.Header>
                 <Modal.Body>
                     {asignaturaToDelete && (
-                        <p>¿Estás seguro de que deseas eliminar la asignatura "{asignaturaToDelete.nombre}"?</p>
+                        <p>¿Estás seguro de que deseas eliminar la asignatura &quot;{asignaturaToDelete.nombre}&quot;?</p>
                     )}
                 </Modal.Body>
                 <Modal.Footer>
@@ -301,7 +301,7 @@ const GestionAsignaturas = ({ params }: { params: { id: string } }) => {
                 </Modal.Header>
                 <Modal.Body>
                     {asignaturaToDelete && (
-                        <p>Vas a eliminar la asignatura "{asignaturaToDelete.nombre}". ¿Estás seguro? No habrá vuelta atrás.</p>
+                        <p>Vas a eliminar la asignatura &quot;{asignaturaToDelete.nombre}&quot;. ¿Estás seguro? No habrá vuelta atrás.</p>
                     )}
                 </Modal.Body>
                 <Modal.Footer>

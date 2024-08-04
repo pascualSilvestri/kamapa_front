@@ -41,6 +41,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         telefono: '',
         Roles: [],
         Instituciones: []
+        
     });
 
     const [institucionSelected, setInstitucionSelected] = useState<Institucion>({
