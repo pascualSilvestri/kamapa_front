@@ -1,12 +1,13 @@
 'use client';
 import { useEffect, useState, useRef } from "react";
-import { Container, Row, Col, Form, Button, Table } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Table, InputGroup } from "react-bootstrap";
 import { Curso, User, Nota, Periodo } from "model/types"; // Asegúrate de que 'User', 'Curso' y 'Nota' estén definidos en 'model/types'
 import { Environment } from "utils/EnviromenManager";
 import { useUserContext, useInstitucionSelectedContext } from "context/userContext";
 import { useCicloLectivo } from "context/CicloLectivoContext";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { BsChevronDown } from "react-icons/bs";
 
 
 const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
@@ -302,56 +303,72 @@ const AddNotasAlumno = ({ params }: { params: { id: string } }) => {
             <Col md={6}>
               <Form.Group>
                 <Form.Label>Curso</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={cursoSeleccionado}
-                  onChange={(e) => {
-                    setCursoSeleccionado(e.target.value);
-                    fetchAsignaturas(e.target.value);
-                  }}
-                >
-                  <option value="">Seleccionar curso</option>
-                  {cursos.map((curso) => (
-                    <option key={curso.id} value={curso.id}>
-                      {curso.nombre}
-                    </option>
-                  ))}
-                </Form.Control>
+                <InputGroup>
+                  <Form.Control
+                    as="select"
+                    value={cursoSeleccionado}
+                    onChange={(e) => {
+                      setCursoSeleccionado(e.target.value);
+                      fetchAsignaturas(e.target.value);
+                    }}
+                  >
+                    <option value="">Seleccionar curso</option>
+                    {cursos.map((curso) => (
+                      <option key={curso.id} value={curso.id}>
+                        {curso.nombre}
+                      </option>
+                    ))}
+
+                  </Form.Control>
+                  <InputGroup.Text>
+                    <BsChevronDown />
+                  </InputGroup.Text>
+                </InputGroup>
               </Form.Group>
             </Col>
             <Col md={6}>
               <Form.Group>
                 <Form.Label>Asignatura</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={asignatura}
-                  onChange={(e) => setAsignatura(e.target.value)}
-                  disabled={!cursoSeleccionado}
-                >
-                  <option value="">Seleccionar asignatura</option>
-                  {asignaturas.map((asignatura) => (
-                    <option key={asignatura.id} value={asignatura.id}>
-                      {asignatura.nombre}
-                    </option>
-                  ))}
-                </Form.Control>
+                <InputGroup>
+                  <Form.Control
+                    as="select"
+                    value={asignatura}
+                    onChange={(e) => setAsignatura(e.target.value)}
+                    disabled={!cursoSeleccionado}
+                  >
+                    <option value="">Seleccionar asignatura</option>
+                    {asignaturas.map((asignatura) => (
+                      <option key={asignatura.id} value={asignatura.id}>
+                        {asignatura.nombre}
+                      </option>
+                    ))}
+                  </Form.Control>
+                  <InputGroup.Text>
+                    <BsChevronDown />
+                  </InputGroup.Text>
+                </InputGroup>
               </Form.Group>
             </Col>
             <Col md={6}>
               <Form.Group>
                 <Form.Label>Periodo Lectivo</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={periodo}
-                  onChange={(e) => setPeriodo(e.target.value)}
-                >
-                  <option value="">Seleccionar periodo</option>
-                  {periodos.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.nombre}
-                    </option>
-                  ))}
-                </Form.Control>
+                <InputGroup>
+                  <Form.Control
+                    as="select"
+                    value={periodo}
+                    onChange={(e) => setPeriodo(e.target.value)}
+                  >
+                    <option value="">Seleccionar periodo</option>
+                    {periodos.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.nombre}
+                      </option>
+                    ))}
+                  </Form.Control>
+                  <InputGroup.Text>
+                    <BsChevronDown />
+                  </InputGroup.Text>
+                </InputGroup>
               </Form.Group>
             </Col>
           </Row>

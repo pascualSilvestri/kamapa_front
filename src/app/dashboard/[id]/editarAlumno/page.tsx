@@ -33,6 +33,7 @@ interface Alumno {
     dni: string;
     cuil: string;
     fechaNacimiento: string;
+    tutor: string;
     telefono: string;
     email: string;
     generoId: number;
@@ -78,6 +79,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }: { params:
         dni: "",
         cuil: "",
         fechaNacimiento: "",
+        tutor: "",
         telefono: "",
         email: "",
         generoId: "",
@@ -187,7 +189,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }: { params:
             }
 
             const data = await response.json();
-            console.log(data);
+            console.log(data.alumnos);
             setAlumnos(data.alumnos);
         } catch (error) {
             console.error("Error al obtener empleados:", error);
@@ -270,6 +272,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }: { params:
             dni: alumno.dni,
             cuil: alumno.cuil,
             fechaNacimiento: alumno.fechaNacimiento,
+            tutor: alumno.tutor,
             telefono: alumno.telefono,
             email: alumno.email,
             generoId: alumno.genero.id.toString(),
@@ -306,6 +309,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }: { params:
                         dni: editedAlumno.dni,
                         cuil: editedAlumno.cuil,
                         fechaNacimiento: editedAlumno.fechaNacimiento,
+                        tutor: editedAlumno.tutor,
                         telefono: editedAlumno.telefono,
                         email: editedAlumno.email,
                         generoId: parseInt(genero),
@@ -327,7 +331,7 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }: { params:
                 console.log(data);
                 throw new Error(JSON.stringify(data));
             }
-            
+
             fetchData();
             // const updatedResponse = await fetch(
             //     `${Environment.getEndPoint(Environment.endPoint.getUsuariosAllByIntitucion)}${params.id}`,
@@ -508,8 +512,12 @@ const EditarAlumnoPage: React.FC<EditarAlumnoPageProps> = ({ params }: { params:
                                 <strong>Fecha de nacimiento:</strong>{" "}
                                 {new Date(selectedAlumno.fechaNacimiento).toLocaleDateString()}
                             </p>
+                            {/* <p>
+                                <strong>Responsable del Alumno:</strong>{" "}
+                                {selectedAlumno.tutor || "No disponible"}
+                            </p> */}
                             <p>
-                                <strong>Teléfono:</strong>{" "}
+                                <strong>Teléfono del Tutor Responsable:</strong>{" "}
                                 {selectedAlumno.telefono || "No disponible"}
                             </p>
                             <p>

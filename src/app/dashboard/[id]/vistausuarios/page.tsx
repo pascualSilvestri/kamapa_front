@@ -113,6 +113,7 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
                 const data = await response.json();
                 console.log(data);
                 setRoles(data);
+                console.log(data)
             } catch (error) {
                 console.error('Error al obtener empleados:', error.message);
             }
@@ -616,13 +617,45 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
 
                 <Modal.Footer>
                     <Button
-                        variant='secondary'
+                        variant='flat'
+                        style={{
+                            backgroundColor: 'gray',
+                            color: 'white',
+                            padding: '0.4rem 1rem',
+                            fontSize: '1rem',
+                            marginBottom: '1rem',
+                            transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.color = 'black';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'gray';
+                            e.currentTarget.style.color = 'white';
+                        }}
                         onClick={() => setShowEditModal(false)}>
                         Cancelar
                     </Button>
 
                     <Button
-                        variant='purple'
+                        variant='flat'
+                        style={{
+                            backgroundColor: 'purple',
+                            color: 'white',
+                            padding: '0.4rem 1rem',
+                            fontSize: '1rem',
+                            marginBottom: '1rem',
+                            transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.color = 'black';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'purple';
+                            e.currentTarget.style.color = 'white';
+                        }}
                         onClick={handleSave}>
                         Guardar
                     </Button>
@@ -642,13 +675,45 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
 
                 <Modal.Footer>
                     <Button
-                        variant='secondary'
+                        variant='flat'
+                        style={{
+                            backgroundColor: 'gray',
+                            color: 'white',
+                            padding: '0.4rem 1rem',
+                            fontSize: '1rem',
+                            marginBottom: '1rem',
+                            transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.color = 'black';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'gray';
+                            e.currentTarget.style.color = 'white';
+                        }}
                         onClick={() => setShowSaveConfirmModal(false)}>
                         Cancelar
                     </Button>
 
                     <Button
-                        variant='purple'
+                        variant='flat'
+                        style={{
+                            backgroundColor: 'purple',
+                            color: 'white',
+                            padding: '0.4rem 1rem',
+                            fontSize: '1rem',
+                            marginBottom: '1rem',
+                            transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.color = 'black';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'purple';
+                            e.currentTarget.style.color = 'white';
+                        }}
                         onClick={handleConfirmSave}>
                         Confirmar
                     </Button>
@@ -668,13 +733,45 @@ const VistaEmpleadosPage = ({ params }: { params: { id: string } }) => {
 
                 <Modal.Footer>
                     <Button
-                        variant='secondary'
+                        variant='flat'
+                        style={{
+                            backgroundColor: 'black',
+                            color: 'white',
+                            padding: '0.4rem 1rem',
+                            fontSize: '1rem',
+                            marginBottom: '1rem',
+                            transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.color = 'black';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'black';
+                            e.currentTarget.style.color = 'white';
+                        }}
                         onClick={() => setShowConfirmModal(false)}>
                         No
                     </Button>
 
                     <Button
-                        variant='danger'
+                        variant='flat'
+                        style={{
+                            backgroundColor: 'red',
+                            color: 'white',
+                            padding: '0.4rem 1rem',
+                            fontSize: '1rem',
+                            marginBottom: '1rem',
+                            transition: 'all 0.3s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.color = 'black';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'red';
+                            e.currentTarget.style.color = 'white';
+                        }}
                         onClick={handleConfirmDelete}>
                         Sí, eliminar
                     </Button>
