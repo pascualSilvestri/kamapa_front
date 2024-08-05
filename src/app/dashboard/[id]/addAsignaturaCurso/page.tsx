@@ -336,12 +336,47 @@ const AddAsignaturaCurso = ({ params }) => {
                                 </tbody>
                             </Table>
                             <Pagination>
-                                {Array.from({ length: totalPages }, (_, i) => (
-                                    <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
-                                        {i + 1}
+                                {/* Botón para ir a la primera página */}
+                                <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
+
+                                {/* Botón para ir a la página anterior */}
+                                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+
+                                {/* Páginas intermedias */}
+                                {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
+                                    const page = currentPage <= 3 ? i + 1 : currentPage - 2 + i;
+                                    return (
+                                        <Pagination.Item
+                                            key={page}
+                                            active={page === currentPage}
+                                            onClick={() => handlePageChange(page)}
+                                        >
+                                            {page}
+                                        </Pagination.Item>
+                                    );
+                                })}
+
+                                {/* Indicador de más páginas (si hay más de 5) */}
+                                {totalPages > 5 && currentPage < totalPages - 2 && (
+                                    <Pagination.Ellipsis disabled />
+                                )}
+
+                                {/* Última página */}
+                                {totalPages > 5 && currentPage < totalPages - 2 && (
+                                    <Pagination.Item
+                                        onClick={() => handlePageChange(totalPages)}
+                                    >
+                                        {totalPages}
                                     </Pagination.Item>
-                                ))}
+                                )}
+
+                                {/* Botón para ir a la página siguiente */}
+                                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+
+                                {/* Botón para ir a la última página */}
+                                <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
                             </Pagination>
+
                         </Col>
                     </Row>
                 </Col>
@@ -357,22 +392,21 @@ const AddAsignaturaCurso = ({ params }) => {
                         </thead>
                         <tbody>
                             {cursosTransformados.map((c) => (
-                                <tr key={c.id}>
-                                    <td>{c.nombre}</td>
-                                    <td>{c.asignaturas.map(a => (
-                                        <li key={a.id}>
-                                            {a.nombre}
-                                        </li>
-                                    ))}</td>
-                                    <td>{c.asignaturas.map(a => (
-                                        <li key={a.id}>
-                                            {a.usuarioAsignatura ? `${a.usuarioAsignatura[0].nombre} ${a.usuarioAsignatura[0].apellido}` : 'No asignado'}
-                                        </li>
-                                    ))}</td>
-                                </tr>
+                                c.asignaturas.map((a, index) => (
+                                    <tr key={`${c.id}-${a.id}`} style={{ backgroundColor: index % 2 === 0 ? '#f2f2f2' : '#ffffff' }}>
+                                        {index === 0 && (
+                                            <td rowSpan={c.asignaturas.length} style={{ verticalAlign: 'middle', fontWeight: 'bold' }}>
+                                                {c.nombre}
+                                            </td>
+                                        )}
+                                        <td>{a.nombre}</td>
+                                        <td>{a.usuarioAsignatura ? `${a.usuarioAsignatura[0].nombre} ${a.usuarioAsignatura[0].apellido}` : 'No asignado'}</td>
+                                    </tr>
+                                ))
                             ))}
                         </tbody>
                     </Table>
+
                 </Col>
             </Row>
         </Container>
