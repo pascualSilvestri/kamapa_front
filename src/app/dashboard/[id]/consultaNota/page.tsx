@@ -135,32 +135,66 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
     };
 
     const exportToPDF = async () => {
-        const input = pdfRef.current;
-        if (!input) return;
+        const pdf = new jsPDF('portrait', 'mm', 'a4');
+        const margin = 10;
+        const pageWidth = pdf.internal.pageSize.getWidth() - 2 * margin;
+        const pageHeight = pdf.internal.pageSize.getHeight() - 2 * margin;
 
-        const canvas = await html2canvas(input, {
-            scale: 2,
-            useCORS: true,
+        const columnWidths = [pageWidth * 0.7, pageWidth * 0.3]; // Proporciones para las columnas
+        const rowHeight = 10;
+
+        let yPosition = margin;
+
+        // Definir un tamaño de fuente para el contenido
+        const fontSize = 10;
+        pdf.setFontSize(fontSize);
+
+        // Título del PDF
+        pdf.setFont('Helvetica', 'bold');
+        pdf.text('Analítico Provisorio', pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 10;
+
+        // Cabecera de la tabla
+        pdf.setFontSize(12);
+        pdf.setFont('Helvetica', 'bold');
+        pdf.text('Nombre de la Asignatura', margin, yPosition);
+        pdf.text('Calificación Final', margin + columnWidths[0], yPosition);
+        yPosition += rowHeight;
+
+        pdf.setFontSize(10);
+        pdf.setFont('Helvetica', 'normal');
+
+        asignaturas.forEach((asignatura) => {
+            const reDiciembre = getNotaExtraordinaria(asignatura.notasExtraordinarias, 3); // Nota reDiciembre
+            const reFebrero = getNotaExtraordinaria(asignatura.notasExtraordinarias, 4); // Nota reFebrero
+            const calificacionFinal = calcularCalificacionFinal(asignatura.notasPorPeriodo, reDiciembre, reFebrero) || '--';
+
+            // Verificar si el contenido excede la página y agregar una nueva si es necesario
+            if (yPosition + rowHeight > pageHeight) {
+                pdf.addPage();
+                yPosition = margin;
+            }
+
+            // Escribir nombre de la asignatura y calificación final en la tabla
+            pdf.text(asignatura.nombre, margin, yPosition);
+            pdf.text(calificacionFinal, margin + columnWidths[0], yPosition);
+            yPosition += rowHeight;
         });
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF();
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save("Notas.pdf");
+
+        pdf.save('Analitico-Provisorio.pdf');
     };
 
+
+
     return (
-        <Container>
-            <Row>
+        <Container fluid>
+            <Row className="mb-4">
                 <Col>
-                    <h1>Consulta de Notas</h1>
-                    {/* aquí se puede poner el nombre de curso y división a la que pertenecen estas notas */}
+                    <h1 className="text-center">Consulta de Notas</h1>
                 </Col>
             </Row>
-            <Row>
-                <Col md={6}>
+            <Row className="mb-4">
+                <Col xs={12} md={6}>
                     <Form.Group controlId="selectCicloLectivo">
                         <Form.Label>Seleccionar Ciclo Lectivo</Form.Label>
                         <Form.Control
@@ -183,39 +217,36 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                 </Col>
             </Row>
             <div ref={pdfRef}>
-                <Row>
+                <Row className="mb-4">
                     <Col>
-                        <h2>Asignaturas y Notas</h2>
-                        <div style={{ overflowX: 'auto' }}>
+                        <h2 className="text-center">Asignaturas y Notas</h2>
+                        <div className="table-responsive">
                             <Table responsive striped bordered hover>
                                 <thead>
                                     <tr>
-                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Asignatura</th>
+                                        <th className="bg-purple text-black">Asignatura</th>
                                         {periodos.map(periodo => (
-                                            <th style={{ backgroundColor: 'purple', color: 'white' }} colSpan={7} key={periodo.id}>
+                                            <th className="bg-purple text-black" colSpan={7} key={periodo.id}>
                                                 {periodo.nombre}
                                             </th>
                                         ))}
-                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Promedio General</th>
-                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Periodo de Evaluaci&oacute;n de Diciembre</th>
-                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Evaluaci&oacute;n Ante Comisi&oacute;n de Febrero</th>
-                                        <th style={{ backgroundColor: 'purple', color: 'white' }}>Calificaci&oacute;n Final</th>
+                                        <th className="bg-purple text-black">Promedio General</th>
+                                        <th className="bg-purple text-black">Periodo de Evaluación de Diciembre</th>
+                                        <th className="bg-purple text-black">Evaluación Ante Comisión de Febrero</th>
+                                        <th className="bg-purple text-black">Calificación Final</th>
                                     </tr>
                                     <tr>
                                         <th></th>
                                         {periodos.flatMap(periodo => [
-                                            <th style={{ backgroundColor: 'purple', color: 'white' }} key={`${periodo.id}-N1`}>N1</th>,
-                                            <th style={{ backgroundColor: 'purple', color: 'white' }} key={`${periodo.id}-N2`}>N2</th>,
-                                            <th style={{ backgroundColor: 'purple', color: 'white' }} key={`${periodo.id}-N3`}>N3</th>,
-                                            <th style={{ backgroundColor: 'purple', color: 'white' }} key={`${periodo.id}-N4`}>N4</th>,
-                                            <th style={{ backgroundColor: 'purple', color: 'white' }} key={`${periodo.id}-N5`}>N5</th>,
-                                            <th style={{ backgroundColor: 'red', color: 'white' }} key={`${periodo.id}-Coloquio`}>Coloquio</th>,
-                                            <th style={{ backgroundColor: 'lightgreen' }} key={`${periodo.id}-Promedio`}>Promedio</th>
+                                            <th className="bg-purple text-black" key={`${periodo.id}-N1`}>N1</th>,
+                                            <th className="bg-purple text-black" key={`${periodo.id}-N2`}>N2</th>,
+                                            <th className="bg-purple text-black" key={`${periodo.id}-N3`}>N3</th>,
+                                            <th className="bg-purple text-black" key={`${periodo.id}-N4`}>N4</th>,
+                                            <th className="bg-purple text-black" key={`${periodo.id}-N5`}>N5</th>,
+                                            <th className="bg-red text-black" key={`${periodo.id}-Coloquio`}>Coloquio</th>,
+                                            <th className="bg-lightgreen" key={`${periodo.id}-Promedio`}>Promedio</th>
                                         ])}
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -238,15 +269,15 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                                                             {new Array(5 - notas.filter(nota => nota.tipoNota?.id === 1).length).fill(null).map((_, idx) => (
                                                                 <td key={`${asignatura.id}-${periodo.id}-empty-${idx}`}>-</td>
                                                             ))}
-                                                            <td key={`${asignatura.id}-${periodo.id}-Coloquio`} style={{ backgroundColor: 'red', color: 'white' }}>{coloquioNota ? coloquioNota.nota : '-'}</td>
-                                                            <td key={`${asignatura.id}-${periodo.id}-Promedio`} style={{ backgroundColor: 'lightgreen' }}>{promedio}</td>
+                                                            <td key={`${asignatura.id}-${periodo.id}-Coloquio`} className="bg-red text-black">{coloquioNota ? coloquioNota.nota : '-'}</td>
+                                                            <td key={`${asignatura.id}-${periodo.id}-Promedio`} className="bg-lightgreen">{promedio}</td>
                                                         </>
                                                     );
                                                 })}
-                                                <td style={{ backgroundColor: 'purple', color: 'white' }}>{calcularPromedioGeneral(asignatura.notasPorPeriodo)}</td>
+                                                <td className="bg-purple text-black">{calcularPromedioGeneral(asignatura.notasPorPeriodo)}</td>
                                                 <td>{reDiciembre !== null ? reDiciembre.toFixed(2) : ''}</td>
                                                 <td>{reFebrero !== null ? reFebrero.toFixed(2) : ''}</td>
-                                                <td style={{ backgroundColor: 'purple', color: 'white' }}>{calificacionFinal}</td>
+                                                <td className="bg-purple text-black">{calificacionFinal}</td>
                                             </tr>
                                         );
                                     })}
@@ -255,16 +286,16 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                         </div>
                     </Col>
                 </Row>
-                <Row>
+                <Row className="mb-4">
                     <Col>
-                        <h2>Asignaturas a Recuperar en Diciembre</h2>
-                        <div style={{ overflowX: 'auto' }}>
+                        <h2 className="text-center">Asignaturas a Recuperar en Diciembre</h2>
+                        <div className="table-responsive">
                             <Table responsive striped bordered hover>
                                 <thead>
                                     <tr>
                                         <th>Asignatura</th>
                                         <th>Promedio General</th>
-                                        <th style={{ backgroundColor: 'purple', color: 'white', textAlign: 'center' }}>Nota Final</th>
+                                        <th className="text-black text-center">Nota Final</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -276,7 +307,7 @@ const ConsultaNota = ({ params }: { params: { id: string } }) => {
                                         <tr key={asignatura.id}>
                                             <td>{asignatura.nombre}</td>
                                             <td>{calcularPromedioGeneral(asignatura.notasPorPeriodo)}</td>
-                                            <td style={{ backgroundColor: 'purple', color: 'white', textAlign: 'center' }}>
+                                            <td className="bg-purple text-black text-center">
                                                 {asignatura.notasPorPeriodo[periodos[0].id]?.[0]?.nota || '-'}
                                             </td>
                                         </tr>
@@ -302,7 +333,7 @@ interface StyledButtonProps extends ButtonProps {
     variant: 'purple';
 }
 
-const StyledButton = styled(Button)<StyledButtonProps>`
+const StyledButton = styled(Button) <StyledButtonProps>`
     background-color: purple;
     border-color: purple;
     color: white;
